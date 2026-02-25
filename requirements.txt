@@ -1,0 +1,29 @@
+# Core dependencies
+onnxruntime>=1.16.0
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Logging and utilities
+loguru>=0.7.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+tenacity>=8.2.0
+
+# Optional AI provider support (installed via extras_require)
+# openai>=1.0.0
+# anthropic>=0.8.0  
+# google-generativeai>=0.3.0
+
+# Performance and caching
+diskcache>=5.6.0
+asyncio-throttle>=1.0.2
+
+# Development dependencies (install with pip install -e ".[dev]")
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
+# pytest-cov>=4.0.0
+# black>=23.0.0
+# isort>=5.12.0
+# flake8>=6.0.0
+# mypy>=1.0.0
+# pre-commit>=3.0.0
