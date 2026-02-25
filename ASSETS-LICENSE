@@ -1,0 +1,66 @@
+ETHICORE ENGINE™ GUARDIAN SDK — PROPRIETARY ASSET LICENSE
+Copyright (c) 2026 Oracles Technologies LLC. All Rights Reserved.
+
+The following files (the "Licensed Assets") are proprietary to Oracles
+Technologies LLC and are NOT covered by the MIT license that governs the
+Guardian SDK framework code:
+
+  ethicore_guardian/data/threat_patterns_licensed.py
+  ethicore_guardian/data/threat_embeddings.json
+  ethicore_guardian/models/minilm-l6-v2.onnx
+  ethicore_guardian/models/minilm-l6-v2.onnx.data
+  ethicore_guardian/models/guardian-model.onnx
+  ethicore_guardian/models/model_signatures.json
+
+GRANT OF LICENSE
+================
+Subject to the terms of this license and payment of the applicable
+subscription fee, Oracles Technologies LLC grants you a limited, non-exclusive,
+non-transferable, revocable license to:
+
+  1. Install and use the Licensed Assets on systems you own or control, solely
+     in conjunction with the Guardian SDK framework.
+  2. Make a reasonable number of backup copies for disaster-recovery purposes.
+
+RESTRICTIONS
+============
+You may NOT:
+
+  a. Redistribute, sublicense, sell, rent, lease, or otherwise transfer the
+     Licensed Assets to any third party.
+  b. Reverse-engineer, decompile, disassemble, or attempt to derive the source
+     or structure of any Licensed Asset, including neural network weights.
+  c. Remove, alter, or obscure any copyright notice, trademark, or proprietary
+     legend contained in the Licensed Assets.
+  d. Use the Licensed Assets in any product or service that competes with
+     Ethicore Engine™ Guardian SDK or any other product of Oracles
+     Technologies LLC.
+  e. Make the Licensed Assets publicly accessible (e.g., by committing them
+     to a public repository, hosting them on a public URL, or including them
+     in an open-source distribution).
+
+TERMINATION
+===========
+This license terminates automatically if you breach any of its terms.  Upon
+termination you must immediately delete all copies of the Licensed Assets in
+your possession or control.
+
+DISCLAIMER OF WARRANTIES
+=========================
+THE LICENSED ASSETS ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+ORACLES TECHNOLOGIES LLC DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+LIMITATION OF LIABILITY
+=======================
+IN NO EVENT SHALL ORACLES TECHNOLOGIES LLC BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+CONTACT
+=======
+For licensing inquiries, enterprise agreements, or support:
+
+  Web:   https://oraclestechnologies.com/guardian
+  Email: support@oraclestechnologies.com
