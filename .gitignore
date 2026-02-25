@@ -1,0 +1,110 @@
+# =============================================================================
+# Ethicore Engine™ - Guardian SDK — .gitignore
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# PAID LICENSED ASSETS — NEVER PUBLISH
+# These files are distributed separately in the paid asset bundle.
+# Committing them would violate the ASSETS-LICENSE and expose proprietary IP.
+# ---------------------------------------------------------------------------
+
+# Local dev directory (outside package tree so assets never appear in the wheel)
+licensed/
+
+# Paid asset bundle — distribute privately, never commit
+ethicore-guardian-assets-pro.zip
+
+# Legacy paths (kept as guards in case of accidental copy-back)
+ethicore_guardian/data/threat_patterns_licensed.py
+ethicore_guardian/data/threat_embeddings.json
+ethicore_guardian/models/*.onnx
+ethicore_guardian/models/*.onnx.data
+ethicore_guardian/models/model_signatures.json
+
+# ---------------------------------------------------------------------------
+# PRIVATE KEY GENERATION SCRIPT — NEVER PUBLISH
+# Contains the unmasked HMAC secret used to sign license keys.
+# ---------------------------------------------------------------------------
+scripts/_keygen.py
+
+# ---------------------------------------------------------------------------
+# Python build artifacts
+# ---------------------------------------------------------------------------
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+
+# ---------------------------------------------------------------------------
+# Root-level artifact directories (pre-existing or build leftovers)
+# These are NOT part of the publishable SDK; use /prefix to anchor to root.
+# ---------------------------------------------------------------------------
+/data/
+/models/
+/learning/
+/ethicore_engine_guardian-*/
+
+# ---------------------------------------------------------------------------
+# Virtual environments
+# ---------------------------------------------------------------------------
+Python_env/
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Environment / secrets
+# ---------------------------------------------------------------------------
+.env
+.env.*
+*.secret
+secrets.*
+
+# ---------------------------------------------------------------------------
+# Python cache
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# ---------------------------------------------------------------------------
+# Testing / coverage
+# ---------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# ---------------------------------------------------------------------------
+# Type checking / linting
+# ---------------------------------------------------------------------------
+.mypy_cache/
+.ruff_cache/
+
+# ---------------------------------------------------------------------------
+# IDE / editor
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------------------
+# Jupyter
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# ---------------------------------------------------------------------------
+# Logs
+# ---------------------------------------------------------------------------
+*.log
+logs/
