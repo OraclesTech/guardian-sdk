@@ -1,6 +1,8 @@
 # Ethicore Engine™ — Guardian SDK
 
-**The only production-grade, offline-capable LLM threat detection SDK built on the conviction that every human interacting with your AI application deserves protection — not as a feature, but as a foundation.**
+**Production-grade, real-time threat detection for Python LLM applications.
+Detect and block prompt injection, jailbreaks, and adversarial manipulation
+before they reach your model.**
 
 [![PyPI version](https://badge.fury.io/py/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
@@ -9,16 +11,17 @@
 
 ---
 
-Every Python developer building an LLM-powered application knows they haven't fully solved
-prompt injection. Most have decided to ship anyway and hope they're not the cautionary tale
-that ends up on Hacker News.
+LLM applications are a new attack surface — and most are deployed without a real
+defense layer. Prompt injection can subvert your system prompt, jailbreaks can
+bypass your safety controls, and role hijacking can turn your AI into a vector
+for extracting data or manipulating behavior. These are not theoretical. They
+happen in production, silently, against deployed systems that have no layer
+watching for them.
 
-Guardian SDK is how you stop hoping and start knowing.
-
-A four-layer analysis pipeline — pattern matching, ONNX semantic embeddings, behavioral
-heuristics, and gradient-boosted ML inference — runs entirely inside your infrastructure.
-No data leaves your stack for detection. The community edition is free, pip-installable,
-and starts protecting your users in four lines of code.
+Guardian SDK is that layer. It sits between your application and the model,
+classifying every input in real-time and blocking threats before they reach
+model context. It runs entirely inside your infrastructure — no data leaves
+your stack for detection — and it ships as a single pip install.
 
 ---
 
@@ -57,13 +60,14 @@ async def main():
 asyncio.run(main())
 ```
 
-That attack fails. Your users are protected. Four lines.
+That attack is stopped before your model ever sees it. Four lines.
 
 ---
 
 ## How It Works
 
-Guardian uses a four-layer pipeline. Each layer catches what the previous one misses:
+Guardian runs a four-layer pipeline on every input. Each layer catches what the
+previous one misses:
 
 | Layer | Technology | What it catches |
 |---|---|---|
@@ -72,9 +76,10 @@ Guardian uses a four-layer pipeline. Each layer catches what the previous one mi
 | **Behavioral** | Session-level heuristics | Multi-turn escalation, gradual manipulation |
 | **ML** | Gradient-boosted inference | Context-aware scoring, subtle drift |
 
-The semantic layer is where sophisticated attacks fail. Pattern matching catches what has been
-documented. Semantic similarity catches what *means* the same thing but has never been
-written down before. Both layers run on-device — no API round-trips, no external calls.
+The semantic layer is where sophisticated attacks fail. Pattern matching catches
+what has been documented. Semantic similarity catches attacks that *mean* the same
+thing but have never been written down before — paraphrased injection, obfuscated
+jailbreaks, novel role-hijacking variants. Both layers run on-device.
 
 **Typical latency:** ~15ms p99 on commodity hardware.
 
@@ -82,19 +87,39 @@ written down before. Both layers run on-device — no API round-trips, no extern
 
 ## Why Offline Inference Matters
 
-Most AI security tools are cloud APIs. That means your users' prompts leave your
-infrastructure for classification — prompts that may contain sensitive user data, private
-context, or regulated information. You have a data sharing agreement. You have an external
-dependency. You have latency you cannot control.
+Most AI security tools are cloud APIs. That means your application's inputs — which
+may contain private context, user data, or proprietary system information — leave
+your infrastructure for classification. You are sending potentially sensitive data
+to a third-party service on every request.
 
-Guardian runs the MiniLM-L6-v2 semantic model locally via ONNX. **Your data never leaves
-your stack.** For applications in regulated industries, for teams that want to own their
-entire security surface, and for any developer building on privacy-sensitive data, this is
-not a convenience — it is a requirement.
+Guardian runs the MiniLM-L6-v2 semantic model locally via ONNX. **No input data
+leaves your stack.** For teams in regulated industries, teams with sensitive system
+prompts, or any developer who wants to own their entire security surface — this is
+not a convenience, it is a requirement.
 
 The licensed tier includes the full ONNX model bundle. The community edition uses a
 hash-based semantic fallback that catches the most common attack classes without any
 external dependency.
+
+---
+
+## What It Defends Against
+
+Guardian protects your AI system from adversarial inputs designed to:
+
+- **Override your instructions** — attacks that attempt to replace or ignore your system prompt
+- **Activate jailbreak modes** — prompts engineered to bypass alignment and safety controls
+- **Hijack the AI's role** — attempts to redefine what the model is and who it serves
+- **Extract your system prompt** — probing attacks targeting your proprietary instructions
+- **Poison RAG context** — indirect injection through retrieved documents or tool outputs *(licensed)*
+- **Hijack agentic tool calls** — manipulation of function-calling and agent behavior *(licensed)*
+- **Exploit multi-turn context** — gradual manipulation across a conversation session
+- **Bypass via translation or encoding** — obfuscation attacks designed to evade detection *(licensed)*
+- **Abuse few-shot patterns** — using example structures to smuggle instructions *(licensed)*
+- **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(licensed)*
+
+The community edition covers the five most prevalent categories. The licensed tier
+covers all 30.
 
 ---
 
@@ -117,21 +142,20 @@ external dependency.
 | **License required** | No | Yes |
 
 **Community covers:** `instructionOverride`, `jailbreakActivation`, `safetyBypass`,
-`roleHijacking`, `systemPromptLeaks` — the five attack categories present in every
-production LLM application. Start here. You get real protection from day one.
+`roleHijacking`, `systemPromptLeaks` — the five categories present in every
+production LLM application. Real protection from day one, no license required.
 
-**Licensed adds:** The full 30-category threat taxonomy covering RAG pipeline attacks,
-agentic architectures, indirect injection via tool outputs, advanced jailbreak variants,
-and 20+ additional categories. If a security review, a compliance audit, or a customer
-asks "how do you prevent prompt injection?" — this is how you answer with something real.
+**Licensed adds:** The full 30-category threat taxonomy for production systems
+handling sensitive data, agentic architectures, RAG pipelines, or any deployment
+where a successful attack has real consequences for your application or your users.
 
 ---
 
 ## Getting a License
 
 1. **Purchase:** [oraclestechnologies.com/guardian](https://oraclestechnologies.com/guardian)
-2. You receive a license key (`EG-PRO-XXXXXXXX-XXXXXXXXXXXXXXXX`) and a download link
-   for the paid asset bundle.
+2. You receive a license key (`EG-PRO-XXXXXXXX-XXXXXXXXXXXXXXXX`) and a download
+   link for the paid asset bundle.
 3. Setup takes under five minutes — see Licensed Setup below.
 
 Questions before purchasing? Email [support@oraclestechnologies.com](mailto:support@oraclestechnologies.com).
@@ -171,7 +195,7 @@ Structure after extraction:
     └── model_signatures.json
 ```
 
-Custom path (useful for Docker or team deployments):
+Custom path (for Docker or team deployments):
 ```bash
 export ETHICORE_ASSETS_DIR="/opt/ethicore-assets"
 ```
@@ -200,7 +224,7 @@ from ethicore_guardian import Guardian, GuardianConfig
 guardian = Guardian(config=GuardianConfig(api_key="my-app"))
 client = guardian.wrap(openai.OpenAI())
 
-# Drop-in replacement — Guardian intercepts transparently
+# Drop-in replacement — Guardian intercepts every input before it reaches the model
 response = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": user_input}]
@@ -235,7 +259,7 @@ async def main():
 
     response = await client.chat(
         model="mistral",
-        messages=[{"role": "user", "content": "Write a poem about the ocean"}]
+        messages=[{"role": "user", "content": user_input}]
     )
     print(response["message"]["content"])
 
@@ -248,12 +272,11 @@ asyncio.run(main())
 
 The framework behind Guardian SDK: **Recognize → Intercept → Infer → Audit → Covenant.**
 
-The first four layers are technical. The fifth is the commitment you make to the people
-using your application — that the intelligence layer will not be turned against them.
-Every architectural decision in Guardian SDK was made with that commitment as the primary
-design constraint.
-
-Not compliance. Not a feature. A covenant.
+The first four layers are technical. The fifth is the developer's commitment — that
+the AI system they deploy will behave as intended, serve the purpose it was built for,
+and not be subverted by adversarial inputs into acting against its design. Developers
+who ship AI applications inherit a responsibility to defend what they build. The Guardian
+Covenant is the operational expression of that responsibility.
 
 [Read the full framework →](https://oraclestechnologies.com/guardian-covenant)
 
@@ -282,9 +305,9 @@ All parameters are also readable from environment variables via `GuardianConfig.
 
 ## Community & Discussions
 
-Found a threat pattern we're not catching? Have a real-world attack scenario to share?
-[Open a GitHub Discussion](https://github.com/OraclesTech/guardian-sdk/discussions) —
-the threat library expands based on what the community surfaces.
+Encountered a real-world attack pattern we're not catching? Have a threat scenario
+from a production deployment to share? [Open a GitHub Discussion](https://github.com/OraclesTech/guardian-sdk/discussions) —
+the threat library expands based on what the community surfaces from real systems.
 
 Bug reports and reproducible issues belong in [GitHub Issues](https://github.com/OraclesTech/guardian-sdk/issues).
 For anything beyond a bug fix, open a Discussion before a PR.
@@ -321,7 +344,6 @@ Proprietary — see [ASSETS-LICENSE](ASSETS-LICENSE).
 
 ---
 
-*The people on the other end of your AI system are not edge cases in a threat model.
-They are people. That is the reason this exists.*
+*You built something that people rely on. Defend it.*
 
 © 2026 [Oracles Technologies LLC](https://oraclestechnologies.com)
