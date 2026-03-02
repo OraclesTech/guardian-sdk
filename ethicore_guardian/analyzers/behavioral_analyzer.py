@@ -115,7 +115,7 @@ class BehavioralAnalyzer:
             "large_payload_weight": 8
         }
         
-        logger.info("🤖 Behavioral Analyzer initialized (server-side)")
+        logger.info("[BOT] Behavioral Analyzer initialized (server-side)")
     
     def initialize(self) -> bool:
         """Initialize behavioral analyzer"""
@@ -123,10 +123,10 @@ class BehavioralAnalyzer:
             # Clean up old profiles periodically
             self._cleanup_old_profiles()
             self.initialized = True
-            logger.info("✅ Behavioral Analyzer: Initialization complete")
+            logger.info("[OK] Behavioral Analyzer: Initialization complete")
             return True
         except Exception as e:
-            logger.error(f"❌ Behavioral Analyzer initialization failed: {e}")
+            logger.error(f"[ERR] Behavioral Analyzer initialization failed: {e}")
             return False
     
     def analyze(self, text: str, metadata: Dict[str, Any] = None) -> BehavioralAnalysisResult:
@@ -552,7 +552,7 @@ if __name__ == "__main__":
         ("Automated request", {"user_id": "bot1"}),
     ]
     
-    print("\n🤖 Running behavioral analyzer tests...\n")
+    print("\n[BOT] Running behavioral analyzer tests...\n")
     
     for text, metadata in test_cases:
         result = analyzer.analyze(text, metadata)

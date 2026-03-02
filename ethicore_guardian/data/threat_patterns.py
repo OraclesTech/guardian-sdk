@@ -357,10 +357,88 @@ def get_threat_statistics() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# License-aware dynamic loading
+# ---------------------------------------------------------------------------
+# If ETHICORE_LICENSE_KEY is set and the licensed asset file is reachable,
+# we replace this module's public namespace with the full 30-category library.
+# This makes `from ethicore_guardian.data.threat_patterns import THREAT_PATTERNS`
+# transparent — callers always get the right data for their tier without
+# needing to know which file is backing it.
+#
+# NOTE: globals() inside a function defined here refers to THIS module's
+# global dict, so assignments take effect immediately on the module object.
+# ---------------------------------------------------------------------------
+
+def _try_load_licensed_edition() -> bool:
+    """
+    Attempt to upgrade this module to the licensed threat pattern library.
+
+    Resolution order for the licensed file:
+      1. $ETHICORE_ASSETS_DIR/data/threat_patterns_licensed.py
+      2. ~/.ethicore/data/threat_patterns_licensed.py
+      3. <package>/data/threat_patterns_licensed.py  (same directory as this file)
+
+    Returns True if the licensed edition was successfully loaded, False
+    if the community stub remains active.
+    """
+    import importlib.util
+    import os
+    from pathlib import Path
+
+    license_key = os.environ.get("ETHICORE_LICENSE_KEY", "").strip()
+    if not license_key:
+        return False
+
+    # Validate the key if the license validator is available.
+    try:
+        from ethicore_guardian.license import LicenseValidator  # type: ignore
+        if not LicenseValidator().validate(license_key).is_valid:
+            return False
+    except (ImportError, Exception):
+        # license.py may not be installed in all distributions; proceed on
+        # the assumption that possession of the key implies authorisation.
+        pass
+
+    assets_dir = os.environ.get("ETHICORE_ASSETS_DIR", "").strip()
+    candidates = []
+    if assets_dir:
+        candidates.append(Path(assets_dir) / "data" / "threat_patterns_licensed.py")
+    candidates.append(Path.home() / ".ethicore" / "data" / "threat_patterns_licensed.py")
+    candidates.append(Path(__file__).parent / "threat_patterns_licensed.py")
+
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "_ethicore_tpl_licensed", str(path)
+            )
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)  # type: ignore[union-attr]
+            # Inject all public names from the licensed module into THIS
+            # module's global namespace so existing import statements
+            # (e.g. `from ... import THREAT_PATTERNS`) pick up the right data.
+            _g = globals()
+            for _name in dir(mod):
+                if not _name.startswith("_"):
+                    _g[_name] = getattr(mod, _name)
+            return True
+        except Exception:
+            continue  # If one candidate fails, try the next
+
+    return False
+
+
+# Perform the upgrade at module-import time (runs once per interpreter session).
+_LICENSED_EDITION_LOADED = _try_load_licensed_edition()
+
+
+# ---------------------------------------------------------------------------
 # Standalone test
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import json
     stats = get_threat_statistics()
-    print("Guardian SDK — Community Edition")
+    edition = "Licensed" if _LICENSED_EDITION_LOADED else "Community"
+    print(f"Guardian SDK — {edition} Edition")
     print(json.dumps(stats, indent=2))

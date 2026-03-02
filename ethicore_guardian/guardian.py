@@ -197,8 +197,8 @@ class Guardian:
             self.config.correction_rate_limit_per_minute
         )
         
-        print(f"🛡️  Guardian SDK initialized")
-        print(f"   API Key: {'✅' if self.config.api_key else '❌'} Set")
+        print(f"[Guardian] SDK initialized")
+        print(f"   API Key: {'[OK]' if self.config.api_key else '[MISSING]'} Set")
         print(f"   Enabled: {self.config.enabled}")
         
         # Initialize providers immediately to catch issues early
@@ -238,14 +238,14 @@ class Guardian:
     
     def _setup_providers(self):
         """Setup available AI provider integrations with better error handling"""
-        print("🔧 Setting up providers...")
+        print("[SETUP] Setting up providers...")
         
         try:
             from .providers.guardian_ollama_provider import OllamaProvider
             self.providers['ollama'] = OllamaProvider(self)
-            print("✅ Ollama provider registered")
+            print("[OK] Ollama provider registered")
         except ImportError:
-            print("⚠️  Ollama provider not found")
+            print("[WARN]  Ollama provider not found")
 
         # Try to import and register OpenAI provider
         try:
@@ -254,7 +254,7 @@ class Guardian:
             providers_dir = current_dir / "providers"
             
             if not providers_dir.exists():
-                print(f"⚠️  Providers directory not found at: {providers_dir}")
+                print(f"[WARN]  Providers directory not found at: {providers_dir}")
                 print("   Creating providers directory structure...")
                 providers_dir.mkdir(exist_ok=True)
                 
@@ -268,7 +268,7 @@ class Guardian:
             try:
                 from providers.openai_provider import OpenAIProvider
                 self.providers['openai'] = OpenAIProvider(self)
-                print("✅ OpenAI provider registered (absolute import)")
+                print("[OK] OpenAI provider registered (absolute import)")
                 return
             except ImportError as e1:
                 print(f"   Absolute import failed: {e1}")
@@ -277,7 +277,7 @@ class Guardian:
                 try:
                     from .providers.openai_provider import OpenAIProvider
                     self.providers['openai'] = OpenAIProvider(self)
-                    print("✅ OpenAI provider registered (relative import)")
+                    print("[OK] OpenAI provider registered (relative import)")
                     return
                 except ImportError as e2:
                     print(f"   Relative import failed: {e2}")
@@ -294,7 +294,7 @@ class Guardian:
                             
                             OpenAIProvider = openai_provider_module.OpenAIProvider
                             self.providers['openai'] = OpenAIProvider(self)
-                            print("✅ OpenAI provider registered (direct file loading)")
+                            print("[OK] OpenAI provider registered (direct file loading)")
                             return
                         else:
                             print(f"   OpenAI provider file not found at: {openai_provider_path}")
@@ -306,7 +306,7 @@ class Guardian:
                         return
         
         except Exception as e:
-            print(f"⚠️  OpenAI provider setup failed: {e}")
+            print(f"[WARN]  OpenAI provider setup failed: {e}")
             print(f"   Error type: {type(e).__name__}")
             print(f"   Current directory: {Path(__file__).parent}")
 
@@ -317,13 +317,13 @@ class Guardian:
         try:
             from .providers.anthropic_provider import AnthropicProvider
             self.providers['anthropic'] = AnthropicProvider(self)
-            print("✅ Anthropic provider registered")
+            print("[OK] Anthropic provider registered")
         except ImportError:
-            print("⚠️  Anthropic provider not available (pip install anthropic)")
+            print("[WARN]  Anthropic provider not available (pip install anthropic)")
     
     def _create_minimal_openai_provider(self):
         """Create a minimal OpenAI provider as fallback"""
-        print("🔧 Creating minimal OpenAI provider...")
+        print("[SETUP] Creating minimal OpenAI provider...")
         
         class MinimalOpenAIProvider:
             def __init__(self, guardian):
@@ -401,7 +401,7 @@ class Guardian:
                                     
                                     if not analysis.is_safe:
                                         error_msg = f"Request blocked: {analysis.threat_level} threat detected. Reasons: {', '.join(analysis.reasoning[:2])}"
-                                        print(f"🚨 BLOCKED: {error_msg}")
+                                        print(f"[ALERT] BLOCKED: {error_msg}")
                                         raise Exception(error_msg)
                                 
                                 return original_method(**kwargs)
@@ -416,7 +416,7 @@ class Guardian:
                                     
                                     if not analysis.is_safe:
                                         error_msg = f"Request blocked: {analysis.threat_level} threat detected. Reasons: {', '.join(analysis.reasoning[:2])}"
-                                        print(f"🚨 BLOCKED: {error_msg}")
+                                        print(f"[ALERT] BLOCKED: {error_msg}")
                                         raise Exception(error_msg)
                                 
                                 return await original_method(**kwargs)
@@ -441,7 +441,7 @@ class Guardian:
         
         # Register the minimal provider
         self.providers['openai'] = MinimalOpenAIProvider(self)
-        print("✅ Minimal OpenAI provider created and registered")
+        print("[OK] Minimal OpenAI provider created and registered")
     
     async def _ensure_initialized(self):
         """Ensure the threat detection system is initialized"""
@@ -471,9 +471,9 @@ class Guardian:
                             license_key=self.license_key,
                             assets_dir=self.assets_dir,
                         )
-                        print("   ✅ Pattern Analyzer loaded")
+                        print("   [OK] Pattern Analyzer loaded")
                     except ImportError as e:
-                        print(f"   ⚠️  Pattern Analyzer not found: {e}")
+                        print(f"   [WARN]  Pattern Analyzer not found: {e}")
 
                     # Semantic Analyzer
                     try:
@@ -484,11 +484,11 @@ class Guardian:
                         )
                         await semantic.initialize()
                         self.analyzers['semantic'] = semantic
-                        print("   ✅ Semantic Analyzer loaded")
+                        print("   [OK] Semantic Analyzer loaded")
                     except ImportError as e:
-                        print(f"   ⚠️  Semantic Analyzer not found: {e}")
+                        print(f"   [WARN]  Semantic Analyzer not found: {e}")
                     except Exception as e:
-                        print(f"   ⚠️  Semantic Analyzer failed to initialize: {e}")
+                        print(f"   [WARN]  Semantic Analyzer failed to initialize: {e}")
                     
                     # Behavioral Analyzer
                     try:
@@ -496,30 +496,37 @@ class Guardian:
                         behavioral = BehavioralAnalyzer()
                         behavioral.initialize()
                         self.analyzers['behavioral'] = behavioral
-                        print("   ✅ Behavioral Analyzer loaded")
+                        print("   [OK] Behavioral Analyzer loaded")
                     except ImportError as e:
-                        print(f"   ⚠️  Behavioral Analyzer not found: {e}")
+                        print(f"   [WARN]  Behavioral Analyzer not found: {e}")
                     except Exception as e:
-                        print(f"   ⚠️  Behavioral Analyzer failed to initialize: {e}")
+                        print(f"   [WARN]  Behavioral Analyzer failed to initialize: {e}")
                     
-                    # ML Inference Engine
+                    # ML Inference Engine — pass assets_dir so guardian-model.onnx is found
                     try:
                         from .analyzers.ml_inference_engine import MLInferenceEngine
-                        ml_engine = MLInferenceEngine()
+                        _ml_models_dir = str(
+                            (Path(self.assets_dir) / "models")
+                            if self.assets_dir else Path(self.models_dir)
+                        )
+                        ml_engine = MLInferenceEngine(
+                            models_dir=_ml_models_dir,
+                            assets_dir=self.assets_dir,
+                        )
                         ml_engine.initialize()
                         self.analyzers['ml'] = ml_engine
-                        print("   ✅ ML Inference Engine loaded")
+                        print("   [OK] ML Inference Engine loaded")
                     except ImportError as e:
-                        print(f"   ⚠️  ML Inference Engine not found: {e}")
+                        print(f"   [WARN]  ML Inference Engine not found: {e}")
                     except Exception as e:
-                        print(f"   ⚠️  ML Inference Engine failed to initialize: {e}")
+                        print(f"   [WARN]  ML Inference Engine failed to initialize: {e}")
                     
-                    print(f"   📊 Loaded {len(self.analyzers)} analyzers")
+                    print(f"   [STATS] Loaded {len(self.analyzers)} analyzers")
                     self.initialized = True
                     return True
                     
                 except Exception as e:
-                    print(f"   ❌ Orchestrator initialization failed: {e}")
+                    print(f"   [ERR] Orchestrator initialization failed: {e}")
                     return False
             
             async def analyze(self, text: str, metadata: Dict = None):
@@ -612,6 +619,32 @@ class Guardian:
                     verdict = 'ALLOW'
                     threat_level = 'LOW' if overall_score > 0 else 'NONE'
                 
+                # Build accurate per-layer votes that mirror the scoring thresholds above.
+                # This replaces the old heuristic ('threat' in str(result)) which always
+                # returned BLOCK because all result objects have attribute names containing
+                # the word "threat" (e.g. threat_level, matched_threats, threat_probability).
+                _layer_vote_objects = []
+                if 'pattern' in results:
+                    pr = results['pattern']
+                    _pl = getattr(pr, 'threat_level', 'NONE')
+                    _pv = 'BLOCK' if _pl in ('HIGH', 'CRITICAL') else 'CHALLENGE' if _pl == 'MEDIUM' else 'ALLOW'
+                    _layer_vote_objects.append(type('Vote', (), {'layer': 'pattern',  'vote': _pv})())
+                if 'semantic' in results:
+                    sr = results['semantic']
+                    _ss = getattr(sr, 'semantic_score', 0)
+                    _sv = 'BLOCK' if _ss >= 60 else 'CHALLENGE' if _ss >= 30 else 'ALLOW'
+                    _layer_vote_objects.append(type('Vote', (), {'layer': 'semantic',  'vote': _sv})())
+                if 'behavioral' in results:
+                    br = results['behavioral']
+                    _ba = getattr(br, 'anomaly_score', 0)
+                    _bv = 'BLOCK' if _ba >= 60 else 'CHALLENGE' if _ba >= 30 else 'ALLOW'
+                    _layer_vote_objects.append(type('Vote', (), {'layer': 'behavioral', 'vote': _bv})())
+                if 'ml' in results:
+                    mr = results['ml']
+                    _mp = getattr(mr, 'threat_probability', 0)
+                    _mv = 'BLOCK' if _mp >= 0.7 else 'CHALLENGE' if _mp >= 0.5 else 'ALLOW'
+                    _layer_vote_objects.append(type('Vote', (), {'layer': 'ml',        'vote': _mv})())
+
                 return type('Result', (), {
                     'verdict': verdict,
                     'threat_level': threat_level,
@@ -620,11 +653,11 @@ class Guardian:
                     'threats_detected': [{'category': t} for t in threats],
                     'reasoning': reasoning or ["No threats detected"],
                     'analysis_time_ms': analysis_time,
-                    'layer_votes': [type('Vote', (), {
-                        'layer': name,
-                        'vote': 'BLOCK' if 'threat' in str(result).lower() else 'ALLOW'
-                    })() for name, result in results.items()],
-                    'metadata': {'analyzers_used': list(results.keys())}
+                    'layer_votes': _layer_vote_objects,
+                    'metadata': {
+                        'analyzers_used': list(results.keys()),
+                        'layers_active': len(results),
+                    }
                 })()
             
             def _empty_result(self, reason):
@@ -662,7 +695,7 @@ class Guardian:
             return True
         
         try:
-            print("🛡️  Initializing Guardian threat detection...")
+            print("[Guardian] Initializing threat detection...")
             
             # Create simple orchestrator using your existing analyzers
             self.threat_detector = self._create_simple_orchestrator()
@@ -671,18 +704,18 @@ class Guardian:
             success = await self.threat_detector.initialize()
             
             if not success:
-                print("⚠️  Threat detection initialization had issues, but continuing...")
+                print("[WARN]  Threat detection initialization had issues, but continuing...")
             
             self.initialized = True
-            print("✅ Guardian initialization complete")
+            print("[OK] Guardian initialization complete")
             
             return True
             
         except Exception as e:
-            print(f"❌ Guardian initialization failed: {e}")
+            print(f"[ERR] Guardian initialization failed: {e}")
             # Don't raise exception - allow fallback mode
             self.initialized = True
-            print("✅ Guardian running in fallback mode")
+            print("[OK] Guardian running in fallback mode")
             return True
     
     def wrap(self, client: Any, provider: Optional[str] = None) -> Any:
@@ -690,14 +723,14 @@ class Guardian:
         Wrap an AI provider client with Guardian protection
         """
         if not self.config.enabled:
-            print("🛡️  Guardian disabled - returning unwrapped client")
+            print("[Guardian]  Guardian disabled - returning unwrapped client")
             return client
         
         # Auto-detect provider if not specified
         if not provider:
             provider = self._detect_provider(client)
         
-        print(f"🔧 Looking for provider: {provider}")
+        print(f"[SETUP] Looking for provider: {provider}")
         print(f"   Available providers: {list(self.providers.keys())}")
         
         if provider not in self.providers:
@@ -709,7 +742,7 @@ class Guardian:
         # Create protected client
         protected_client = provider_wrapper.wrap_client(client)
         
-        print(f"🛡️  {provider} client wrapped with Guardian protection")
+        print(f"[Guardian]  {provider} client wrapped with Guardian protection")
         return protected_client
     
     def _detect_provider(self, client: Any) -> str:
@@ -717,7 +750,7 @@ class Guardian:
         client_type = str(type(client)).lower()
         client_module = getattr(client, '__module__', '').lower()
         
-        print(f"🔍 Detecting provider for client: {type(client)}")
+        print(f"[INFO] Detecting provider for client: {type(client)}")
         print(f"   Client type: {client_type}")
         print(f"   Client module: {client_module}")
         
@@ -996,7 +1029,7 @@ class Guardian:
             if hasattr(self.config, key):
                 old_value = getattr(self.config, key)
                 setattr(self.config, key, value)
-                print(f"🔧 Config updated: {key} = {value} (was {old_value})")
+                print(f"[SETUP] Config updated: {key} = {value} (was {old_value})")
     
     # ------------------------------------------------------------------
     # Cache helpers — Principle 12 (Sacred Privacy)

@@ -180,7 +180,7 @@ class PatternAnalyzer:
                 )
                 compiled.append({**pattern_data, "compiled": compiled_regex})
             except re.error as e:
-                print(f"⚠️ Failed to compile pattern: {pattern_data['pattern'][:50]}... - {e}")
+                print(f"[WARN] Failed to compile pattern: {pattern_data['pattern'][:50]}... - {e}")
         return compiled
 
     def analyze(self, text: str) -> PatternAnalysisResult:
@@ -383,7 +383,7 @@ if __name__ == "__main__":
         "Can you help me with my homework?"
     ]
 
-    print("\n🧪 Running pattern analyzer tests...\n")
+    print("\n[TEST] Running pattern analyzer tests...\n")
 
     for test_text in test_cases:
         result = analyzer.analyze(test_text)
