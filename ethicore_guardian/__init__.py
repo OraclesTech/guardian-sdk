@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports
@@ -27,7 +27,7 @@ try:
     from .analyzers.behavioral_analyzer import BehavioralAnalyzer
     from .analyzers.ml_inference_engine import MLInferenceEngine
 except ImportError as e:
-    print(f"⚠️  Some analyzers not available: {e}")
+    print(f"[WARN]  Some analyzers not available: {e}")
 
 # License validator — stdlib-only, always available
 try:
@@ -76,7 +76,7 @@ def _print_welcome():
         import sys
         if hasattr(sys, 'ps1'):  # Interactive Python
             print(f"""
-🛡️  Ethicore Engine™ - Guardian SDK v{__version__}
+[Guardian]  Ethicore Engine™ - Guardian SDK v{__version__}
    AI Threat Protection Ready
 
 Quick Start:
