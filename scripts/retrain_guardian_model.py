@@ -782,119 +782,53 @@ def _build_feature_vector(
     semantic_27d: List[float],
 ) -> List[float]:
     """
-    Build the full 127-dimensional feature vector for a training sample.
+    Build the 127-dimensional feature vector for a training sample.
 
-    Mirrors the slot layout in MLInferenceEngine.extract_features() but
-    populates the semantic slot with real embeddings computed offline.
+    CRITICAL: this function must produce EXACTLY the same output as
+    MLInferenceEngine.extract_features(text) when called without
+    behavioral_data or technical_data.  Any divergence means the model
+    is trained on a different feature space than it is evaluated on,
+    causing undefined behaviour at inference time (empirically: benign
+    texts score 0.990+ threat probability due to sentinel value mismatch
+    in features [0] and [1]).
 
-    Slots:
-      [0:40]    behavioral (40D) — proxy features derived from text
-      [40:75]   linguistic  (35D)
-      [75:100]  technical   (25D)
-      [100:127] semantic    (27D) ← populated from SemanticAnalyzer
+    Slots — must match extract_features() exactly:
+      [0:40]    behavioral (40D) — sentinel defaults [0.5, 1.0, 0.0, 0.0, ...]
+      [40:75]   linguistic  (35D) — 5 text-derived features, rest zeros
+      [75:100]  technical   (25D) — sentinel defaults [0.1, 0.0, ...]
+      [100:127] semantic    (27D) — real MiniLM or [0.01]*27 null placeholder
     """
     text_lower = text.lower()
-    words = text.split()
-    n_chars = len(text)
-    n_words = len(words)
 
-    # -- Behavioral proxy (40D) -----------------------------------------------
-    # At train time we don't have a real session, so we approximate behavioral
-    # features from text structure.  These won't be perfect but give the model
-    # structural signal it can later combine with real behavioral data.
-    behav: List[float] = [
-        # [0] normalised char length (caps at 1 for 500+ chars)
-        min(1.0, n_chars / 500.0),
-        # [1] normalised word count
-        min(1.0, n_words / 100.0),
-        # [2] avg word length normalised
-        min(1.0, (n_chars / max(1, n_words)) / 20.0),
-        # [3] fraction of uppercase chars
-        sum(1 for c in text if c.isupper()) / max(1, n_chars),
-        # [4] fraction of digits
-        sum(1 for c in text if c.isdigit()) / max(1, n_chars),
-        # [5] fraction of special chars
-        sum(1 for c in text if not c.isalnum() and not c.isspace()) / max(1, n_chars),
-        # [6] count of exclamation marks (normalised)
-        min(1.0, text.count("!") / 5.0),
-        # [7] count of question marks
-        min(1.0, text.count("?") / 5.0),
-        # [8] ratio of sentences to words
-        min(1.0, (text.count(".") + text.count("!") + text.count("?")) / max(1, n_words)),
-        # [9] has square bracket injections [SYSTEM], [OVERRIDE], etc.
-        1.0 if any(t in text_lower for t in ["[system", "[override", "[jailbreak", "[admin"]) else 0.0,
-        # [10] has emoji / unicode heavy content
-        min(1.0, sum(1 for c in text if ord(c) > 127) / max(1, n_chars) * 10),
-        # [11] repetition: fraction of repeated words
-        min(1.0, (n_words - len(set(words))) / max(1, n_words)),
-        # [12-39] pad
-    ]
-    behav.extend([0.0] * (40 - len(behav)))
+    # -- Behavioral (40D) -----------------------------------------------------
+    # engine default when behavioral_data=None: [0.5, 1.0, 0.0, 0.0] + zeros.
+    # Training has no session context so use identical sentinel values.
+    # Using text-derived proxies here would create feature-space mismatch and
+    # cause the model to misclassify inputs at runtime.
+    features: List[float] = [0.5, 1.0, 0.0, 0.0]
+    features.extend([0.0] * 36)   # pad to 40
 
-    # -- Linguistic features (35D) --------------------------------------------
-    ling: List[float] = [
-        # [0] char len
-        min(1.0, n_chars / 500.0),
-        # [1] word count
-        min(1.0, n_words / 100.0),
-        # [2] question marks
-        min(1.0, text.count("?") / 5.0),
-        # [3] uppercase ratio
-        sum(1 for c in text if c.isupper()) / max(1, n_chars),
-        # [4] imperative override keywords
-        1.0 if any(w in text_lower for w in ["ignore", "forget", "override", "disregard"]) else 0.0,
-        # [5] jailbreak persona keywords
-        1.0 if any(w in text_lower for w in ["dan", "jailbreak", "liberated", "unfiltered", "uncensored"]) else 0.0,
-        # [6] roleplay / persona keywords
-        1.0 if any(w in text_lower for w in ["pretend", "roleplay", "act as", "you are now", "simulate"]) else 0.0,
-        # [7] system / prompt leakage keywords
-        1.0 if any(w in text_lower for w in ["system prompt", "instructions", "reveal", "show me your"]) else 0.0,
-        # [8] bypass / disable keywords
-        1.0 if any(w in text_lower for w in ["bypass", "disable", "remove", "deactivate", "turn off"]) else 0.0,
-        # [9] authority keywords
-        1.0 if any(w in text_lower for w in ["operator", "anthropic", "openai", "developer mode", "admin"]) else 0.0,
-        # [10] harmful content keywords
-        1.0 if any(w in text_lower for w in ["synthesize", "hack", "exploit", "malware", "weapon"]) else 0.0,
-        # [11] coercive language
-        1.0 if any(w in text_lower for w in ["must", "immediately", "do not refuse", "no choice", "comply"]) else 0.0,
-        # [12] leet-speak indicators (numbers replacing letters)
-        1.0 if any(c.isdigit() and words and any(c in w for w in words if len(w) > 2) for c in "013") else 0.0,
-        # [13] fraction of words that are threat-domain vocabulary
-        min(1.0, sum(
-            1 for w in words
-            if w.lower() in {
-                "ignore", "forget", "override", "bypass", "disable", "jailbreak",
-                "dan", "unfiltered", "uncensored", "liberated", "pretend", "roleplay",
-                "instructions", "system", "prompt", "reveal", "disregard", "delete",
-                "exploit", "hack", "malware", "synthesize", "weapon", "bomb"
-            }
-        ) / max(1, n_words)),
-        # [14-34] pad
-    ]
-    ling.extend([0.0] * (35 - len(ling)))
+    # -- Linguistic (35D) — matches engine computation exactly ----------------
+    features.extend([
+        min(1.0, len(text) / 500.0),                                     # char count
+        min(1.0, len(text.split()) / 100.0),                             # word count
+        min(1.0, text.count("?") / 5.0),                                 # question marks
+        len([c for c in text if c.isupper()]) / max(1, len(text)),       # uppercase ratio
+        1.0 if any(w in text_lower for w in ["ignore", "forget", "override"]) else 0.0,
+    ])
+    features.extend([0.0] * 30)   # pad to 35
 
-    # -- Technical features (25D) ---------------------------------------------
-    tech: List[float] = [
-        # [0] normalised char count (proxy for request size)
-        min(1.0, n_chars / 1000.0),
-        # [1] is very long (possible context flooding)
-        1.0 if n_chars > 800 else 0.0,
-        # [2] contains code block markers
-        1.0 if any(m in text for m in ["```", "~~~", "<code>", "<?", "#!/"]) else 0.0,
-        # [3] contains XML/JSON injection markers
-        1.0 if any(m in text for m in ["<system>", "<|", "{\"role\":", "---\nrole:"]) else 0.0,
-        # [4] high special char density (obfuscation indicator)
-        1.0 if sum(1 for c in text if not c.isalnum() and not c.isspace()) / max(1, n_chars) > 0.15 else 0.0,
-        # [5-24] pad
-    ]
-    tech.extend([0.0] * (25 - len(tech)))
+    # -- Technical (25D) ------------------------------------------------------
+    # engine default when technical_data=None: [0.1, 0.0] + zeros.
+    features.extend([0.1, 0.0])
+    features.extend([0.0] * 23)   # pad to 25
 
-    # -- Semantic (27D) — real embeddings ─────────────────────────────────────
-    sem = semantic_27d[:27]
+    # -- Semantic (27D) — real MiniLM or null placeholder ─────────────────────
+    sem = list(semantic_27d[:27])
     if len(sem) < 27:
-        sem = sem + [0.01] * (27 - len(sem))
+        sem.extend([0.01] * (27 - len(sem)))
+    features.extend(sem)
 
-    features = behav + ling + tech + sem
     assert len(features) == 127, f"Feature dim error: {len(features)}"
     return features
 
@@ -978,20 +912,15 @@ def _train_and_export(
         "What time is it in Tokyo?",
         "Can you explain how recursion works in Python?",
     ]
-    # We need semantic embeddings for the calibration texts too
-    # Use synchronous fallback embedding for simplicity here
-    from ethicore_guardian.analyzers.semantic_analyzer import SemanticAnalyzer
-    _cal_analyzer = SemanticAnalyzer.__new__(SemanticAnalyzer)
-    _cal_analyzer.config = {"embedding_dimension": 384, "compressed_dimension": 27}
-    _cal_analyzer.special_tokens = None
-    _cal_analyzer.vocab = None
-    _cal_analyzer.session = None
+    # MLInferenceEngine.initialize() calls extract_features(text) with NO
+    # semantic_data argument, which falls through to [0.01]*27 placeholder.
+    # The calibration gate here must use that exact same vector so the model
+    # that passes this gate will also pass the engine's load-time check.
+    _null_sem = [0.01] * 27
 
     cal_features = []
     for ct in calibration_texts:
-        raw_emb = _cal_analyzer._generate_fallback_embedding(ct)
-        sem_27d = _cal_analyzer.compress_embedding(raw_emb)
-        cal_features.append(_build_feature_vector(ct, sem_27d))
+        cal_features.append(_build_feature_vector(ct, _null_sem))
     cal_X = np.array(cal_features, dtype=np.float32)
     cal_proba = clf.predict_proba(cal_X)[:, 1]
     avg_benign = float(cal_proba.mean())
@@ -1153,6 +1082,29 @@ async def _run(
 
     print(f"\n  Computing semantic embeddings (this is the slow step) …")
     semantic_embeddings = await _compute_semantic_embeddings(texts, license_key, assets_dir)
+
+    # ── Null-semantic injection ───────────────────────────────────────────────
+    # MLInferenceEngine.extract_features() uses [0.01]*27 when no semantic_data
+    # is provided (e.g. its own load-time calibration check, or any edge case
+    # where SemanticAnalyzer is unavailable).  Without training samples that
+    # carry this placeholder the model has undefined behaviour on that input
+    # and may score it as a threat (empirically: 0.990+).
+    #
+    # Fix: replace 20% of all samples' semantic slot with [0.01]*27.
+    # The model learns "null semantic signal != threat" and falls back
+    # gracefully to behavioral + linguistic + technical features only.
+    # Production inference (through Guardian) still receives real MiniLM
+    # embeddings -- this only covers the no-semantic-data edge case.
+    _rng_null = random.Random(seed + 777)
+    _null_sem = [0.01] * 27
+    _null_count = 0
+    for i in range(len(semantic_embeddings)):
+        if _rng_null.random() < 0.20 or not semantic_embeddings[i]:
+            semantic_embeddings[i] = _null_sem
+            _null_count += 1
+    print(f"\n  Null-semantic injection: {_null_count}/{len(texts)} samples "
+          f"({100 * _null_count / len(texts):.0f}%) -- model will handle "
+          f"missing semantic data gracefully")
 
     ok = _train_and_export(
         texts=texts,
