@@ -12,7 +12,7 @@ Covers all Phase 4 additions:
     1e  ragPoisoning
 
   Item 2 — Dynamic _get_core_threat_patterns() sourcing all categories
-  Item 3 — Full-coverage regeneration (234 embeddings across 30 categories)
+  Item 3 — Full-coverage regeneration (444 embeddings across 51 categories as of v1.2.0)
   Regression — Existing categories still fire; benign strings still pass
 
 Principle 13 (Ultimate Accountability): every security property must be proven
@@ -399,7 +399,7 @@ class TestDynamicPatternSourcing:
     def test_dynamic_patterns_count_exceeds_old_hardcoded(self):
         """
         The dynamic set must cover more than the 12 previously hardcoded patterns.
-        (Old count was 12; new count is 234.)
+        (Old count was 12; v1.1.0 was 234; v1.2.0 is 444.)
         """
         analyzer = self._make_analyzer()
         OLD_HARDCODED_COUNT = 12
@@ -449,30 +449,40 @@ class TestDynamicPatternSourcing:
 @requires_license
 class TestEmbeddingCoverage:
     """
-    Item 3: After regeneration the embedding file must contain 234 entries
-    (all semantic fingerprints) covering all 30 categories.
+    Item 3: After regeneration the embedding file must contain all semantic
+    fingerprint entries (444 as of v1.2.0, across 51 categories).
+
+    Counts use >= assertions so adding more categories in future does not
+    break this suite — only regressions (drops in count) are caught.
     """
 
-    def test_threat_statistics_show_30_categories(self):
-        """THREAT_PATTERNS must report exactly 30 categories after Phase 4."""
+    def test_threat_statistics_show_51_categories(self):
+        """THREAT_PATTERNS must report at least 51 categories (v1.2.0 baseline)."""
         stats = get_threat_statistics()
-        assert stats["totalCategories"] == 30
+        assert stats["totalCategories"] >= 51, (
+            f"Expected >= 51 categories, got {stats['totalCategories']}"
+        )
 
-    def test_threat_statistics_show_234_fingerprints(self):
-        """Total semantic fingerprints must be exactly 234 after Phase 4."""
+    def test_threat_statistics_show_444_fingerprints(self):
+        """Total semantic fingerprints must be at least 444 (v1.2.0 baseline)."""
         stats = get_threat_statistics()
-        assert stats["totalSemanticFingerprints"] == 234
+        assert stats["totalSemanticFingerprints"] >= 444, (
+            f"Expected >= 444 fingerprints, got {stats['totalSemanticFingerprints']}"
+        )
 
-    def test_threat_statistics_show_235_regex_patterns(self):
-        """Total regex patterns must be 235 after Phase 4 additions."""
+    def test_threat_statistics_show_500_regex_patterns(self):
+        """Total regex patterns must be at least 500 (v1.2.0 baseline)."""
         stats = get_threat_statistics()
-        assert stats["totalRegexPatterns"] == 235
+        assert stats["totalRegexPatterns"] >= 500, (
+            f"Expected >= 500 patterns, got {stats['totalRegexPatterns']}"
+        )
 
     @pytest.mark.asyncio
-    async def test_initialize_loads_234_embeddings(self, tmp_path):
+    async def test_initialize_loads_all_embeddings(self, tmp_path):
         """
-        SemanticAnalyzer.initialize() must generate 234 threat embeddings
-        when no cached file exists (uses fallback embeddings so no ONNX needed).
+        SemanticAnalyzer.initialize() must generate embeddings for every
+        semantic fingerprint in the active threat library (444 as of v1.2.0).
+        Uses fallback hash-based embeddings so no ONNX model is required.
         """
         analyzer = SemanticAnalyzer(
             models_dir=str(tmp_path / "models"),
@@ -480,14 +490,17 @@ class TestEmbeddingCoverage:
         )
         # initialize() falls back to hash-based embeddings if ONNX model missing
         await analyzer.initialize()
-        assert len(analyzer.threat_embeddings) == 234, (
-            f"Expected 234 threat embeddings, got {len(analyzer.threat_embeddings)}"
+        expected = len(get_semantic_fingerprints())
+        assert len(analyzer.threat_embeddings) == expected, (
+            f"Expected {expected} threat embeddings, "
+            f"got {len(analyzer.threat_embeddings)}"
         )
 
     @pytest.mark.asyncio
     async def test_initialize_covers_all_new_categories(self, tmp_path):
         """
-        The generated embeddings must include entries for all 5 Phase 4 categories.
+        The generated embeddings must include entries for all Phase 4 categories
+        (v1.1.0) and all Phase 5 / v1.2.0 categories added in the expansion.
         """
         analyzer = SemanticAnalyzer(
             models_dir=str(tmp_path / "models"),
@@ -495,16 +508,47 @@ class TestEmbeddingCoverage:
         )
         await analyzer.initialize()
         embedded_categories = {e.get("category") for e in analyzer.threat_embeddings}
-        new_cats = {
+
+        # Phase 4 / v1.1.0 categories
+        phase4_cats = {
             "agenticToolHijacking",
             "sycophancyExploitation",
             "fewShotNormalization",
             "translationLeakAttack",
             "ragPoisoning",
         }
-        missing = new_cats - embedded_categories
-        assert not missing, (
-            f"Phase 4 categories not in generated embeddings: {missing}"
+        missing_p4 = phase4_cats - embedded_categories
+        assert not missing_p4, (
+            f"Phase 4 categories not in generated embeddings: {missing_p4}"
+        )
+
+        # v1.2.0 categories — 21 new categories added in expansion
+        v12_cats = {
+            "crescendoAttack",
+            "manyShotJailbreaking",
+            "cipherObfuscation",
+            "authorityImpersonation",
+            "sandboxExemption",
+            "delimiterInjection",
+            "outputFormatEscape",
+            "persistentPersona",
+            "contextWindowFlooding",
+            "falsePermissionClaim",
+            "legalJurisdictionBypass",
+            "professionalAuthorityBypass",
+            "researchExemption",
+            "reversePsychology",
+            "contrastiveExtraction",
+            "metaInstructionAttack",
+            "memorySeedingAttack",
+            "adversarialFormatting",
+            "goalHijackingChain",
+            "negationBypass",
+            "plinyStyleJailbreak",
+        }
+        missing_v12 = v12_cats - embedded_categories
+        assert not missing_v12, (
+            f"v1.2.0 categories not in generated embeddings: {missing_v12}"
         )
 
 
