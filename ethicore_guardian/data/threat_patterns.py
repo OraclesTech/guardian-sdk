@@ -71,6 +71,7 @@ THREAT_PATTERNS: Dict[str, Any] = {
             r"ignore\s+(?:all|your|the|my)\s+instructions?",
             r"disregard\s+(previous|all)\s+(instructions?|rules?|guidelines?)",
             r"forget\s+(everything|all|previous)\s+(instructions?|you'?ve?\s+been\s+told)",
+            r"forget\s+(your|the)\s+(previous\s+)?(role|persona|character|purpose|identity|training|values?|guidelines?)",
             r"override\s+(your|previous|system)\s+(instructions?|programming|directives?)",
         ],
         "severity": ThreatSeverity.CRITICAL,
@@ -130,6 +131,7 @@ THREAT_PATTERNS: Dict[str, Any] = {
         "patterns": [
             r"(disable|turn\s+off|deactivate|remove)\s+(your\s+)?(safety|ethical|moral)\s+(guidelines?|filters?|restrictions?|measures?)",
             r"bypass\s+(safety|content)\s+(filters?|restrictions?)",
+            r"bypass\s+(all\s+)?(security|ethical|moral)?\s*(restrictions?|limitations?|controls?|boundaries|barriers)",
             r"ignore\s+(safety|ethical|content)\s+(guidelines?|warnings?|policies?)",
         ],
         "severity": ThreatSeverity.CRITICAL,
@@ -158,6 +160,10 @@ THREAT_PATTERNS: Dict[str, Any] = {
     "roleHijacking": {
         "patterns": [
             r"you\s+are\s+now\s+(a|an)\s+(?!assistant|helpful|AI)[\w\s]+",
+            r"you\s+are\s+[\w]+\s+with\s+(no|zero|absolutely\s+no)\s+(content\s+filters?|ethical\s+guidelines?|restrictions?|censorship)",
+            r"you\s+are\s+no\s+longer\s+a\s+(helpful\s+)?(assistant|AI|bot)",
+            r"your\s+(new|only|sole)?\s*(purpose|goal|objective|mission|role|task)\s+(now\s+)?is\s+to\s+(ignore|bypass|disregard|comply\s+with\s+everything|forget)",
+            r"(reply|respond|answer)\s+only\s+as\s+an?\s+(AI|assistant|bot|model)\s+that\s+(always|never|has\s+no)",
             r"act\s+as\s+(if\s+you\s+are\s+)?(a|an)\s+(?!assistant)[\w\s]+",
             r"pretend\s+(to\s+be|you\s+are)\s+(a|an)\s+(?!assistant)[\w\s]+",
         ],
