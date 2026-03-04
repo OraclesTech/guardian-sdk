@@ -1,6 +1,6 @@
 """
 Ethicore Engine™ — Guardian SDK License Validator
-Version: 1.0.0
+Version: 1.2.0
 
 SECURITY NOTE: XOR-obfuscated secret is a lightweight deterrent, not
 cryptographic security. Upgrade to Ed25519 for v2 so the private key
@@ -49,10 +49,6 @@ _SECRET_MASKED = bytes([
     0x5A, 0x1C, 0xA2, 0xDF, 0xD5, 0xB9, 0x9C, 0x26,
     0xF1, 0x5A, 0x5D, 0xE2, 0x52, 0xFD, 0xDF, 0x45,
 ])
-# NOTE: While _SECRET_MASKED is all zeros every computed HMAC equals the
-# HMAC of the all-zeros key, meaning NO key you generate will validate
-# against a different secret.  This is intentional — fill in real masked
-# bytes before generating customer keys with scripts/_keygen.py.
 
 _VALID_TIERS = frozenset({"PRO", "ENT"})
 
