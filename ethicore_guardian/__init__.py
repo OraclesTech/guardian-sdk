@@ -29,6 +29,17 @@ try:
 except ImportError as e:
     print(f"[WARN]  Some analyzers not available: {e}")
 
+# Phase 3 — output analysis + closed-loop adversarial learning
+try:
+    from .analyzers.output_analyzer import OutputAnalyzer, OutputAnalysisResult
+    from .analyzers.adversarial_learner import AdversarialLearner, LearningOutcome
+except ImportError as e:
+    print(f"[WARN]  Phase 3 analyzers not available: {e}")
+    OutputAnalyzer = None        # type: ignore[assignment,misc]
+    OutputAnalysisResult = None  # type: ignore[assignment,misc]
+    AdversarialLearner = None    # type: ignore[assignment,misc]
+    LearningOutcome = None       # type: ignore[assignment,misc]
+
 # License validator — stdlib-only, always available
 try:
     from .license import LicenseValidator, LicenseInfo, validate_license
@@ -56,6 +67,12 @@ __all__ = [
     'SemanticAnalyzer',
     'BehavioralAnalyzer',
     'MLInferenceEngine',
+
+    # Phase 3 — output analysis + adversarial learning
+    'OutputAnalyzer',
+    'OutputAnalysisResult',
+    'AdversarialLearner',
+    'LearningOutcome',
 
     # License
     'LicenseValidator',
