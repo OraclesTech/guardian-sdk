@@ -62,12 +62,40 @@ asyncio.run(main())
 
 That attack is stopped before your model ever sees it. Four lines.
 
+### Post-flight: guard the response too
+
+```python
+# Pre-flight
+preflight = await guardian.analyze(user_input)
+if preflight.recommended_action in ("BLOCK", "CHALLENGE"):
+    return "I can't help with that."
+
+# Call your LLM
+llm_response = await your_llm(user_input)
+
+# Post-flight — catches jailbreak compliance, system prompt leaks, role abandonment
+output = await guardian.analyze_response(
+    response=llm_response,
+    original_input=user_input,
+    preflight_result=preflight,
+)
+if output.suppressed:
+    # LLM complied with an adversarial prompt — return the safe replacement
+    return output.safe_response   # "I'm not able to provide that response."
+    # output.learning_triggered=True means AdversarialLearner already updated
+    # the semantic threat DB — future similar attacks will be caught pre-flight
+
+return llm_response
+```
+
 ---
 
 ## How It Works
 
-Guardian runs a four-layer pipeline on every input. Each layer catches what the
-previous one misses:
+Guardian runs a **bi-directional, six-layer pipeline** — four layers on every input
+before it reaches the model, two layers on every response before it reaches the user.
+
+### Pre-flight gate (input → model)
 
 | Layer | Technology | What it catches |
 |---|---|---|
@@ -76,12 +104,19 @@ previous one misses:
 | **Behavioral** | Session-level heuristics | Multi-turn escalation, gradual manipulation |
 | **ML** | Gradient-boosted inference | Context-aware scoring, subtle drift |
 
-The semantic layer is where sophisticated attacks fail. Pattern matching catches
-what has been documented. Semantic similarity catches attacks that *mean* the same
-thing but have never been written down before — paraphrased injection, obfuscated
-jailbreaks, novel role-hijacking variants. Both layers run on-device.
+### Post-flight gate (model → user)
 
-**Typical latency:** ~15ms p99 on commodity hardware.
+| Layer | Technology | What it catches |
+|---|---|---|
+| **OutputAnalyzer** | Weighted signal scoring + context heuristics | Jailbreak compliance, constraint removal, system prompt revelation, role abandonment, self-disclosure in identity-inquiry context |
+| **AdversarialLearner** | Embedding-based closed-loop learning | Adds confirmed attack patterns to the semantic threat DB so pre-flight catches them on the next attempt |
+
+The pre-flight gate blocks attacks before the model sees them. The post-flight gate
+catches what slipped through — and teaches the system to pre-empt it next time.
+The "model proposes, deterministic layer decides" principle applies to **both sides**.
+
+**Typical latency:** ~15ms p99 pre-flight on commodity hardware. OutputAnalyzer
+adds <1ms (pure-Python, no I/O, compiled at import time).
 
 ---
 
@@ -119,7 +154,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(licensed)*
 
 The community edition covers the five most prevalent categories. The licensed tier
-covers all 30.
+covers all 51.
 
 ---
 
@@ -128,10 +163,13 @@ covers all 30.
 | | Community (Free) | Licensed — PRO / ENT |
 |---|---|---|
 | **Install** | `pip install ethicore-engine-guardian` | Same + asset bundle |
-| **Threat categories** | 5 | 30 |
-| **Regex patterns** | 18 | 235+ |
-| **Semantic model** | Hash-based fallback | 234-vector ONNX MiniLM |
+| **Threat categories** | 5 | 51 |
+| **Regex patterns** | 18 | 500+ |
+| **Semantic model** | Hash-based fallback | 384-dim ONNX MiniLM-L6-v2 |
+| **Semantic fingerprints** | Runtime-only (AdversarialLearner) | 444+ pre-loaded + runtime growth |
 | **Full ONNX inference** | — | ✅ |
+| **Post-flight OutputAnalyzer** | ✅ | ✅ |
+| **Adversarial learning (runtime)** | ✅ hash-based | ✅ embedding-based |
 | **RAG / indirect injection** | — | ✅ |
 | **Agentic tool hijacking** | — | ✅ |
 | **Context poisoning detection** | — | ✅ |
@@ -145,7 +183,7 @@ covers all 30.
 `roleHijacking`, `systemPromptLeaks` — the five categories present in every
 production LLM application. Real protection from day one, no license required.
 
-**Licensed adds:** The full 30-category threat taxonomy for production systems
+**Licensed adds:** The full 51-category threat taxonomy for production systems
 handling sensitive data, agentic architectures, RAG pipelines, or any deployment
 where a successful attack has real consequences for your application or your users.
 
@@ -186,8 +224,8 @@ Structure after extraction:
 ```
 ~/.ethicore/
 ├── data/
-│   ├── threat_patterns_licensed.py   ← 30 categories, 235+ patterns
-│   └── threat_embeddings.json        ← 234-vector semantic database
+│   ├── threat_patterns_licensed.py   ← 51 categories, 500+ patterns
+│   └── threat_embeddings.json        ← 384-dim embeddings · 444+ threat fingerprints
 └── models/
     ├── minilm-l6-v2.onnx
     ├── minilm-l6-v2.onnx.data
@@ -205,7 +243,7 @@ export ETHICORE_ASSETS_DIR="/opt/ethicore-assets"
 ```python
 from ethicore_guardian.data.threat_patterns import get_threat_statistics
 stats = get_threat_statistics()
-print(stats["totalCategories"])  # 30 (licensed) or 5 (community)
+print(stats["totalCategories"])  # 51 (licensed) or 5 (community)
 print(stats.get("edition"))      # "community" if still in fallback mode
 ```
 
@@ -298,6 +336,11 @@ Covenant is the operational expression of that responsibility.
 | `log_level` | `str` | `"INFO"` | Python logging level |
 | `license_key` | `str` | `None` | License key (env: `ETHICORE_LICENSE_KEY`) |
 | `assets_dir` | `str` | `None` | Asset bundle path (env: `ETHICORE_ASSETS_DIR`) |
+| `enable_output_analysis` | `bool` | `True` | Enable post-flight OutputAnalyzer gate |
+| `output_sensitivity` | `float` | `0.65` | Compromise score threshold for SUPPRESS verdict |
+| `suppressed_response_message` | `str` | `"I'm not able to provide that response."` | Safe replacement text shown when a response is suppressed |
+| `auto_adversarial_learning` | `bool` | `True` | Automatically learn from suppressed responses via AdversarialLearner |
+| `max_learned_fingerprints` | `int` | `500` | Cap on runtime-learned semantic fingerprints |
 
 All parameters are also readable from environment variables via `GuardianConfig.from_env()`.
 

@@ -8,6 +8,15 @@
 # Committing them would violate the ASSETS-LICENSE and expose proprietary IP.
 # ---------------------------------------------------------------------------
 
+# Proprietary engine — core IP, never publish
+# Distributed as compiled artifact in the paid asset bundle only.
+ethicore_guardian/analyzers/
+ethicore_guardian/guardian.py
+
+# Tests for proprietary components — reveal signal logic and pipeline behavior
+tests/test_output_analyzer.py
+tests/test_adversarial_learner.py
+
 # Local dev directory (outside package tree so assets never appear in the wheel)
 licensed/
 
@@ -110,8 +119,21 @@ Thumbs.db
 logs/
 
 # ---------------------------------------------------------------------------
-# Scratch / temporary helper scripts
+# Scratch / temporary helper scripts and test artefacts
 # ---------------------------------------------------------------------------
 fix_*.py
+verify_*.py
+verify_*.txt
+run_*.bat
+phase3_results.txt
 *.bak
 *.tmp
+
+# ---------------------------------------------------------------------------
+# Demo temp files (created by test/debug scripts at project root)
+# ---------------------------------------------------------------------------
+/demo/test_phase3.py
+/demo/run_test.bat
+/demo/test_output.txt
+/demo/phase3_test_results.txt
+/run_phase3_tests.bat
