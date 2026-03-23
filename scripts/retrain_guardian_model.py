@@ -9,7 +9,7 @@ Key design properties (all required for production-quality ML layer):
   1. Real semantic embeddings  — SemanticAnalyzer runs on every training sample
      so the 27-dimensional semantic slot in the 127-feature vector is populated
      with actual MiniLM (or hash-based fallback) signal, not 0.01 placeholders.
-  2. Large, diverse dataset   — 20 000 samples (10 000 threat / 10 000 benign)
+  2. Large, diverse dataset   — 30 000 samples (15 000 threat / 15 000 benign)
      generated from 444 semantic fingerprints × multiple variation strategies.
   3. Hard negatives           — ~750 legitimate security-research / educational
      sentences labeled BENIGN, teaching the model that discussing AI safety ≠
@@ -37,7 +37,7 @@ Usage:
     --dry-run     Build dataset + train + evaluate, but do NOT write model
     --force       Overwrite existing model without prompting
     --out PATH    Custom output path for guardian-model.onnx
-    --samples N   Total samples (default: 20000; half threat, half benign)
+    --samples N   Total samples (default: 30000; half threat, half benign)
     --hidden A,B  Hidden layer sizes (default: 128,64)
     --seed N      Random seed (default: 42)
 """
@@ -492,9 +492,99 @@ _BENIGN_HARD_NEGATIVES = [
     "How do open-source AI models compare to closed models in terms of safety?",
 ]
 
+# Short, casual, informal phrases — the MiniLM model has historically false-positived
+# on these because they are short, greet-style, or contain innocuous words ("benign",
+# "normal", "debug") that overlap with security/threat vocabulary in embedding space.
+# Over-sampled 4× in _ALL_BENIGN and given a dedicated 20% sampling path in
+# _make_benign_sample() to counteract this specific failure mode.
+_BENIGN_CASUAL = [
+    # Greetings and openers
+    "Hello!",
+    "Hi there!",
+    "Hey!",
+    "Good morning!",
+    "Good afternoon!",
+    "Good evening!",
+    "Hi, how are you?",
+    "Hello, how are you doing today?",
+    "Hey, what's up?",
+    "Hi, I hope you're having a good day.",
+    "Greetings!",
+    "Hello there!",
+    "Hi! Nice to meet you.",
+    "Good morning, I hope your day is going well.",
+    "Hey, thanks for being here.",
+    # Short questions and requests
+    "Can you help me?",
+    "I have a quick question.",
+    "Do you have a moment?",
+    "Could you help me out?",
+    "I need some assistance.",
+    "Can I ask you something?",
+    "I was wondering if you could help.",
+    "Quick question for you.",
+    "I just need a bit of help.",
+    "Do you mind helping me with something?",
+    # Normal, benign task requests
+    "Hello, help me debug this function.",
+    "Hi, can you help me debug this code?",
+    "Hello, I'm working on a Python script and need help.",
+    "Hey, can you review my code?",
+    "Hi there, I need help with a bug in my program.",
+    "Can you help me fix this error?",
+    "Hello, this is a normal message asking for help.",
+    "Hi, I just want to ask a coding question.",
+    "Can you help me understand this concept?",
+    "I'm stuck on a problem, can you help?",
+    # Phrases containing "benign" / "normal" used naturally
+    "Hello, this is a normal benign message.",
+    "This is just a regular, benign request.",
+    "I have a totally normal, benign question.",
+    "Nothing suspicious here — just a benign inquiry.",
+    "This is a benign test message.",
+    "Please treat this as the normal, benign input it is.",
+    "Just a benign question about programming.",
+    "A completely benign message from a user.",
+    "Hello, I'm sending this benign message to test the API.",
+    # Conversational fillers and thanks
+    "Thanks for your help!",
+    "Thank you so much!",
+    "I really appreciate your assistance.",
+    "That was very helpful, thank you.",
+    "Thanks, that's exactly what I needed.",
+    "You've been very helpful!",
+    "Thanks for explaining that.",
+    "That makes sense now, thank you!",
+    "Great, thanks!",
+    "Appreciate it!",
+    # Simple factual queries
+    "What is the capital of France?",
+    "How do I boil an egg?",
+    "What's the weather like today?",
+    "Can you recommend a good book?",
+    "What time is it?",
+    "What does this word mean?",
+    "How far is the moon from the earth?",
+    "What is photosynthesis?",
+    "Who invented the telephone?",
+    "What are some good movies to watch?",
+    # Casual productivity
+    "Can you help me write an email?",
+    "I need to plan my week.",
+    "Help me make a to-do list.",
+    "Can you summarize this text for me?",
+    "I want to learn something new today.",
+    "What's a good way to stay productive?",
+    "Can you help me brainstorm ideas?",
+    "I'm writing a short story, can you help?",
+    "What's a good recipe for pasta?",
+    "Can you help me prepare for an interview?",
+]
+
 # Combine all benign templates
-# Include assistant phrasing 3x in the combined pool so the sampler sees it
-# frequently enough to counteract the MiniLM embedding overlap with threats.
+# Include assistant phrasing 3x and casual phrases 4x in the combined pool
+# so the sampler sees them frequently enough to counteract MiniLM semantic
+# overlap with threats, especially for short/informal inputs.
 _ALL_BENIGN = (
     _BENIGN_CODING
     + _BENIGN_CS
@@ -503,6 +593,7 @@ _ALL_BENIGN = (
     + _BENIGN_CREATIVE
     + _BENIGN_ASSISTANT_PHRASING * 3   # over-sample to combat semantic bleed
     + _BENIGN_HARD_NEGATIVES * 2       # over-sample hard negatives
+    + _BENIGN_CASUAL * 4              # over-sample casual — key false-positive domain
 )
 
 # Filler text for templates with {}
@@ -625,15 +716,19 @@ def _make_benign_sample(rng: random.Random) -> str:
     """Sample from the full benign pool with targeted over-sampling.
 
     Sampling weights (approximate):
-      25% — assistant phrasing ("can you help me", "how can I help you", etc.)
-              directly counteracts MiniLM semantic overlap with threat patterns
+      20% — casual / informal phrases (greetings, "this is a benign message", etc.)
+              directly addresses the false-positive failure mode on short inputs
+      20% — assistant phrasing ("can you help me", "how can I help you", etc.)
+              counteracts MiniLM semantic overlap with threat patterns
       15% — hard negatives (security research framing)
-      60% — general benign pool
+      45% — general benign pool
     """
     r = rng.random()
-    if r < 0.25:
-        text = rng.choice(_BENIGN_ASSISTANT_PHRASING)
+    if r < 0.20:
+        text = rng.choice(_BENIGN_CASUAL)
     elif r < 0.40:
+        text = rng.choice(_BENIGN_ASSISTANT_PHRASING)
+    elif r < 0.55:
         text = rng.choice(_BENIGN_HARD_NEGATIVES)
     else:
         text = rng.choice(_ALL_BENIGN)
@@ -936,7 +1031,7 @@ def _train_and_export(
             f"\n[ERR]  Calibration gate FAILED (avg={avg_benign:.4f} > 0.4).\n"
             "       The model would produce systematic false positives.\n"
             "       Suggestions:\n"
-            "         - Increase --samples (try 20000)\n"
+            "         - Increase --samples (try 30000)\n"
             "         - Add more benign templates to the script\n"
             "         - Try --hidden 128,64 (simpler model)\n"
             "       The existing model has NOT been overwritten.",
@@ -1148,8 +1243,8 @@ def main(argv=None) -> int:
                         help="License key (overrides $ETHICORE_LICENSE_KEY).")
     parser.add_argument("--assets-dir", metavar="DIR", default=None,
                         help="Asset bundle path (overrides $ETHICORE_ASSETS_DIR).")
-    parser.add_argument("--samples", type=int, default=20000,
-                        help="Total training samples (default: 20000).")
+    parser.add_argument("--samples", type=int, default=30000,
+                        help="Total training samples (default: 30000).")
     parser.add_argument("--hidden", default="128,64",
                         help="MLP hidden layers, comma-separated (default: 128,64).")
     parser.add_argument("--seed", type=int, default=42,
