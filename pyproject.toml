@@ -21,6 +21,7 @@ keywords = [
     "llm-security",
     "openai",
     "anthropic",
+    "minimax",
     "claude",
     "gpt",
 ]
@@ -50,6 +51,7 @@ requires-python = ">=3.8"
 #   pip install "ethicore-engine-guardian[openai]"
 #   pip install "ethicore-engine-guardian[anthropic]"
 #   pip install "ethicore-engine-guardian[google]"
+#   pip install "ethicore-engine-guardian[minimax]"
 #
 # Full ML inference (transformer models via HuggingFace):
 #   pip install "ethicore-engine-guardian[ml]"
@@ -76,6 +78,7 @@ dev = [
 openai = ["openai>=1.0.0"]
 anthropic = ["anthropic>=0.8.0"]
 google = ["google-generativeai>=0.3.0"]
+minimax = ["openai>=1.0.0"]
 
 # ml: enables full transformer-based ML inference in MLInferenceEngine.
 # Without these packages the engine runs its built-in heuristic fallback,
@@ -92,6 +95,7 @@ all = [
     "google-generativeai>=0.3.0",
     "transformers>=4.21.0",
     "torch>=1.12.0",
+    # minimax uses the openai SDK (already included above)
 ]
 
 [project.urls]

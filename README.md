@@ -35,7 +35,8 @@ With provider integrations:
 ```bash
 pip install "ethicore-engine-guardian[openai]"
 pip install "ethicore-engine-guardian[anthropic]"
-pip install "ethicore-engine-guardian[openai,anthropic]"
+pip install "ethicore-engine-guardian[minimax]"
+pip install "ethicore-engine-guardian[openai,anthropic,minimax]"
 ```
 
 ---
@@ -277,6 +278,50 @@ from ethicore_guardian import Guardian, GuardianConfig
 
 guardian = Guardian(config=GuardianConfig(api_key="my-app"))
 client = guardian.wrap(anthropic.Anthropic())
+```
+
+### MiniMax
+
+[MiniMax](https://www.minimax.io) provides powerful LLM models (M2.7, M2.5) through an
+OpenAI-compatible API. Guardian protects MiniMax calls the same way it protects OpenAI.
+
+```python
+import openai
+from ethicore_guardian import Guardian, GuardianConfig
+from ethicore_guardian.providers.minimax_provider import MiniMaxProvider
+
+guardian = Guardian(config=GuardianConfig(api_key="my-app"))
+
+# Create an OpenAI client pointed at MiniMax
+minimax_client = openai.OpenAI(
+    api_key="your-minimax-api-key",
+    base_url="https://api.minimax.io/v1",
+)
+
+# Wrap with Guardian protection
+provider = MiniMaxProvider(guardian)
+client = provider.wrap_client(minimax_client)
+
+# Use exactly like normal — Guardian intercepts every input
+response = client.chat.completions.create(
+    model="MiniMax-M2.7",
+    messages=[{"role": "user", "content": user_input}]
+)
+```
+
+Or use the one-step convenience factory:
+
+```python
+from ethicore_guardian.providers.minimax_provider import create_protected_minimax_client
+
+client = create_protected_minimax_client(
+    api_key="your-minimax-api-key",
+    guardian_api_key="ethicore-...",
+)
+response = client.chat.completions.create(
+    model="MiniMax-M2.7",
+    messages=[{"role": "user", "content": user_input}]
+)
 ```
 
 ### Ollama (local LLMs)
