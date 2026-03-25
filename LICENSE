@@ -28,14 +28,12 @@ source files that implement the detection pipeline, provider wrappers, and
 public API (the "Software" described above).
 
 The following assets are NOT covered by this MIT license and are governed by
-the separate ASSETS-LICENSE file:
+the separate API-LICENSE file:
 
-  - ethicore_guardian/data/threat_patterns_licensed.py
-  - ethicore_guardian/data/threat_embeddings.json
-  - ethicore_guardian/models/minilm-l6-v2.onnx
-  - ethicore_guardian/models/minilm-l6-v2.onnx.data
-  - ethicore_guardian/models/guardian-model.onnx
-  - ethicore_guardian/models/model_signatures.json
+  - Full Threat Patterns Library
+  - Full Semantic Fingerprints Library
+  - Models
+  - Model Files & Data (weights, signatures, etc)
 
-These proprietary assets are distributed separately and require a paid license
-key.  See ASSETS-LICENSE for terms.
+These proprietary assets are distributed as part of the API subscription
+and require a valid API key.  See API-LICENSE for terms.

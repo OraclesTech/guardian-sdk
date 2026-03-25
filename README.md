@@ -20,8 +20,7 @@ watching for them.
 
 Guardian SDK is that layer. It sits between your application and the model,
 classifying every input in real-time and blocking threats before they reach
-model context. It runs entirely inside your infrastructure — no data leaves
-your stack for detection — and it ships as a single pip install.
+model context. It ships as a single pip install.
 
 ---
 
@@ -47,7 +46,7 @@ import asyncio
 from ethicore_guardian import Guardian, GuardianConfig
 
 async def main():
-    guardian = Guardian(config=GuardianConfig(api_key="my-app"))
+    guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
     await guardian.initialize()
 
     result = await guardian.analyze(
@@ -120,24 +119,6 @@ adds <1ms (pure-Python, no I/O, compiled at import time).
 
 ---
 
-## Why Offline Inference Matters
-
-Most AI security tools are cloud APIs. That means your application's inputs — which
-may contain private context, user data, or proprietary system information — leave
-your infrastructure for classification. You are sending potentially sensitive data
-to a third-party service on every request.
-
-Guardian runs the MiniLM-L6-v2 semantic model locally via ONNX. **No input data
-leaves your stack.** For teams in regulated industries, teams with sensitive system
-prompts, or any developer who wants to own their entire security surface — this is
-not a convenience, it is a requirement.
-
-The licensed tier includes the full ONNX model bundle. The community edition uses a
-hash-based semantic fallback that catches the most common attack classes without any
-external dependency.
-
----
-
 ## What It Defends Against
 
 Guardian protects your AI system from adversarial inputs designed to:
@@ -146,106 +127,75 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Activate jailbreak modes** — prompts engineered to bypass alignment and safety controls
 - **Hijack the AI's role** — attempts to redefine what the model is and who it serves
 - **Extract your system prompt** — probing attacks targeting your proprietary instructions
-- **Poison RAG context** — indirect injection through retrieved documents or tool outputs *(licensed)*
-- **Hijack agentic tool calls** — manipulation of function-calling and agent behavior *(licensed)*
+- **Poison RAG context** — indirect injection through retrieved documents or tool outputs *(API)*
+- **Hijack agentic tool calls** — manipulation of function-calling and agent behavior *(API)*
 - **Exploit multi-turn context** — gradual manipulation across a conversation session
-- **Bypass via translation or encoding** — obfuscation attacks designed to evade detection *(licensed)*
-- **Abuse few-shot patterns** — using example structures to smuggle instructions *(licensed)*
-- **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(licensed)*
+- **Bypass via translation or encoding** — obfuscation attacks designed to evade detection *(API)*
+- **Abuse few-shot patterns** — using example structures to smuggle instructions *(API)*
+- **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(API)*
 
-The community edition covers the five most prevalent categories. The licensed tier
-covers all 51.
-
----
-
-## Community vs Licensed
-
-| | Community (Free) | Licensed — PRO / ENT |
-|---|---|---|
-| **Install** | `pip install ethicore-engine-guardian` | Same + asset bundle |
-| **Threat categories** | 5 | 51 |
-| **Regex patterns** | 18 | 500+ |
-| **Semantic model** | Hash-based fallback | 384-dim ONNX MiniLM-L6-v2 |
-| **Semantic fingerprints** | Runtime-only (AdversarialLearner) | 444+ pre-loaded + runtime growth |
-| **Full ONNX inference** | — | ✅ |
-| **Post-flight OutputAnalyzer** | ✅ | ✅ |
-| **Adversarial learning (runtime)** | ✅ hash-based | ✅ embedding-based |
-| **RAG / indirect injection** | — | ✅ |
-| **Agentic tool hijacking** | — | ✅ |
-| **Context poisoning detection** | — | ✅ |
-| **Sycophancy exploitation** | — | ✅ |
-| **Translation / encoding attacks** | — | ✅ |
-| **Few-shot normalization** | — | ✅ |
-| **Multi-turn behavioral analysis** | ✅ | ✅ |
-| **License required** | No | Yes |
-
-**Community covers:** `instructionOverride`, `jailbreakActivation`, `safetyBypass`,
-`roleHijacking`, `systemPromptLeaks` — the five categories present in every
-production LLM application. Real protection from day one, no license required.
-
-**Licensed adds:** The full 51-category threat taxonomy for production systems
-handling sensitive data, agentic architectures, RAG pipelines, or any deployment
-where a successful attack has real consequences for your application or your users.
+The community edition covers the five most prevalent categories. The API covers all 51.
 
 ---
 
-## Getting a License
+## Community vs API
 
-1. **Purchase:** [oraclestechnologies.com/guardian](https://oraclestechnologies.com/guardian)
-2. You receive a license key (`EG-PRO-XXXXXXXX-XXXXXXXXXXXXXXXX`) and a download
-   link for the paid asset bundle.
-3. Setup takes under five minutes — see Licensed Setup below.
+| | Community | API — Free | API — Pro | API — ENT |
+|---|---|---|---|---|
+| **Threat categories** | 5 | 51 | 51 | 51 |
+| **Regex patterns** | 18 | 500+ | 500+ | 500+ |
+| **Semantic model** | Hash-based fallback | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 |
+| **Semantic fingerprints** | Runtime-only | 444+ pre-loaded + runtime | 444+ pre-loaded + runtime | 444+ pre-loaded + runtime |
+| **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
+| **Agentic tool hijacking** | — | ✅ | ✅ | ✅ |
+| **Post-flight OutputAnalyzer** | ✅ | ✅ | ✅ | ✅ |
+| **Adversarial learning** | ✅ hash-based | ✅ embedding-based | ✅ embedding-based | ✅ embedding-based |
+| **Monthly requests** | Unlimited (local) | 1,000 | 100,000 | Custom |
+| **Rate limit** | Unlimited (local) | 60 RPM | 600 RPM | Custom |
+| **API key required** | No | Yes | Yes | Yes |
+| **Price** | Free | Free | Paid | Contact us |
 
-Questions before purchasing? Email [support@oraclestechnologies.com](mailto:support@oraclestechnologies.com).
+**Community** is the open-source, pip-installable SDK. Inference runs locally using a
+hash-based fallback covering the five most common attack categories. No API key, no
+account required.
+
+**API (Free & Pro)** routes requests through the Ethicore Engine™ platform. The full
+threat library, ONNX models, and semantic fingerprint database are managed server-side
+— no downloads, no local model files, no configuration beyond your API key. Free and Pro
+are identical in capability; they differ only in rate limits.
+
+---
+
+## API Access
+
+1. **Sign up:** [portal.oraclestechnologies.com](https://portal.oraclestechnologies.com)
+   — choose Free or Pro at registration.
+2. Your API key is generated immediately and displayed once. Store it securely — it
+   is your credential for platform access.
+3. That's it. No downloads, no model files, no additional setup.
+
+Questions? Email [support@oraclestechnologies.com](mailto:support@oraclestechnologies.com).
 You will get a direct response from the engineer who built this.
 
 ---
 
-## Licensed Setup
+## API Setup
 
-### 1. Set your license key
+Set your API key as an environment variable:
 
 ```bash
-export ETHICORE_LICENSE_KEY="EG-PRO-XXXXXXXX-XXXXXXXXXXXXXXXX"
+export ETHICORE_API_KEY="eg_live_XXXXXXXXXXXXXXXXXXXXXXXX"
 ```
 
 Or pass it directly in code:
-```python
-Guardian(config=GuardianConfig(license_key="EG-PRO-..."))
-```
-
-### 2. Install the asset bundle
-
-```bash
-unzip ethicore-guardian-assets-pro.zip -d ~/.ethicore/
-```
-
-Structure after extraction:
-```
-~/.ethicore/
-├── data/
-│   ├── threat_patterns_licensed.py   ← 51 categories, 500+ patterns
-│   └── threat_embeddings.json        ← 384-dim embeddings · 444+ threat fingerprints
-└── models/
-    ├── minilm-l6-v2.onnx
-    ├── minilm-l6-v2.onnx.data
-    ├── guardian-model.onnx
-    └── model_signatures.json
-```
-
-Custom path (for Docker or team deployments):
-```bash
-export ETHICORE_ASSETS_DIR="/opt/ethicore-assets"
-```
-
-### 3. Verify
 
 ```python
-from ethicore_guardian.data.threat_patterns import get_threat_statistics
-stats = get_threat_statistics()
-print(stats["totalCategories"])  # 51 (licensed) or 5 (community)
-print(stats.get("edition"))      # "community" if still in fallback mode
+Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
+
+The SDK uses your key to authenticate against the Ethicore Engine™ platform and
+unlock the full 51-category threat library. Without a key, the SDK falls back to
+community mode (5 categories, local hash-based inference).
 
 ---
 
@@ -259,7 +209,7 @@ Guardian wraps your existing AI client. No architectural changes required.
 import openai
 from ethicore_guardian import Guardian, GuardianConfig
 
-guardian = Guardian(config=GuardianConfig(api_key="my-app"))
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
 client = guardian.wrap(openai.OpenAI())
 
 # Drop-in replacement — Guardian intercepts every input before it reaches the model
@@ -275,7 +225,7 @@ response = client.chat.completions.create(
 import anthropic
 from ethicore_guardian import Guardian, GuardianConfig
 
-guardian = Guardian(config=GuardianConfig(api_key="my-app"))
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
 client = guardian.wrap(anthropic.Anthropic())
 ```
 
@@ -289,7 +239,7 @@ from ethicore_guardian.providers.guardian_ollama_provider import (
 )
 
 async def main():
-    guardian = Guardian(config=GuardianConfig(api_key="local"))
+    guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
     await guardian.initialize()
 
     provider = OllamaProvider(guardian, OllamaConfig(base_url="http://localhost:11434"))
@@ -324,7 +274,7 @@ Covenant is the operational expression of that responsibility.
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `api_key` | `str` | `None` | Application identifier (not a secret) |
+| `api_key` | `str` | `None` | Your secret Ethicore API key — authenticates platform access and unlocks the full threat library (env: `ETHICORE_API_KEY`) |
 | `enabled` | `bool` | `True` | Master on/off switch |
 | `strict_mode` | `bool` | `False` | Block on CHALLENGE as well as BLOCK |
 | `pattern_sensitivity` | `float` | `0.8` | Pattern layer threshold (0–1) |
@@ -334,8 +284,6 @@ Covenant is the operational expression of that responsibility.
 | `cache_enabled` | `bool` | `True` | SHA-256 keyed result cache |
 | `cache_ttl_seconds` | `int` | `300` | Cache entry lifetime |
 | `log_level` | `str` | `"INFO"` | Python logging level |
-| `license_key` | `str` | `None` | License key (env: `ETHICORE_LICENSE_KEY`) |
-| `assets_dir` | `str` | `None` | Asset bundle path (env: `ETHICORE_ASSETS_DIR`) |
 | `enable_output_analysis` | `bool` | `True` | Enable post-flight OutputAnalyzer gate |
 | `output_sensitivity` | `float` | `0.65` | Compromise score threshold for SUPPRESS verdict |
 | `suppressed_response_message` | `str` | `"I'm not able to provide that response."` | Safe replacement text shown when a response is suppressed |
@@ -368,11 +316,11 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 
 pip install -e ".[dev]"
 
-# Community test suite — no license required
+# Community test suite — no API key required
 pytest tests/ -v
 
-# Full test suite — requires license + asset bundle
-ETHICORE_LICENSE_KEY="EG-PRO-..." ETHICORE_ASSETS_DIR="$HOME/.ethicore" pytest tests/ -v
+# Full test suite — requires a valid API key
+ETHICORE_API_KEY="eg_live_..." pytest tests/ -v
 ```
 
 ---
@@ -382,11 +330,11 @@ ETHICORE_LICENSE_KEY="EG-PRO-..." ETHICORE_ASSETS_DIR="$HOME/.ethicore" pytest t
 **Framework code** (`ethicore_guardian/` Python sources, tests, scripts):
 MIT License — see [LICENSE](LICENSE).
 
-**Threat library and ONNX models** (paid asset bundle):
-Proprietary — see [ASSETS-LICENSE](ASSETS-LICENSE).
+**Threat library and ONNX models** (platform-managed, API access only):
+Proprietary — see [API-LICENSE](API-LICENSE).
 
 ---
 
-*You built something that people rely on. Defend it.*
+*Intelligence With Integrity*
 
 © 2026 [Oracles Technologies LLC](https://oraclestechnologies.com)
