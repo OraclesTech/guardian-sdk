@@ -5,12 +5,10 @@ The following files (the "Licensed Assets") are proprietary to Oracles
 Technologies LLC and are NOT covered by the MIT license that governs the
 Guardian SDK framework code:
 
-  ethicore_guardian/data/threat_patterns_licensed.py
-  ethicore_guardian/data/threat_embeddings.json
-  ethicore_guardian/models/minilm-l6-v2.onnx
-  ethicore_guardian/models/minilm-l6-v2.onnx.data
-  ethicore_guardian/models/guardian-model.onnx
-  ethicore_guardian/models/model_signatures.json
+  - Full Threat Patterns Library
+  - Full Semantic Fingerprints Library
+  - Models
+  - Model Files & Data (weights, signatures, etc)
 
 GRANT OF LICENSE
 ================

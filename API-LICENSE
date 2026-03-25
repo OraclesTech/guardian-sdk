@@ -1,0 +1,77 @@
+ETHICORE ENGINE™ GUARDIAN SDK — PROPRIETARY ASSET LICENSE
+Copyright (c) 2026 Oracles Technologies LLC. All Rights Reserved.
+
+The following (the "Assets") are proprietary to Oracles
+Technologies LLC and are NOT covered by the MIT license that governs the
+Guardian SDK framework code:
+
+  - Full Threat Patterns Library
+  - Full Semantic Fingerprints Library
+  - Models
+  - Model Files & Data (weights, signatures, etc)
+
+These assets are made available exclusively through the Ethicore Engine™ API
+platform (FREE, PRO, and ENT tiers) at portal.oraclestechnologies.com.
+
+GRANT OF LICENSE
+================
+Subject to the terms of this license and an active API subscription, Oracles
+Technologies LLC grants you a limited, non-exclusive, non-transferable,
+revocable license to:
+
+  1. Install and use the Assets on systems you own or control, solely
+     in conjunction with the Guardian SDK framework and your active API
+     subscription tier.
+  2. Make a reasonable number of backup copies for disaster-recovery purposes.
+
+Access to the Assets is contingent on maintaining a valid API key
+issued through the Ethicore Engine™ Developer Portal. FREE tier access is
+provided at no charge. PRO and ENT tier access requires a paid subscription.
+
+RESTRICTIONS
+============
+You may NOT:
+
+  a. Redistribute, sublicense, sell, rent, lease, or otherwise transfer the
+     Assets to any third party.
+  b. Reverse-engineer, decompile, disassemble, or attempt to derive the source
+     or structure of any Asset, including neural network weights.
+  c. Remove, alter, or obscure any copyright notice, trademark, or proprietary
+     legend contained in the Assets.
+  d. Use the Assets in any product or service that competes with
+     Ethicore Engine™ - Guardian SDK or any other product of Oracles
+     Technologies LLC.
+  e. Make the Assets publicly accessible (e.g., by committing them
+     to a public repository, hosting them on a public URL, or including them
+     in an open-source distribution).
+  f. Share, transfer, or expose your API key to unauthorized parties.
+
+TERMINATION
+===========
+This license terminates automatically if you breach any of its terms or if
+your API subscription lapses without renewal. Upon termination you must
+immediately delete all copies of the Assets in your possession or
+control.
+
+DISCLAIMER OF WARRANTIES
+=========================
+THE ASSETS ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+ORACLES TECHNOLOGIES LLC DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+LIMITATION OF LIABILITY
+=======================
+IN NO EVENT SHALL ORACLES TECHNOLOGIES LLC BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES, EVEN IF ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES.
+
+CONTACT
+=======
+For API access, tier upgrades, enterprise agreements, or support:
+
+  Portal: https://portal.oraclestechnologies.com
+  Web:    https://oraclestechnologies.com/guardian
+  Email:  support@oraclestechnologies.com
+
+Intelligence With Integrity
