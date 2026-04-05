@@ -299,6 +299,10 @@ def get_provider_for_client(client: Any) -> str:
     
     # Check client type and module for provider indicators
     if 'openai' in client_type or 'openai' in client_module:
+        # Check if the client is configured for MiniMax (OpenAI-compatible API)
+        base_url = str(getattr(client, 'base_url', '') or '')
+        if 'minimax' in base_url.lower():
+            return 'minimax'
         return 'openai'
     elif 'anthropic' in client_type or 'anthropic' in client_module:
         return 'anthropic'
