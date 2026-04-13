@@ -114,8 +114,17 @@ guardian = "ethicore_guardian.cli:main"
 # Package discovery
 # ---------------------------------------------------------------------------
 
-[tool.setuptools.packages.find]
-include = ["ethicore_guardian*"]
+# Explicit package list — safer than find + exclude because setuptools
+# silently ignores `exclude` when `include` is also present.
+# Proprietary packages (analyzers/, guardian.py) are intentionally omitted.
+[tool.setuptools]
+packages = [
+    "ethicore_guardian",
+    "ethicore_guardian.data",
+    "ethicore_guardian.models",
+    "ethicore_guardian.providers",
+    "ethicore_guardian.utils",
+]
 
 [tool.setuptools.package-data]
 ethicore_guardian = [
@@ -130,6 +139,7 @@ ethicore_guardian = [
     #   models/model_signatures.json
     #   data/threat_embeddings.json
     #   data/threat_patterns_licensed.py
+    #   analyzers/  (entire subpackage)
 ]
 
 [tool.setuptools.dynamic]
