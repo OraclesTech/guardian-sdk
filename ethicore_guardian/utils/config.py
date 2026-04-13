@@ -66,7 +66,15 @@ class GuardianConfig:
     # Override via env var: ETHICORE_ASSETS_DIR
     # Layout expected: <assets_dir>/data/threat_patterns_licensed.py
     #                  <assets_dir>/models/minilm-l6-v2.onnx  (etc.)
+    #                  <assets_dir>/models/paraphrase-multilingual-minilm-l12-v2.onnx (optional)
     assets_dir: Optional[str] = None
+
+    # Multilingual threat detection — Layer 8 (Principle 10: Divine Justice).
+    # Community tier: keyword heuristics covering 7 languages + learned fingerprints.
+    # Licensed tier : + ONNX multilingual model (50+ languages) when model present in assets_dir.
+    # Set False to disable Layer 8 entirely (English-only mode, no latency for non-English).
+    # Override via env var: ETHICORE_MULTILINGUAL_ENABLED
+    multilingual_enabled: bool = True
 
     @classmethod
     def from_env(cls) -> "GuardianConfig":
@@ -91,4 +99,5 @@ class GuardianConfig:
             correction_rate_limit_per_minute=_int_env("ETHICORE_CORRECTION_RATE_LIMIT", 10),
             license_key=os.getenv("ETHICORE_LICENSE_KEY"),
             assets_dir=os.getenv("ETHICORE_ASSETS_DIR"),
+            multilingual_enabled=os.getenv("ETHICORE_MULTILINGUAL_ENABLED", "true").lower() == "true",
         )

@@ -35,6 +35,17 @@ try:
     from .analyzers.adversarial_learner import AdversarialLearner, LearningOutcome
 except ImportError as e:
     print(f"[WARN]  Phase 3 analyzers not available: {e}")
+
+# Multilingual support — Layer 8 (community + licensed tier)
+try:
+    from .analyzers.language_detector import LanguageDetector, LanguageDetectionResult
+    from .analyzers.multilingual_semantic_analyzer import (
+        MultilingualSemanticAnalyzer,
+        MultilingualSemanticResult,
+        MultilingualMatch,
+    )
+except ImportError as e:  # pragma: no cover
+    print(f"[WARN]  Multilingual analyzers not available: {e}")
     OutputAnalyzer = None        # type: ignore[assignment,misc]
     OutputAnalysisResult = None  # type: ignore[assignment,misc]
     AdversarialLearner = None    # type: ignore[assignment,misc]
@@ -78,6 +89,13 @@ __all__ = [
     'LicenseValidator',
     'LicenseInfo',
     'validate_license',
+
+    # Multilingual — Layer 8
+    'LanguageDetector',
+    'LanguageDetectionResult',
+    'MultilingualSemanticAnalyzer',
+    'MultilingualSemanticResult',
+    'MultilingualMatch',
 
     # Version
     '__version__',

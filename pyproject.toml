@@ -77,6 +77,12 @@ openai = ["openai>=1.0.0"]
 anthropic = ["anthropic>=0.8.0"]
 google = ["google-generativeai>=0.3.0"]
 
+# multilingual: enables language detection for Layer 8 (Multilingual Semantic Analyzer).
+# Without langdetect, Layer 8 is disabled and the system runs as English-only (existing behaviour).
+# Community tier: keyword heuristics for 7 languages + AdversarialLearner learned fingerprints.
+# Licensed tier : add paraphrase-multilingual-minilm-l12-v2.onnx to assets_dir for 50+ languages.
+multilingual = ["langdetect>=1.0.9"]
+
 # ml: enables full transformer-based ML inference in MLInferenceEngine.
 # Without these packages the engine runs its built-in heuristic fallback,
 # which is still effective but less accurate than a fine-tuned classifier.
@@ -92,6 +98,7 @@ all = [
     "google-generativeai>=0.3.0",
     "transformers>=4.21.0",
     "torch>=1.12.0",
+    "langdetect>=1.0.9",
 ]
 
 [project.urls]
