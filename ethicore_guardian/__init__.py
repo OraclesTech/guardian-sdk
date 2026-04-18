@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports
@@ -50,6 +50,42 @@ except ImportError as e:  # pragma: no cover
     OutputAnalysisResult = None  # type: ignore[assignment,misc]
     AdversarialLearner = None    # type: ignore[assignment,misc]
     LearningOutcome = None       # type: ignore[assignment,misc]
+
+# Agentic pipeline protection — Phase 4
+try:
+    from .analyzers.tool_output_scanner import ToolOutputScanner, ToolOutputScanResult
+    from .analyzers.tool_call_validator import ToolCallValidator, ToolCallScanResult, ToolCallMatch
+except ImportError as e:
+    print(f"[WARN]  Agentic analyzers not available: {e}")
+
+# Agentic security extensions — Phase 4b (API tier)
+# Tool provenance tracking + response anomaly detection
+try:
+    from .analyzers.tool_registry import (
+        ToolRegistry,
+        ToolRegistration,
+        ToolProvenanceResult,
+    )
+    from .analyzers.response_anomaly_detector import (
+        ResponseAnomalyDetector,
+        ResponseAnomalyResult,
+        AnomalySignal,
+    )
+except ImportError as e:
+    print(f"[WARN]  Phase 4b security extensions not available: {e}")
+
+# LangChain callback handlers — optional (requires langchain-core)
+try:
+    from .providers.langchain_callback import (
+        GuardianCallbackHandler,
+        GuardianAsyncCallbackHandler,
+        GuardianPipelineError,
+        GuardianAgentBlockedError,
+        GuardianToolCallBlockedError,
+        GuardianToolOutputBlockedError,
+    )
+except ImportError:
+    pass  # langchain-core not installed — handlers unavailable
 
 # License validator — stdlib-only, always available
 try:
@@ -96,6 +132,29 @@ __all__ = [
     'MultilingualSemanticAnalyzer',
     'MultilingualSemanticResult',
     'MultilingualMatch',
+
+    # Agentic pipeline protection — Phase 4
+    'ToolOutputScanner',
+    'ToolOutputScanResult',
+    'ToolCallValidator',
+    'ToolCallScanResult',
+    'ToolCallMatch',
+
+    # Agentic security extensions — Phase 4b (API tier)
+    'ToolRegistry',
+    'ToolRegistration',
+    'ToolProvenanceResult',
+    'ResponseAnomalyDetector',
+    'ResponseAnomalyResult',
+    'AnomalySignal',
+
+    # LangChain integration (optional)
+    'GuardianCallbackHandler',
+    'GuardianAsyncCallbackHandler',
+    'GuardianPipelineError',
+    'GuardianAgentBlockedError',
+    'GuardianToolCallBlockedError',
+    'GuardianToolOutputBlockedError',
 
     # Version
     '__version__',
