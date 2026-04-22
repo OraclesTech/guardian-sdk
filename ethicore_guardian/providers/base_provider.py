@@ -298,6 +298,11 @@ def get_provider_for_client(client: Any) -> str:
     client_module = getattr(client, '__module__', '').lower()
     
     # Check client type and module for provider indicators
+    # xAI/Grok clients are OpenAI clients with a custom base_url — check first
+    base_url = str(getattr(client, 'base_url', '') or '').lower()
+    if 'x.ai' in base_url or 'xai' in base_url:
+        return 'xai'
+
     if 'openai' in client_type or 'openai' in client_module:
         return 'openai'
     elif 'anthropic' in client_type or 'anthropic' in client_module:
