@@ -20,6 +20,20 @@ from .guardian import (
     protect_openai,
 )
 
+# xAI / Grok provider — always available (depends only on openai package)
+try:
+    from .providers.xai_provider import (
+        XAIProvider,
+        ProtectedXAIClient,
+        ThreatBlockedException as XAIThreatBlockedException,
+        AgentToolBlockedException,
+        ToolOutputBlockedException,
+        create_protected_xai_client,
+    )
+    from .guardian import protect_xai  # convenience wrapper registered in guardian.py
+except ImportError:
+    pass  # openai package not installed
+
 # Convenience imports for existing analyzers
 try:
     from .analyzers.pattern_analyzer import PatternAnalyzer
@@ -108,6 +122,14 @@ __all__ = [
     # Convenience functions
     'analyze_text',
     'protect_openai',
+    'protect_xai',
+    'create_protected_xai_client',
+
+    # xAI / Grok provider
+    'XAIProvider',
+    'ProtectedXAIClient',
+    'AgentToolBlockedException',
+    'ToolOutputBlockedException',
 
     # Analyzers (if available)
     'PatternAnalyzer',

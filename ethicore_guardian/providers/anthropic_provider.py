@@ -16,6 +16,14 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional
 
+from ._agentic_guards import (
+    extract_anthropic_tool_results,
+    extract_anthropic_tool_calls,
+    scan_inbound_tool_results,
+    scan_outbound_tool_calls,
+    run_sync,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +63,18 @@ class ThreatChallengeException(Exception):
     ) -> None:
         self.analysis_result = analysis_result
         super().__init__(message)
+
+
+class ToolOutputBlockedException(ThreatBlockedException):
+    """Raised when a tool result contains an injection payload."""
+    def __init__(self, analysis_result: Any, message: str = "Tool output blocked") -> None:
+        super().__init__(analysis_result, message)
+
+
+class AgentToolBlockedException(ThreatBlockedException):
+    """Raised when the model issues a dangerous tool invocation."""
+    def __init__(self, analysis_result: Any, message: str = "Agentic tool call blocked") -> None:
+        super().__init__(analysis_result, message)
 
 
 # ---------------------------------------------------------------------------
@@ -232,34 +252,30 @@ class ProtectedMessages:
     # ------------------------------------------------------------------
 
     def create(self, **kwargs: Any) -> Any:
-        """Protected synchronous ``messages.create()``."""
-        prompt_text = self._provider.extract_prompt(**kwargs)
+        """Protected synchronous ``messages.create()`` — all three agentic layers."""
+        messages = kwargs.get("messages", [])
 
+        # Layer 1: prompt scan
+        prompt_text = self._provider.extract_prompt(**kwargs)
         if prompt_text and prompt_text.strip():
-            analysis = self._run_analysis_sync(prompt_text, kwargs)
+            analysis = run_sync(self._analyze(prompt_text, kwargs))
             self._enforce_policy(analysis, prompt_text)
 
-        return self._original_messages.create(**kwargs)
+        # Layer 2: inbound tool result scan (Anthropic tool_result blocks)
+        tool_results = extract_anthropic_tool_results(messages)
+        if tool_results:
+            run_sync(scan_inbound_tool_results(
+                self._guardian, tool_results, ToolOutputBlockedException
+            ))
 
-    def _run_analysis_sync(self, prompt_text: str, request_kwargs: Dict[str, Any]) -> Any:
-        """Run Guardian analysis, handling sync/async context differences."""
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop:
-            # Already inside an event loop — push analysis to a thread pool
-            import concurrent.futures
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-                future = pool.submit(
-                    asyncio.run,
-                    self._analyze(prompt_text, request_kwargs),
-                )
-                return future.result()
-        else:
-            return asyncio.run(self._analyze(prompt_text, request_kwargs))
+        # Layer 3: execute, then scan outbound tool_use blocks
+        response = self._original_messages.create(**kwargs)
+        tool_calls = extract_anthropic_tool_calls(response)
+        if tool_calls:
+            run_sync(scan_outbound_tool_calls(
+                self._guardian, tool_calls, AgentToolBlockedException
+            ))
+        return response
 
     # ------------------------------------------------------------------
     # Async path
@@ -267,20 +283,36 @@ class ProtectedMessages:
 
     async def async_create(self, **kwargs: Any) -> Any:
         """
-        Protected async ``messages.create()``.
+        Protected async ``messages.create()`` — all three agentic layers.
 
         Usage with ``anthropic.AsyncAnthropic``::
 
             protected = guardian.wrap(async_client)
             response = await protected.messages.async_create(model=..., ...)
         """
-        prompt_text = self._provider.extract_prompt(**kwargs)
+        messages = kwargs.get("messages", [])
 
+        # Layer 1: prompt scan
+        prompt_text = self._provider.extract_prompt(**kwargs)
         if prompt_text and prompt_text.strip():
             analysis = await self._analyze(prompt_text, kwargs)
             self._enforce_policy(analysis, prompt_text)
 
-        return await self._original_messages.create(**kwargs)
+        # Layer 2: inbound tool result scan
+        tool_results = extract_anthropic_tool_results(messages)
+        if tool_results:
+            await scan_inbound_tool_results(
+                self._guardian, tool_results, ToolOutputBlockedException
+            )
+
+        # Layer 3: execute, then scan outbound tool_use blocks
+        response = await self._original_messages.create(**kwargs)
+        tool_calls = extract_anthropic_tool_calls(response)
+        if tool_calls:
+            await scan_outbound_tool_calls(
+                self._guardian, tool_calls, AgentToolBlockedException
+            )
+        return response
 
     # ------------------------------------------------------------------
     # Shared helpers

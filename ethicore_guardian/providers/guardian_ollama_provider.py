@@ -13,6 +13,13 @@ import json
 from typing import Dict, List, Any, Optional, Union
 from dataclasses import dataclass
 
+from ._agentic_guards import (
+    extract_ollama_tool_results,
+    extract_ollama_tool_calls,
+    scan_inbound_tool_results,
+    scan_outbound_tool_calls,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -21,6 +28,18 @@ class ThreatBlockedException(Exception):
     def __init__(self, analysis_result, message="Threat detected and blocked"):
         self.analysis_result = analysis_result
         super().__init__(message)
+
+
+class ToolOutputBlockedException(ThreatBlockedException):
+    """Raised when a tool result contains an injection payload."""
+    def __init__(self, analysis_result, message="Tool output blocked — injection detected"):
+        super().__init__(analysis_result, message)
+
+
+class AgentToolBlockedException(ThreatBlockedException):
+    """Raised when the model issues a dangerous tool invocation."""
+    def __init__(self, analysis_result, message="Agentic tool call blocked"):
+        super().__init__(analysis_result, message)
 
 
 @dataclass
@@ -84,39 +103,47 @@ class ProtectedOllamaClient:
         
         logger.debug("🛡️ Protected Ollama client created")
     
-    async def chat(self, 
+    async def chat(self,
                    model: str,
                    messages: List[Dict[str, str]],
                    stream: bool = False,
                    options: Optional[Dict] = None) -> Dict[str, Any]:
-        """Protected chat completion with local LLM"""
-        
-        # Extract user message for analysis
+        """Protected chat completion — all three agentic layers."""
+
+        # Layer 1: prompt scan
         user_message = self._extract_user_message(messages)
-        
         if user_message:
-            # Analyze with Guardian
             context = {
                 'provider': 'ollama',
                 'model': model,
                 'local_llm': True,
-                'base_url': self.config.base_url
+                'base_url': self.config.base_url,
             }
-            
             analysis = await self.guardian.analyze(user_message, context)
-            
-            # Handle threat detection
             if not analysis.is_safe:
                 self._handle_threat_detected(analysis, user_message, model)
-        
-        # Safe to proceed with Ollama API call
-        return await self._make_ollama_request(
+
+        # Layer 2: inbound tool result scan (Ollama ≥ 0.3 with tool-capable models)
+        tool_results = extract_ollama_tool_results(messages)
+        if tool_results:
+            await scan_inbound_tool_results(
+                self.guardian, tool_results, ToolOutputBlockedException
+            )
+
+        # Layer 3: execute, then scan outbound tool calls in response
+        response = await self._make_ollama_request(
             model=model,
             messages=messages,
             stream=stream,
             options=options
         )
-    
+        tool_calls = extract_ollama_tool_calls(response)
+        if tool_calls:
+            await scan_outbound_tool_calls(
+                self.guardian, tool_calls, AgentToolBlockedException
+            )
+        return response
+
     def _extract_user_message(self, messages: List[Dict[str, str]]) -> str:
         """Extract user message from chat messages"""
         user_messages = [msg for msg in messages if msg.get('role') == 'user']

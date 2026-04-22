@@ -13,7 +13,29 @@ from typing import Dict, List, Any, Optional, Union
 import json
 from functools import wraps
 
+from ._agentic_guards import (
+    extract_openai_tool_results,
+    extract_openai_tool_calls,
+    scan_inbound_tool_results,
+    scan_outbound_tool_calls,
+    run_sync,
+)
+
 logger = logging.getLogger(__name__)
+
+
+class ToolOutputBlockedException(Exception):
+    """Raised when a tool result contains an injection payload."""
+    def __init__(self, analysis_result, message="Tool output blocked — injection detected"):
+        self.analysis_result = analysis_result
+        super().__init__(message)
+
+
+class AgentToolBlockedException(Exception):
+    """Raised when the model issues a dangerous tool invocation."""
+    def __init__(self, analysis_result, message="Agentic tool call blocked"):
+        self.analysis_result = analysis_result
+        super().__init__(message)
 
 
 class ProviderError(Exception):
@@ -212,50 +234,58 @@ class ProtectedOpenAIClient:
                         )
                     
                     def _guardian_protect_request(self, original_method, **kwargs):
-                        """Apply Guardian protection to sync request"""
-                        # Extract prompt for analysis
+                        """Apply Guardian protection to sync request — all three agentic layers."""
+                        messages = kwargs.get('messages', [])
+
+                        # Layer 1: prompt scan
                         prompt_text = self._provider.extract_prompt(**kwargs)
-                        
                         if prompt_text and len(prompt_text.strip()) > 0:
-                            # Run threat analysis (async)
-                            loop = None
-                            try:
-                                loop = asyncio.get_running_loop()
-                            except RuntimeError:
-                                pass
-                            
-                            if loop:
-                                # We're in an async context, need to run in thread
-                                import concurrent.futures
-                                with concurrent.futures.ThreadPoolExecutor() as executor:
-                                    future = executor.submit(asyncio.run, self._analyze_threat(prompt_text, kwargs))
-                                    analysis = future.result()
-                            else:
-                                # Not in async context, can run directly
-                                analysis = asyncio.run(self._analyze_threat(prompt_text, kwargs))
-                            
-                            # Check result
+                            analysis = run_sync(self._analyze_threat(prompt_text, kwargs))
                             if not analysis.is_safe:
                                 self._handle_threat_detected(analysis, prompt_text)
-                        
-                        # Request is safe, proceed with original call
-                        return original_method(**kwargs)
-                    
+
+                        # Layer 2: inbound tool result scan
+                        tool_results = extract_openai_tool_results(messages)
+                        if tool_results:
+                            run_sync(scan_inbound_tool_results(
+                                self._guardian, tool_results, ToolOutputBlockedException
+                            ))
+
+                        # Layer 3: execute request, then scan outbound tool calls
+                        response = original_method(**kwargs)
+                        tool_calls = extract_openai_tool_calls(response)
+                        if tool_calls:
+                            run_sync(scan_outbound_tool_calls(
+                                self._guardian, tool_calls, AgentToolBlockedException
+                            ))
+                        return response
+
                     async def _guardian_protect_request_async(self, original_method, **kwargs):
-                        """Apply Guardian protection to async request"""
-                        # Extract prompt for analysis
+                        """Apply Guardian protection to async request — all three agentic layers."""
+                        messages = kwargs.get('messages', [])
+
+                        # Layer 1: prompt scan
                         prompt_text = self._provider.extract_prompt(**kwargs)
-                        
                         if prompt_text and len(prompt_text.strip()) > 0:
-                            # Run threat analysis
                             analysis = await self._analyze_threat(prompt_text, kwargs)
-                            
-                            # Check result
                             if not analysis.is_safe:
                                 self._handle_threat_detected(analysis, prompt_text)
-                        
-                        # Request is safe, proceed with original call
-                        return await original_method(**kwargs)
+
+                        # Layer 2: inbound tool result scan
+                        tool_results = extract_openai_tool_results(messages)
+                        if tool_results:
+                            await scan_inbound_tool_results(
+                                self._guardian, tool_results, ToolOutputBlockedException
+                            )
+
+                        # Layer 3: execute request, then scan outbound tool calls
+                        response = await original_method(**kwargs)
+                        tool_calls = extract_openai_tool_calls(response)
+                        if tool_calls:
+                            await scan_outbound_tool_calls(
+                                self._guardian, tool_calls, AgentToolBlockedException
+                            )
+                        return response
                     
                     async def _analyze_threat(self, prompt_text: str, request_kwargs: Dict) -> Any:
                         """Analyze prompt for threats"""
