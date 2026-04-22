@@ -152,7 +152,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Abuse few-shot patterns** — using example structures to smuggle instructions *(API)*
 - **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(API)*
 
-The community edition covers the five most prevalent categories. The API covers all 53.
+The community edition covers the five most prevalent categories. The API covers 50+.
 
 ---
 
@@ -160,10 +160,10 @@ The community edition covers the five most prevalent categories. The API covers 
 
 | | Community | API — Free | API — Pro | API — ENT |
 |---|---|---|---|---|
-| **Threat categories** | 5 | 53 | 53 | 53 |
+| **Threat categories** | 5 | 50+ | 50+ | 50+ |
 | **Regex patterns** | 18 | 500+ | 500+ | 500+ |
 | **Semantic model** | Hash-based fallback | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 |
-| **Semantic fingerprints** | Runtime-only | 468+ pre-loaded + runtime | 468+ pre-loaded + runtime | 468+ pre-loaded + runtime |
+| **Semantic fingerprints** | Runtime-only | ~500 pre-loaded + runtime | ~500 pre-loaded + runtime | ~500 pre-loaded + runtime |
 | **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
 | **Agentic pipeline protection** | — | ✅ | ✅ | ✅ |
 | **Tool call validation** | — | ✅ | ✅ | ✅ |
@@ -215,7 +215,7 @@ Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
 
 The SDK uses your key to authenticate against the Ethicore Engine™ platform and
-unlock the full 53-category threat library. Without a key, the SDK falls back to
+unlock the full threat library (50+ categories). Without a key, the SDK falls back to
 community mode (5 categories, local hash-based inference).
 
 ---
