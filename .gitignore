@@ -128,6 +128,14 @@ run_*.bat
 phase3_results.txt
 *.bak
 *.tmp
+pytest_out.txt
+run_tests.py
+
+# ---------------------------------------------------------------------------
+# Windows path-expansion artifacts (created by scripts with bad ~ expansion)
+# ---------------------------------------------------------------------------
+Userslawor.ethicore/
+embeddings_backup_pre_v160/
 
 # ---------------------------------------------------------------------------
 # Demo temp files (created by test/debug scripts at project root)
