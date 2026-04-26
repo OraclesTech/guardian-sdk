@@ -31,7 +31,7 @@ from typing import Any, Dict, List, Optional
 
 
 # ---------------------------------------------------------------------------
-# Enumerations (identical to licensed edition)
+# Enumerations (identical to API tier edition)
 # ---------------------------------------------------------------------------
 
 class ThreatSeverity(Enum):
@@ -217,7 +217,7 @@ THREAT_PATTERNS: Dict[str, Any] = {
 
 
 # ---------------------------------------------------------------------------
-# Public API — identical signatures to licensed edition
+# Public API — identical signatures to API tier edition
 # ---------------------------------------------------------------------------
 
 def get_all_patterns() -> List[Dict[str, Any]]:
@@ -283,7 +283,7 @@ def calculate_threat_score(matches: List[Dict[str, Any]]) -> float:
     Calculate a weighted threat score (0–200) from a list of match summaries.
 
     Each item in *matches* should have a ``category`` key and a ``count`` key.
-    Scores are capped at 200 to keep the range consistent with the licensed edition.
+    Scores are capped at 200 to keep the range consistent with the API tier edition.
     """
     score = 0.0
     for match in matches:
@@ -299,7 +299,7 @@ def determine_threat_level(score: float) -> str:
     """
     Convert a numeric threat score to a human-readable threat level string.
 
-    Thresholds (identical to licensed edition):
+    Thresholds (identical to API tier edition):
         CRITICAL  ≥ 150
         HIGH      ≥ 100
         MEDIUM    ≥ 50
@@ -332,7 +332,7 @@ def get_threat_statistics() -> Dict[str, Any]:
 
     Community-edition extras:
         ``edition``                    → "community"
-        ``licensed_categories_available`` → 30
+        ``api_categories_available``   → 50+
     """
     categories = list(THREAT_PATTERNS.keys())
 
@@ -357,7 +357,7 @@ def get_threat_statistics() -> Dict[str, Any]:
         "avgFingerprintsPerCategory":  round(total_fingerprints / len(categories), 1),
         # Community-edition metadata
         "edition":                     "community",
-        "licensed_categories_available": 30,
+        "api_categories_available":    "50+",
     }
 
 
@@ -374,7 +374,7 @@ def get_threat_statistics() -> Dict[str, Any]:
 # global dict, so assignments take effect immediately on the module object.
 # ---------------------------------------------------------------------------
 
-def _try_load_licensed_edition() -> bool:
+def _try_load_api_edition() -> bool:
     """
     Attempt to upgrade this module to the full threat pattern library.
 
@@ -428,7 +428,7 @@ def _try_load_licensed_edition() -> bool:
 
 
 # Perform the upgrade at module-import time (runs once per interpreter session).
-_LICENSED_EDITION_LOADED = _try_load_licensed_edition()
+_API_EDITION_LOADED = _try_load_api_edition()
 
 
 # ---------------------------------------------------------------------------
@@ -437,6 +437,6 @@ _LICENSED_EDITION_LOADED = _try_load_licensed_edition()
 if __name__ == "__main__":
     import json
     stats = get_threat_statistics()
-    edition = "Licensed" if _LICENSED_EDITION_LOADED else "Community"
+    edition = "API" if _API_EDITION_LOADED else "Community"
     print(f"Guardian SDK — {edition} Edition")
     print(json.dumps(stats, indent=2))
