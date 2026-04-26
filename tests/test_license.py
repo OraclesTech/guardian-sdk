@@ -235,19 +235,17 @@ class TestLicenseValidatorEdgeCases:
             assert r.is_valid is False
 
     @pytest.mark.skipif(
-        not os.environ.get("ETHICORE_LICENSE_KEY"),
-        reason="No ETHICORE_LICENSE_KEY in environment — skipping live key test.",
+        not os.environ.get("ETHICORE_API_KEY"),
+        reason="No ETHICORE_API_KEY in environment — skipping live key test.",
     )
     def test_environment_key_validates(self, validator):
         """
-        If ETHICORE_LICENSE_KEY is set in the environment, it must validate
-        successfully.  This test is only meaningful once the real HMAC secret
-        is embedded in license.py and a valid key has been generated.
+        If ETHICORE_API_KEY is set in the environment, it must validate
+        successfully.
         """
-        key = os.environ["ETHICORE_LICENSE_KEY"]
+        key = os.environ["ETHICORE_API_KEY"]
         result = validator.validate(key)
         assert result.is_valid is True, (
-            f"ETHICORE_LICENSE_KEY did not validate: tier={result.tier!r}.  "
-            "Ensure _SECRET_MASKED in license.py matches the key's HMAC secret."
+            f"ETHICORE_API_KEY did not validate: tier={result.tier!r}."
         )
         assert result.tier in ("PRO", "ENT", "API")

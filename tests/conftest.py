@@ -80,12 +80,12 @@ async def strict_guardian() -> Guardian:
 # Principle 11 (Sacred Truth): skip reason is visible and explicit — never
 # silently passing tests that cannot actually run in this environment.
 # ---------------------------------------------------------------------------
-LICENSED = bool(os.environ.get("ETHICORE_LICENSE_KEY"))
+LICENSED = bool(os.environ.get("ETHICORE_API_KEY"))
 
 requires_license = pytest.mark.skipif(
     not LICENSED,
     reason=(
         "Requires full threat library + ONNX models. "
-        "Set ETHICORE_LICENSE_KEY (and optionally ETHICORE_ASSETS_DIR) to enable."
+        "Set ETHICORE_API_KEY (and optionally ETHICORE_ASSETS_DIR) to enable."
     ),
 )

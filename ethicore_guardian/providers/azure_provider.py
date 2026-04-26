@@ -120,7 +120,7 @@ def create_protected_azure_client(
 
     Args:
         azure_client:     openai.AzureOpenAI or openai.AsyncAzureOpenAI instance.
-        guardian_api_key: Ethicore Guardian API key (ETHICORE_LICENSE_KEY).
+        guardian_api_key: Ethicore Guardian API key (ETHICORE_API_KEY).
 
     Returns:
         ProtectedOpenAIClient with full three-layer agentic protection.
@@ -135,7 +135,7 @@ def create_protected_azure_client(
             api_version="2024-12-01",
             api_key=os.environ["AZURE_OPENAI_KEY"],
         )
-        protected = create_protected_azure_client(az, guardian_api_key="EG-PRO-...")
+        protected = create_protected_azure_client(az, guardian_api_key="eg-sk-...")
         response = protected.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": "Hello"}],

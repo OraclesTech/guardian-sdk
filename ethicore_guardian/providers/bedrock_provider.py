@@ -343,7 +343,7 @@ def create_protected_bedrock_client(
         from ethicore_guardian.providers.bedrock_provider import create_protected_bedrock_client
 
         client = boto3.client("bedrock-runtime", region_name="us-east-1")
-        protected = create_protected_bedrock_client(client, guardian_api_key="EG-PRO-...")
+        protected = create_protected_bedrock_client(client, guardian_api_key="eg-sk-...")
 
         response = protected.converse(
             modelId="anthropic.claude-3-5-sonnet-20241022-v2:0",

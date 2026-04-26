@@ -58,10 +58,6 @@ class GuardianConfig:
     correction_key: Optional[str] = None
     correction_rate_limit_per_minute: int = 10
 
-    # Paid asset license key — enables licensed threat library (30 categories).
-    # Override via env var: ETHICORE_LICENSE_KEY (never log this value).
-    license_key: Optional[str] = None
-
     # Path to extracted paid asset bundle directory.
     # Override via env var: ETHICORE_ASSETS_DIR
     # Layout expected: <assets_dir>/data/threat_patterns_licensed.py
@@ -71,7 +67,7 @@ class GuardianConfig:
 
     # Multilingual threat detection — Layer 8 (Principle 10: Divine Justice).
     # Community tier: keyword heuristics covering 7 languages + learned fingerprints.
-    # Licensed tier : + ONNX multilingual model (50+ languages) when model present in assets_dir.
+    # API tier      : + ONNX multilingual model (50+ languages) when model present in assets_dir.
     # Set False to disable Layer 8 entirely (English-only mode, no latency for non-English).
     # Override via env var: ETHICORE_MULTILINGUAL_ENABLED
     multilingual_enabled: bool = True
@@ -97,7 +93,6 @@ class GuardianConfig:
             cache_max_size_mb=_int_env("ETHICORE_CACHE_MAX_MB", 256),
             correction_key=os.getenv("ETHICORE_CORRECTION_KEY"),
             correction_rate_limit_per_minute=_int_env("ETHICORE_CORRECTION_RATE_LIMIT", 10),
-            license_key=os.getenv("ETHICORE_LICENSE_KEY"),
             assets_dir=os.getenv("ETHICORE_ASSETS_DIR"),
             multilingual_enabled=os.getenv("ETHICORE_MULTILINGUAL_ENABLED", "true").lower() == "true",
         )

@@ -394,7 +394,7 @@ def create_protected_gemini_client(
         from ethicore_guardian.providers.gemini_provider import create_protected_gemini_client
 
         client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
-        protected = create_protected_gemini_client(client, guardian_api_key="EG-PRO-...")
+        protected = create_protected_gemini_client(client, guardian_api_key="eg-sk-...")
 
         response = protected.models.generate_content(
             model="gemini-2.0-flash",

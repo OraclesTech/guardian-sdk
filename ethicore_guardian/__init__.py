@@ -93,7 +93,7 @@ try:
 except ImportError as e:
     print(f"[WARN]  Phase 3 analyzers not available: {e}")
 
-# Multilingual support — Layer 8 (community + licensed tier)
+# Multilingual support — Layer 8 (community + API tier)
 try:
     from .analyzers.language_detector import LanguageDetector, LanguageDetectionResult
     from .analyzers.multilingual_semantic_analyzer import (
@@ -143,14 +143,6 @@ try:
     )
 except ImportError:
     pass  # langchain-core not installed — handlers unavailable
-
-# License validator — stdlib-only, always available
-try:
-    from .license import LicenseValidator, LicenseInfo, validate_license
-except ImportError:
-    LicenseValidator = None  # type: ignore[assignment,misc]
-    LicenseInfo = None       # type: ignore[assignment,misc]
-    validate_license = None  # type: ignore[assignment]
 
 # Main API exports
 __all__ = [
@@ -208,11 +200,6 @@ __all__ = [
     'OutputAnalysisResult',
     'AdversarialLearner',
     'LearningOutcome',
-
-    # License
-    'LicenseValidator',
-    'LicenseInfo',
-    'validate_license',
 
     # Multilingual — Layer 8
     'LanguageDetector',

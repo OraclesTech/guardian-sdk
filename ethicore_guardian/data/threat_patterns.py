@@ -5,18 +5,17 @@ Threat Pattern Library — Community Edition
 Version: 1.0.0 (Community)
 
 This is the open-source community edition, covering 5 OWASP LLM Top-10
-aligned threat categories.  The full licensed edition adds 25 additional
-categories (30 total), complete ONNX semantic embeddings, and advanced
-agentic/multi-turn threat detection.
+aligned threat categories.  The API tier adds 50+ additional categories,
+complete ONNX semantic embeddings, and advanced agentic/multi-turn threat
+detection.
 
 To unlock the full threat library:
-  1. Purchase a license at https://oraclestechnologies.com/guardian
-  2. Set ETHICORE_LICENSE_KEY in your environment
-  3. Extract the asset bundle: unzip ethicore-guardian-assets-pro.zip -d ~/.ethicore/
+  1. Sign up at portal.oraclestechnologies.com
+  2. Set ETHICORE_API_KEY in your environment (or pass api_key= to Guardian())
 
-API contract: identical to the licensed edition — same exports, same function
+API contract: identical to the API tier — same exports, same function
 signatures.  Code written against the community edition works unchanged with
-the licensed edition when credentials are supplied.
+the API tier when credentials are supplied.
 
 References:
   - OWASP LLM Top 10: https://owasp.org/www-project-top-10-for-large-language-model-applications/
@@ -363,10 +362,10 @@ def get_threat_statistics() -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# License-aware dynamic loading
+# API-key-aware dynamic loading
 # ---------------------------------------------------------------------------
-# If ETHICORE_LICENSE_KEY is set and the licensed asset file is reachable,
-# we replace this module's public namespace with the full 30-category library.
+# If ETHICORE_API_KEY is set and the full-edition asset file is reachable,
+# we replace this module's public namespace with the full threat library.
 # This makes `from ethicore_guardian.data.threat_patterns import THREAT_PATTERNS`
 # transparent — callers always get the right data for their tier without
 # needing to know which file is backing it.
@@ -377,33 +376,26 @@ def get_threat_statistics() -> Dict[str, Any]:
 
 def _try_load_licensed_edition() -> bool:
     """
-    Attempt to upgrade this module to the licensed threat pattern library.
+    Attempt to upgrade this module to the full threat pattern library.
 
-    Resolution order for the licensed file:
+    Resolution order for the full-edition file:
       1. $ETHICORE_ASSETS_DIR/data/threat_patterns_licensed.py
       2. ~/.ethicore/data/threat_patterns_licensed.py
       3. <package>/data/threat_patterns_licensed.py  (same directory as this file)
 
-    Returns True if the licensed edition was successfully loaded, False
+    Returns True if the full edition was successfully loaded, False
     if the community stub remains active.
+
+    Key validation is server-side (portal.oraclestechnologies.com);
+    possession of a valid ETHICORE_API_KEY implies authorisation.
     """
     import importlib.util
     import os
     from pathlib import Path
 
-    license_key = os.environ.get("ETHICORE_LICENSE_KEY", "").strip()
-    if not license_key:
+    api_key = os.environ.get("ETHICORE_API_KEY", "").strip()
+    if not api_key:
         return False
-
-    # Validate the key if the license validator is available.
-    try:
-        from ethicore_guardian.license import LicenseValidator  # type: ignore
-        if not LicenseValidator().validate(license_key).is_valid:
-            return False
-    except (ImportError, Exception):
-        # license.py may not be installed in all distributions; proceed on
-        # the assumption that possession of the key implies authorisation.
-        pass
 
     assets_dir = os.environ.get("ETHICORE_ASSETS_DIR", "").strip()
     candidates = []

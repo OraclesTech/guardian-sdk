@@ -11,7 +11,7 @@ model differs from other providers:
 
     protected = guardian.protect_litellm()
     # or
-    protected = create_protected_litellm(guardian_api_key="EG-PRO-...")
+    protected = create_protected_litellm(guardian_api_key="eg-sk-...")
 
     response = protected.completion(model="gpt-4o", messages=[...])
     response = await protected.acompletion(model="gemini/gemini-2.0-flash", ...)
@@ -128,7 +128,7 @@ class ProtectedLiteLLMClient:
         from ethicore_guardian.providers.litellm_provider import ProtectedLiteLLMClient
         from ethicore_guardian import Guardian
 
-        guardian = Guardian(api_key="EG-PRO-...")
+        guardian = Guardian(api_key="eg-sk-...")
         protected = ProtectedLiteLLMClient(guardian)
 
         response = protected.completion(
@@ -310,7 +310,7 @@ def create_protected_litellm(guardian_api_key: str) -> ProtectedLiteLLMClient:
     Convenience factory: create a Guardian-protected LiteLLM wrapper.
 
     Args:
-        guardian_api_key: Ethicore Guardian API key (ETHICORE_LICENSE_KEY).
+        guardian_api_key: Ethicore Guardian API key (ETHICORE_API_KEY).
 
     Returns:
         ProtectedLiteLLMClient exposing .completion() and .acompletion().
@@ -319,7 +319,7 @@ def create_protected_litellm(guardian_api_key: str) -> ProtectedLiteLLMClient:
 
         from ethicore_guardian.providers.litellm_provider import create_protected_litellm
 
-        protected = create_protected_litellm(guardian_api_key="EG-PRO-...")
+        protected = create_protected_litellm(guardian_api_key="eg-sk-...")
 
         response = protected.completion(
             model="groq/llama-3.3-70b-versatile",

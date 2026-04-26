@@ -27,8 +27,8 @@ this provider also intercepts the *agentic loop*:
                        executes them (malicious tool invocation)
 
 Steps 2 and 3 delegate to Guardian's scan_tool_output() and scan_tool_call()
-respectively, which are API-tier methods (license key required).  When no
-license key is present the agentic checks are skipped with a warning so the
+respectively, which are API-tier methods (API key required).  When no
+API key is present the agentic checks are skipped with a warning so the
 provider degrades gracefully to prompt-only protection.
 
 Principle 14 (Divine Safety): fail-closed on analysis errors — when in doubt,

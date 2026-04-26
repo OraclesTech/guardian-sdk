@@ -13,7 +13,7 @@ Layer 3 — Outbound tool call scan
     installs, data exfiltration, destructive filesystem operations).
 
 Both layers delegate to Guardian's scan_tool_output() and scan_tool_call() methods
-(API tier, license-gated).  When no license key is present the layers skip with a
+(API tier, API-key-gated).  When no API key is present the layers skip with a
 debug-level log so providers degrade gracefully to prompt-only protection.
 
 Provider-specific extraction helpers are co-located here so every provider uses
