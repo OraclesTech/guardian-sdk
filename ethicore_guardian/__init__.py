@@ -34,6 +34,49 @@ try:
 except ImportError:
     pass  # openai package not installed
 
+# Azure OpenAI provider — depends only on openai package
+try:
+    from .providers.azure_provider import (
+        AzureOpenAIProvider,
+        create_protected_azure_client,
+    )
+    from .guardian import protect_azure
+except ImportError:
+    pass
+
+# Google Gemini provider — requires google-genai
+try:
+    from .providers.gemini_provider import (
+        GeminiProvider,
+        ProtectedGeminiClient,
+        create_protected_gemini_client,
+    )
+    from .guardian import protect_gemini
+except ImportError:
+    pass  # google-genai not installed
+
+# AWS Bedrock provider — requires boto3
+try:
+    from .providers.bedrock_provider import (
+        BedrockProvider,
+        ProtectedBedrockClient,
+        create_protected_bedrock_client,
+    )
+    from .guardian import protect_bedrock
+except ImportError:
+    pass  # boto3 not installed
+
+# LiteLLM provider — requires litellm
+try:
+    from .providers.litellm_provider import (
+        LiteLLMProvider,
+        ProtectedLiteLLMClient,
+        create_protected_litellm,
+    )
+    from .guardian import protect_litellm
+except ImportError:
+    pass  # litellm not installed
+
 # Convenience imports for existing analyzers
 try:
     from .analyzers.pattern_analyzer import PatternAnalyzer
@@ -124,12 +167,35 @@ __all__ = [
     'protect_openai',
     'protect_xai',
     'create_protected_xai_client',
+    'protect_azure',
+    'create_protected_azure_client',
+    'protect_gemini',
+    'create_protected_gemini_client',
+    'protect_bedrock',
+    'create_protected_bedrock_client',
+    'protect_litellm',
+    'create_protected_litellm',
 
     # xAI / Grok provider
     'XAIProvider',
     'ProtectedXAIClient',
     'AgentToolBlockedException',
     'ToolOutputBlockedException',
+
+    # Azure OpenAI provider
+    'AzureOpenAIProvider',
+
+    # Google Gemini provider
+    'GeminiProvider',
+    'ProtectedGeminiClient',
+
+    # AWS Bedrock provider
+    'BedrockProvider',
+    'ProtectedBedrockClient',
+
+    # LiteLLM provider
+    'LiteLLMProvider',
+    'ProtectedLiteLLMClient',
 
     # Analyzers (if available)
     'PatternAnalyzer',

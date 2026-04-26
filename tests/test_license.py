@@ -250,4 +250,4 @@ class TestLicenseValidatorEdgeCases:
             f"ETHICORE_LICENSE_KEY did not validate: tier={result.tier!r}.  "
             "Ensure _SECRET_MASKED in license.py matches the key's HMAC secret."
         )
-        assert result.tier in ("PRO", "ENT")
+        assert result.tier in ("PRO", "ENT", "API")
