@@ -366,7 +366,11 @@ class ProtectedOpenAIClient:
                 prompt_text = self._provider.extract_prompt(**kwargs)
                 
                 if prompt_text:
-                    analysis = asyncio.run(self._guardian.analyze(prompt_text))
+                    _loop = asyncio.new_event_loop()
+                    try:
+                        analysis = _loop.run_until_complete(self._guardian.analyze(prompt_text))
+                    finally:
+                        _loop.close()
                     
                     if not analysis.is_safe and (self._guardian.config.strict_mode or analysis.recommended_action == 'BLOCK'):
                         raise ThreatBlockedException(

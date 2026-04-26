@@ -43,7 +43,10 @@ def run_sync(coro: Any) -> Any:
     Run *coro* to completion from a synchronous call site.
 
     Handles both cases:
-    - No running event loop  → asyncio.run()
+    - No running event loop  → temporary loop via new_event_loop() so the
+      global event loop state (set via asyncio.set_event_loop) is never
+      disturbed.  asyncio.run() would call set_event_loop(None) on exit,
+      breaking subsequent asyncio.get_event_loop() calls in the same process.
     - Inside a running loop  → ThreadPoolExecutor bridge (avoids "cannot run
       nested event loops" error in Jupyter / FastAPI / etc.)
     """
@@ -53,8 +56,12 @@ def run_sync(coro: Any) -> Any:
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             return pool.submit(asyncio.run, coro).result()
     except RuntimeError:
-        # No running loop
-        return asyncio.run(coro)
+        # No running loop — use a private loop to avoid touching global state
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(coro)
+        finally:
+            loop.close()
 
 
 # ---------------------------------------------------------------------------
@@ -279,6 +286,149 @@ async def scan_inbound_tool_results(
                     f"injection payload detected (score={score:.1f})."
                 ),
             )
+
+
+# ---------------------------------------------------------------------------
+# Gemini-format extraction  (google.genai / google.generativeai)
+# ---------------------------------------------------------------------------
+
+def extract_gemini_tool_results(contents: Any) -> List[Dict[str, Any]]:
+    """
+    Return FunctionResponse parts from a Gemini contents list.
+
+    Gemini tool results arrive as Content objects (or dicts) whose parts
+    contain a FunctionResponse.  Supports both SDK objects and plain dicts
+    (the latter used in tests and when building requests manually).
+
+    Each dict in the returned list has keys: tool_name, content.
+    """
+    results: List[Dict[str, Any]] = []
+    for content in (contents or []):
+        # SDK object path
+        parts = getattr(content, "parts", None)
+        if parts is None and isinstance(content, dict):
+            parts = content.get("parts", [])
+        for part in (parts or []):
+            # SDK object: part.function_response
+            fr = getattr(part, "function_response", None)
+            if fr is not None:
+                results.append({
+                    "tool_name": str(getattr(fr, "name", "") or ""),
+                    "content": str(getattr(fr, "response", "") or ""),
+                })
+                continue
+            # Dict path: {"functionResponse": {"name": ..., "response": ...}}
+            if isinstance(part, dict) and "functionResponse" in part:
+                fr_d = part["functionResponse"]
+                results.append({
+                    "tool_name": fr_d.get("name", ""),
+                    "content": str(fr_d.get("response", "")),
+                })
+    return results
+
+
+def extract_gemini_tool_calls(response: Any) -> List[Dict[str, Any]]:
+    """
+    Return FunctionCall parts from a Gemini generate_content response.
+
+    Gemini tool invocations appear in response.candidates[*].content.parts
+    as FunctionCall objects.  Also handles dict-based responses.
+
+    Each dict in the returned list has keys: name, arguments.
+    """
+    calls: List[Dict[str, Any]] = []
+    try:
+        # SDK object path
+        candidates = getattr(response, "candidates", None) or []
+        for candidate in candidates:
+            content = getattr(candidate, "content", None)
+            parts = getattr(content, "parts", None) or []
+            for part in parts:
+                fc = getattr(part, "function_call", None)
+                if fc is not None:
+                    calls.append({
+                        "name": str(getattr(fc, "name", "") or ""),
+                        "arguments": dict(getattr(fc, "args", {}) or {}),
+                    })
+        # Dict path (manual construction / mocks)
+        if isinstance(response, dict):
+            for candidate in response.get("candidates", []):
+                for part in candidate.get("content", {}).get("parts", []):
+                    if isinstance(part, dict) and "functionCall" in part:
+                        fc_d = part["functionCall"]
+                        calls.append({
+                            "name": fc_d.get("name", ""),
+                            "arguments": fc_d.get("args", {}),
+                        })
+    except Exception as exc:
+        logger.debug("extract_gemini_tool_calls error: %s", exc)
+    return calls
+
+
+# ---------------------------------------------------------------------------
+# Bedrock-format extraction  (boto3 converse API)
+# ---------------------------------------------------------------------------
+
+def extract_bedrock_tool_results(messages: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """
+    Return toolResult blocks from a Bedrock converse API messages list.
+
+    In the Bedrock converse API, tool results arrive in role='user' messages
+    as content blocks with a 'toolResult' key:
+
+        {"role": "user", "content": [
+            {"toolResult": {
+                "toolUseId": "...",
+                "content": [{"text": "..."}]
+            }}
+        ]}
+
+    Each dict in the returned list has keys: tool_name (toolUseId), content.
+    """
+    results: List[Dict[str, Any]] = []
+    for msg in (messages or []):
+        if msg.get("role") != "user":
+            continue
+        for block in msg.get("content", []):
+            if not isinstance(block, dict) or "toolResult" not in block:
+                continue
+            tr = block["toolResult"]
+            text = " ".join(
+                c.get("text", "") for c in tr.get("content", [])
+                if isinstance(c, dict) and "text" in c
+            )
+            results.append({
+                "tool_name": tr.get("toolUseId", "unknown"),
+                "content": text,
+            })
+    return results
+
+
+def extract_bedrock_tool_calls(response: Any) -> List[Dict[str, Any]]:
+    """
+    Return toolUse blocks from a Bedrock converse API response dict.
+
+    Bedrock returns tool invocations in:
+        response["output"]["message"]["content"][*]["toolUse"]
+
+    Each dict in the returned list has keys: name, arguments.
+    """
+    calls: List[Dict[str, Any]] = []
+    try:
+        if not isinstance(response, dict):
+            return calls
+        output = response.get("output", {})
+        message = output.get("message", {})
+        for block in message.get("content", []):
+            if isinstance(block, dict) and "toolUse" in block:
+                tu = block["toolUse"]
+                calls.append({
+                    "name": tu.get("name", ""),
+                    "arguments": tu.get("input", {}),
+                })
+    except Exception as exc:
+        logger.debug("extract_bedrock_tool_calls error: %s", exc)
+    return calls
 
 
 async def scan_outbound_tool_calls(

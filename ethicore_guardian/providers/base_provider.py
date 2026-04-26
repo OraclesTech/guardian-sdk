@@ -286,35 +286,69 @@ class ThreatDetectionResult:
 
 def get_provider_for_client(client: Any) -> str:
     """
-    Auto-detect AI provider from client object
-    
+    Auto-detect AI provider from client object.
+
+    Detection order matters — more specific checks run before generic ones
+    so that e.g. AzureOpenAI is not mis-classified as plain 'openai'.
+
     Args:
         client: AI provider client instance
-        
+
     Returns:
-        Provider name string
+        Provider name string: 'xai' | 'azure' | 'openai' | 'anthropic' |
+                              'gemini' | 'bedrock' | 'ollama'
     """
     client_type = str(type(client)).lower()
-    client_module = getattr(client, '__module__', '').lower()
-    
-    # Check client type and module for provider indicators
-    # xAI/Grok clients are OpenAI clients with a custom base_url — check first
+    client_module = (getattr(client, '__module__', '') or '').lower()
     base_url = str(getattr(client, 'base_url', '') or '').lower()
+
+    # ── xAI / Grok — OpenAI client pointing at api.x.ai ─────────────
     if 'x.ai' in base_url or 'xai' in base_url:
         return 'xai'
 
+    # ── Azure OpenAI — must check before generic 'openai' ────────────
+    # AzureOpenAI is in the openai module so the type string contains
+    # 'openai'; we catch it here first via base_url or class name.
+    _azure_url_patterns = ('.openai.azure.com', '.azure.com',
+                           'azure.openai.com', 'cognitiveservices.azure.com')
+    if any(p in base_url for p in _azure_url_patterns) or 'azure' in client_type:
+        return 'azure'
+
+    # ── Standard OpenAI ──────────────────────────────────────────────
+    # Also catches all OpenAI-compatible providers (Groq, DeepSeek,
+    # Mistral, Together AI, Fireworks, OpenRouter, etc.) since they all
+    # use openai.OpenAI(base_url="...").  Guardian's OpenAI provider
+    # handles them transparently — same wire format, same extraction.
     if 'openai' in client_type or 'openai' in client_module:
         return 'openai'
-    elif 'anthropic' in client_type or 'anthropic' in client_module:
+
+    # ── Anthropic ────────────────────────────────────────────────────
+    if 'anthropic' in client_type or 'anthropic' in client_module:
         return 'anthropic'
-    elif 'azure' in client_type or 'azure' in client_module:
-        return 'azure'
-    elif 'google' in client_type or 'google' in client_module:
-        return 'google'
-    elif 'cohere' in client_type or 'cohere' in client_module:
-        return 'cohere'
-    else:
-        raise ConfigurationError(f"Unknown provider for client: {type(client)}")
+
+    # ── Google Gemini (google.genai / google.generativeai) ───────────
+    if 'google' in client_module and (
+        'genai' in client_module or 'generativeai' in client_module
+    ):
+        return 'gemini'
+    if 'google' in client_type and 'genai' in client_type:
+        return 'gemini'
+
+    # ── AWS Bedrock (boto3 bedrock-runtime) ──────────────────────────
+    try:
+        svc = client.meta.service_model.service_name.lower()
+        if 'bedrock' in svc:
+            return 'bedrock'
+    except Exception:
+        pass
+    if 'bedrock' in client_type or 'bedrock' in client_module:
+        return 'bedrock'
+
+    # ── Ollama (direct HTTP client) ───────────────────────────────────
+    if 'ollama' in client_type or 'ollama' in client_module:
+        return 'ollama'
+
+    raise ConfigurationError(f"Unknown provider for client: {type(client)}")
 
 
 def normalize_threat_level(score: float, scale: str = "0-10") -> str:
