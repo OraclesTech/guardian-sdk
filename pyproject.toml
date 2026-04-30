@@ -83,6 +83,23 @@ google = ["google-generativeai>=0.3.0"]
 # Licensed tier : add paraphrase-multilingual-minilm-l12-v2.onnx to assets_dir for 50+ languages.
 multilingual = ["langdetect>=1.0.9"]
 
+# vision: enables Layers 9-11 (OCR, steganography detection, QR/barcode decode).
+# Without these packages the visual layers are skipped and the system runs
+# text-only analysis (existing behaviour — no regression).
+# pytesseract also requires the Tesseract binary in PATH:
+#   macOS : brew install tesseract
+#   Ubuntu: apt install tesseract-ocr
+#   Windows: https://github.com/UB-Mannheim/tesseract/wiki
+# pyzbar requires the zbar shared library:
+#   macOS : brew install zbar
+#   Ubuntu: apt install libzbar0
+vision = [
+    "Pillow>=9.0.0",
+    "pytesseract>=0.3.10",
+    "pyzbar>=0.1.9",
+    "numpy>=1.21.0",
+]
+
 # ml: enables full transformer-based ML inference in MLInferenceEngine.
 # Without these packages the engine runs its built-in heuristic fallback,
 # which is still effective but less accurate than a fine-tuned classifier.
@@ -99,6 +116,10 @@ all = [
     "transformers>=4.21.0",
     "torch>=1.12.0",
     "langdetect>=1.0.9",
+    "Pillow>=9.0.0",
+    "pytesseract>=0.3.10",
+    "pyzbar>=0.1.9",
+    "numpy>=1.21.0",
 ]
 
 [project.urls]
