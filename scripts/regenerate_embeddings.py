@@ -264,12 +264,12 @@ def main(argv: list[str] | None = None) -> int:
         help="Explicit output path for threat_embeddings.json (overrides auto-resolve).",
     )
     parser.add_argument(
-        "--license-key",
+        "--api-key",
         metavar="KEY",
         default=None,
         help=(
-            "License key (overrides $ETHICORE_LICENSE_KEY env var). "
-            "Enables licensed 51-category fingerprint set."
+            "API key (overrides $ETHICORE_API_KEY env var). "
+            "Enables licensed 68-category fingerprint set."
         ),
     )
     parser.add_argument(
@@ -284,7 +284,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     # Resolve credentials: CLI arg > env var
-    license_key = args.license_key or os.environ.get("ETHICORE_LICENSE_KEY") or None
+    license_key = args.api_key or os.environ.get("ETHICORE_API_KEY") or None
     assets_dir = args.assets_dir or os.environ.get("ETHICORE_ASSETS_DIR") or None
 
     # Trim whitespace so copy-paste from shell doesn't silently break validation

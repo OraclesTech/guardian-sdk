@@ -15,7 +15,7 @@ tenacity>=8.2.0
 # google-generativeai>=0.3.0
 
 # Performance and caching
-diskcache>=5.6.0
+cachetools>=5.3.0
 asyncio-throttle>=1.0.2
 
 # Development dependencies (install with pip install -e ".[dev]")

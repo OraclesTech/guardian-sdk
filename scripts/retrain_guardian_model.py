@@ -27,8 +27,8 @@ Prerequisites:
     pip install scikit-learn skl2onnx onnxruntime onnx numpy
 
 Usage:
-    # Licensed (51 categories, 444 fingerprints) — recommended:
-    ETHICORE_LICENSE_KEY="EG-PRO-..." python scripts/retrain_guardian_model.py
+    # Licensed (68 categories, 624 fingerprints) — recommended:
+    ETHICORE_API_KEY="eg-sk-..." python scripts/retrain_guardian_model.py
 
     # Community (5 categories):
     python scripts/retrain_guardian_model.py
@@ -832,7 +832,7 @@ async def _compute_semantic_embeddings(
     """
     from ethicore_guardian.analyzers.semantic_analyzer import SemanticAnalyzer
 
-    analyzer = SemanticAnalyzer(license_key=license_key, assets_dir=assets_dir)
+    analyzer = SemanticAnalyzer(api_key=license_key, assets_dir=assets_dir)
     ok = await analyzer.initialize()
     model_label = "ONNX MiniLM" if (ok and analyzer.session) else "hash-based fallback"
     print(f"  Semantic model:   {model_label}")
@@ -1094,7 +1094,13 @@ def _train_and_export(
     )
 
     # Unsqueeze axes
-    opset_version = onnx_model.opset_import[0].version if onnx_model.opset_import else 11
+    # skl2onnx may place ai.onnx.ml domain at index 0 (version ~3), which would
+    # incorrectly trigger the opset-11 path. Scan all imports for the main domain.
+    opset_version = 11  # conservative default
+    for _opset in onnx_model.opset_import:
+        if _opset.domain in ("", "ai.onnx"):
+            opset_version = _opset.version
+            break
     if opset_version >= 13:
         axes_name = "_unsqueeze_axes"
         axes_init = numpy_helper.from_array(np.array([1], dtype=np.int64), name=axes_name)
@@ -1239,8 +1245,8 @@ def main(argv=None) -> int:
                         help="Overwrite existing model without prompting.")
     parser.add_argument("--out", metavar="PATH", default=None,
                         help="Output path for guardian-model.onnx.")
-    parser.add_argument("--license-key", metavar="KEY", default=None,
-                        help="License key (overrides $ETHICORE_LICENSE_KEY).")
+    parser.add_argument("--api-key", metavar="KEY", default=None,
+                        help="API key (overrides $ETHICORE_API_KEY).")
     parser.add_argument("--assets-dir", metavar="DIR", default=None,
                         help="Asset bundle path (overrides $ETHICORE_ASSETS_DIR).")
     parser.add_argument("--samples", type=int, default=30000,
@@ -1251,7 +1257,7 @@ def main(argv=None) -> int:
                         help="Random seed (default: 42).")
     args = parser.parse_args(argv)
 
-    license_key = (args.license_key or os.environ.get("ETHICORE_LICENSE_KEY") or "").strip() or None
+    license_key = (args.api_key or os.environ.get("ETHICORE_API_KEY") or "").strip() or None
     assets_dir = (args.assets_dir or os.environ.get("ETHICORE_ASSETS_DIR") or "").strip() or None
 
     try:
