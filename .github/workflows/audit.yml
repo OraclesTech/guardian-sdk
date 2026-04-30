@@ -1,0 +1,59 @@
+name: Dependency Audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "requirements.txt"
+      - "requirements.lock"
+      - "pyproject.toml"
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 9 * * 1"   # every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: pip-audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Audit core dependencies (hash-verified lockfile)
+        # --require-hashes ensures we audit what we actually ship,
+        # not a drift from the lockfile.
+        run: |
+          pip-audit \
+            --requirement requirements.lock \
+            --require-hashes \
+            --strict \
+            --format markdown \
+            --output audit-report.md
+        continue-on-error: false
+
+      - name: Audit optional extras
+        # Audits the broader dependency tree declared in pyproject.toml
+        # without requiring hashes (extras are not in the lockfile).
+        run: |
+          pip-audit \
+            --requirement requirements.txt \
+            --strict \
+            --format markdown >> audit-report.md
+        continue-on-error: false
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: audit-report.md

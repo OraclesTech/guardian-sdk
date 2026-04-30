@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: ethicore-guardian
+Version: 0.0.1
+Summary: You may have mistyped the package name. The correct package is ethicore-engine-guardian.
+Author-email: Oracles Technologies LLC <support@oraclestechnologies.com>
+License: MIT
+Project-URL: Homepage, https://pypi.org/project/ethicore-engine-guardian/
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# ethicore-guardian
+
+⚠️ You may have mistyped the package name.
+
+The correct package is **[ethicore-engine-guardian](https://pypi.org/project/ethicore-engine-guardian/)**.
+
+```bash
+pip install ethicore-engine-guardian
+```

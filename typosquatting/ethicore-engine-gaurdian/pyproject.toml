@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ethicore-engine-gaurdian"
+version = "0.0.1"
+description = "You may have mistyped the package name. The correct package is ethicore-engine-guardian."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "Oracles Technologies LLC", email = "support@oraclestechnologies.com"}]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://pypi.org/project/ethicore-engine-guardian/"
