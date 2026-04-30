@@ -2,12 +2,12 @@
 Ethicore Engine™ - Guardian SDK - Version Information
 """
 
-__version__ = "1.0.0"
+__version__ = "1.8.1"
 __version_info__ = tuple(map(int, __version__.split('.')))
 
 # Build information
 __build__ = "stable.1"
-__release_date__ = "2026-02-25"
+__release_date__ = "2026-04-30"
 
 # Feature flags
 FEATURES = {

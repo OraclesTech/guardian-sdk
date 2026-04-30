@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports
