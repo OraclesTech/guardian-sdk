@@ -100,6 +100,16 @@ vision = [
     "numpy>=1.21.0",
 ]
 
+# vision2: Phase 2 enhancements — DCT stego (scipy), perceptual hashing, PaddleOCR.
+# Install with: pip install "ethicore-engine-guardian[vision,vision2]"
+# paddleocr is optional and large (~1 GB); only include if multilingual OCR is needed.
+# opencv-python-headless is required by imagehash for some hash algorithms.
+vision2 = [
+    "scipy>=1.7.0",
+    "imagehash>=4.3.1",
+    "opencv-python-headless>=4.8.0",
+]
+
 # ml: enables full transformer-based ML inference in MLInferenceEngine.
 # Without these packages the engine runs its built-in heuristic fallback,
 # which is still effective but less accurate than a fine-tuned classifier.
@@ -108,7 +118,8 @@ ml = [
     "torch>=1.12.0",
 ]
 
-# all: every provider + full ML inference.
+# all: every provider + full ML inference + vision (Phase 1 + Phase 2).
+# paddleocr excluded from 'all' due to size — install separately if needed.
 all = [
     "openai>=1.0.0",
     "anthropic>=0.8.0",
@@ -120,6 +131,9 @@ all = [
     "pytesseract>=0.3.10",
     "pyzbar>=0.1.9",
     "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "imagehash>=4.3.1",
+    "opencv-python-headless>=4.8.0",
 ]
 
 [project.urls]
