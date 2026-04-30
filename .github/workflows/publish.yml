@@ -1,0 +1,78 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"          # trigger on any version tag, e.g. v1.8.1
+  workflow_dispatch:  # allow manual trigger from the Actions tab
+
+jobs:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Build the source distribution and wheel in an isolated environment.
+  # Artifacts are passed to the publish job via GitHub's artifact store so
+  # the publish job never has write access to the source tree.
+  # ──────────────────────────────────────────────────────────────────────────
+  build:
+    name: Build distribution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so setuptools-scm / version attrs work
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install build dependencies (hash-verified)
+        run: |
+          pip install --require-hashes -r requirements.lock
+
+      - name: Install build frontend
+        run: pip install build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Upload dist artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  # ──────────────────────────────────────────────────────────────────────────
+  # Publish to PyPI using Trusted Publisher (OIDC) — no long-lived API token
+  # stored as a secret.  The id-token: write permission is required for GitHub
+  # to mint the OIDC token that Sigstore uses to attest the release.
+  #
+  # Sigstore attestations are generated automatically by pypa/gh-action-pypi-publish
+  # when attestations: true is set.  Users can verify with:
+  #   pip install pypi-attestations
+  #   python -m pypi_attestations verify --package ethicore-engine-guardian==<ver>
+  # ──────────────────────────────────────────────────────────────────────────
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: pypi
+      url: https://pypi.org/project/ethicore-engine-guardian/
+
+    permissions:
+      id-token: write  # REQUIRED — lets GitHub mint the OIDC token for Sigstore
+
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI (with Sigstore attestations)
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: true
