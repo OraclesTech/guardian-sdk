@@ -110,6 +110,15 @@ vision2 = [
     "opencv-python-headless>=4.8.0",
 ]
 
+# video: enables Layer 12 (VideoFrameAnalyzer — frame sampling + temporal correlation).
+# Also requires the ffmpeg binary in PATH:
+#   macOS : brew install ffmpeg
+#   Ubuntu: apt install ffmpeg
+#   Windows: https://ffmpeg.org/download.html
+video = [
+    "ffmpeg-python>=0.2.0",
+]
+
 # ml: enables full transformer-based ML inference in MLInferenceEngine.
 # Without these packages the engine runs its built-in heuristic fallback,
 # which is still effective but less accurate than a fine-tuned classifier.
