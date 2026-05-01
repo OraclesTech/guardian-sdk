@@ -3,7 +3,8 @@
 **Production-grade, real-time threat detection for Python LLM and agentic
 applications. Detect and block prompt injection, jailbreaks, adversarial
 manipulation, malicious tool calls, and data exfiltration across the full
-agentic loop — before they reach your model or execute in your pipeline.**
+agentic loop — in text, images, and video — before they reach your model or
+execute in your pipeline.**
 
 [![PyPI version](https://badge.fury.io/py/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
@@ -42,6 +43,21 @@ pip install "ethicore-engine-guardian[anthropic]"
 pip install "ethicore-engine-guardian[openai,anthropic]"
 ```
 
+With visual analysis (images):
+```bash
+pip install "ethicore-engine-guardian[vision]"
+```
+
+With video frame analysis (also requires `ffmpeg` in PATH):
+```bash
+pip install "ethicore-engine-guardian[video]"
+```
+
+Everything at once:
+```bash
+pip install "ethicore-engine-guardian[all]"
+```
+
 ---
 
 ## See It Work (4 Lines)
@@ -65,6 +81,29 @@ asyncio.run(main())
 ```
 
 That attack is stopped before your model ever sees it. Four lines.
+
+### Analyze images alongside text *(API tier)*
+
+Vision-capable models accept images as part of their input. Guardian does too.
+Pass image bytes directly to `analyze()` and the same pipeline that guards text
+runs against every image in the request:
+
+```python
+with open("uploaded_image.png", "rb") as f:
+    image_bytes = f.read()
+
+result = await guardian.analyze(
+    text="What does this image say?",
+    images=[image_bytes],          # list — one or more images, any common format
+)
+
+if result.recommended_action == "BLOCK":
+    return "This image contains content that cannot be processed."
+```
+
+Supports PNG, JPEG, GIF, WebP, BMP, TIFF, and SVG. Video frames can be
+submitted via the `metadata` interface — contact support for the video API
+reference.
 
 ### Post-flight: guard the response too
 
@@ -96,10 +135,11 @@ return llm_response
 
 ## How It Works
 
-Guardian runs a **full agentic loop protection pipeline** — four layers on every
-input before it reaches the model, two layers on every response before it reaches
-the user, and two additional intercept points protecting every tool call and tool
-output in the agentic loop.
+Guardian runs a **full agentic loop protection pipeline** — multiple detection
+layers on every input before it reaches the model, two layers on every response
+before it reaches the user, two intercept points protecting every tool call and
+tool output in the agentic loop, and visual analysis across images and video
+submitted alongside text.
 
 ### Pre-flight gate (input → model)
 
@@ -109,6 +149,8 @@ output in the agentic loop.
 | **Semantic** | ONNX MiniLM-L6 embeddings | Paraphrased attacks, novel variants by meaning |
 | **Behavioral** | Session-level heuristics | Multi-turn escalation, gradual manipulation |
 | **ML** | Gradient-boosted inference | Context-aware scoring, subtle drift |
+| **Visual** | Multi-format image and video analysis | Threat payloads embedded in images and video frames passed alongside text *(API)* |
+| **Cross-modal fusion** | Combined signal analysis | Coordinated attacks that distribute threat signals across text and visual channels to evade single-modality detection *(API)* |
 
 ### Post-flight gate (model → user)
 
@@ -151,6 +193,9 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Bypass via translation or encoding** — obfuscation attacks designed to evade detection *(API)*
 - **Abuse few-shot patterns** — using example structures to smuggle instructions *(API)*
 - **Exploit sycophancy** — persistence attacks that leverage model compliance tendencies *(API)*
+- **Embed threats in images** — adversarial instructions, injection payloads, and exfiltration commands hidden in images submitted to vision-capable models *(API)*
+- **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
+- **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
 The community edition covers the five most prevalent categories. The API covers 50+.
 
@@ -169,6 +214,8 @@ The community edition covers the five most prevalent categories. The API covers 
 | **Tool call validation** | — | ✅ | ✅ | ✅ |
 | **Tool output scanning** | — | ✅ | ✅ | ✅ |
 | **LangChain callback integration** | — | ✅ | ✅ | ✅ |
+| **Visual analysis (images + video)** | — | ✅ | ✅ | ✅ |
+| **Cross-modal threat fusion** | — | ✅ | ✅ | ✅ |
 | **Post-flight OutputAnalyzer** | ✅ | ✅ | ✅ | ✅ |
 | **Adversarial learning** | ✅ hash-based | ✅ embedding-based | ✅ embedding-based | ✅ embedding-based |
 | **Monthly requests** | Unlimited (local) | 1,000 | 100,000 | Custom |
