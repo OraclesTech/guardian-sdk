@@ -10,15 +10,27 @@ All Rights Reserved
 __version__ = "2.2.0"
 __author__ = "Oracles Technologies LLC"
 
-# Core exports
-from .guardian import (
-    Guardian,
-    ThreatAnalysis,
-    GuardianConfig,
-    ThreatChallengeException,
-    analyze_text,
-    protect_openai,
-)
+# Core exports — full API-tier guardian preferred; community fallback for wheel installs
+try:
+    from .guardian import (
+        Guardian,
+        ThreatAnalysis,
+        GuardianConfig,
+        ThreatChallengeException,
+        analyze_text,
+        protect_openai,
+    )
+except ImportError:
+    # guardian.py is intentionally excluded from the public PyPI wheel.
+    # Fall back to the community edition so `import ethicore_guardian` always works.
+    from .community_guardian import (  # type: ignore[assignment]
+        Guardian,
+        ThreatAnalysis,
+        GuardianConfig,
+        ThreatChallengeException,
+        analyze_text,
+        protect_openai,
+    )
 
 # xAI / Grok provider — always available (depends only on openai package)
 try:
