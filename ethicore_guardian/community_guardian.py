@@ -2,14 +2,15 @@
 Ethicore Engine™ - Guardian SDK - Community Edition
 Pure-Python threat detection — no external ML dependencies.
 
-Covers 5 OWASP LLM Top-10 aligned categories:
+Covers 6 OWASP LLM Top-10 aligned categories:
   - instructionOverride
   - jailbreakActivation
   - safetyBypass
   - roleHijacking
   - systemPromptLeaks
+  - encodingEvasion
 
-To unlock 50+ categories, full semantic embeddings, agentic pipeline
+To unlock 80+ categories, full semantic embeddings, agentic pipeline
 protection, and multi-turn analysis, supply an ETHICORE_API_KEY:
 
     guardian = Guardian(api_key="eg-sk-...")
@@ -20,7 +21,7 @@ signatures. Code written against the community edition works unchanged
 when credentials are supplied.
 
 Copyright © 2026 Oracles Technologies LLC. All Rights Reserved.
-Framework: MIT License. Full threat library: Proprietary.
+License: Business Source License 1.1 (BSL 1.1). Full threat library: Proprietary.
 """
 from __future__ import annotations
 
@@ -45,7 +46,7 @@ from .data.threat_patterns import (
 logger = logging.getLogger(__name__)
 
 _UPGRADE_NOTE = (
-    "Upgrade to the API tier for 50+ threat categories, full semantic "
+    "Upgrade to the API tier for 80+ threat categories, full semantic "
     "embeddings, agentic pipeline protection, and multi-turn analysis. "
     "Set ETHICORE_API_KEY or pass api_key= to Guardian()."
 )
@@ -275,7 +276,7 @@ class Guardian:
     Ethicore Engine™ Guardian — Community Edition.
 
     Drop-in replacement for the API-tier Guardian with the same public
-    interface. Covers 5 threat categories using pure-Python detection
+    interface. Covers 6 threat categories using pure-Python detection
     (regex + hash-based fingerprints). No external ML dependencies.
 
     Usage::
@@ -286,7 +287,7 @@ class Guardian:
         if result.blocked:
             raise ValueError("Threat detected")
 
-    For full 50+ category coverage pass an ``api_key`` (or set the
+    For full 80+ category coverage pass an ``api_key`` (or set the
     ``ETHICORE_API_KEY`` environment variable) and use the main
     ``Guardian`` class from ``ethicore_guardian``.
     """
@@ -301,7 +302,7 @@ class Guardian:
         )
         self._detector = _CommunityDetector()
         self._learner = _HashBasedLearner()
-        logger.debug("Guardian (community edition) initialised — 5 categories active")
+        logger.debug("Guardian (community edition) initialised — 6 categories active")
 
     # ------------------------------------------------------------------
     # Core analysis
@@ -416,7 +417,7 @@ class Guardian:
         """
         Analyse an AI response for threats.
 
-        Community edition scans response text with the same 5-category
+        Community edition scans response text with the same 6-category
         detector.  The API tier adds output-specific patterns (data
         exfiltration, PII leakage, prompt reflection detection).
         """
