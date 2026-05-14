@@ -10,6 +10,8 @@ execute in your pipeline.**
 [![PyPI Downloads](https://img.shields.io/pypi/dm/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](LICENSE)
+[![NIST OLIR · CSF 2.0](https://img.shields.io/badge/NIST_OLIR-CSF_2.0-0071bc)](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=209#/olir/home)
+[![NIST OLIR · AI RMF 1.0](https://img.shields.io/badge/NIST_OLIR-AI_RMF_1.0-0071bc)](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=210#/olir/home)
 
 ---
 
@@ -587,6 +589,19 @@ ETHICORE_API_KEY="eg_live_..." pytest tests/ -v
 
 ---
 
+
+## Standards & Compliance
+
+Guardian SDK is listed in the **NIST OLIR (Online Informative Reference) Catalog**, establishing formal alignment with the foundational security and AI risk frameworks recognized by the U.S. federal government:
+
+| Framework | Catalog Entry |
+|---|---|
+| NIST Cybersecurity Framework 2.0 | [GuardianSDK-to-CSF2.0](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=209#/olir/home) |
+| NIST AI Risk Management Framework 1.0 | [GuardianSDK-to-AIRMF1.0](https://csrc.nist.gov/projects/olir/informative-reference-catalog/details?referenceId=210#/olir/home) |
+
+These listings document the formal mapping of Guardian SDK's protection layers against NIST-recognized security and risk management controls, providing a standards-aligned baseline for enterprise, regulated industry, and government deployments.
+
+---
 
 ## License Update
 
