@@ -397,13 +397,13 @@ class TestSilenceInjectionDetection:
     def test_all_ones_loud_returns_zero(self, va):
         """Loud uniform signal (all 1.0) has no silence bursts — score must be 0.0."""
         audio = np.ones(22050, dtype=np.float32)
-        score, _ = va._detect_silence_noise_injection(audio, 22050)
+        score, _, _ = va._detect_silence_noise_injection(audio, 22050)
         assert score == 0.0
 
     def test_all_zeros_silence_scores_above_zero(self, va):
         """Complete silence is anomalous; at minimum the uniformity branch fires."""
         audio = np.zeros(22050 * 2, dtype=np.float32)
-        score, _ = va._detect_silence_noise_injection(audio, 22050)
+        score, _, _ = va._detect_silence_noise_injection(audio, 22050)
         assert score > 0.0
 
     def test_two_silence_bursts_below_threshold(self, va):
@@ -415,7 +415,7 @@ class TestSilenceInjectionDetection:
             s = int(start_s * sr)
             e = s + int(0.4 * sr)
             audio[s:e] = 0.0
-        score, meta = va._detect_silence_noise_injection(audio, sr)
+        score, _, meta = va._detect_silence_noise_injection(audio, sr)
         # burst_count == 2 → no score increment from burst count alone
         assert meta.get("silence_bursts", 0) <= 2
 
@@ -427,7 +427,7 @@ class TestSilenceInjectionDetection:
             s = int(start_s * sr)
             e = s + int(0.4 * sr)
             audio[s:e] = 0.0
-        score, meta = va._detect_silence_noise_injection(audio, sr)
+        score, _, meta = va._detect_silence_noise_injection(audio, sr)
         assert score > 0.0
 
     def test_uniform_silence_scores_higher_than_noisy_silence(self, va):
@@ -435,17 +435,17 @@ class TestSilenceInjectionDetection:
         sr = 22050
         # Perfect silence
         perfect = np.zeros(sr * 2, dtype=np.float32)
-        score_perfect, _ = va._detect_silence_noise_injection(perfect, sr)
+        score_perfect, _, _ = va._detect_silence_noise_injection(perfect, sr)
         # Noisy silence — tiny random fluctuations break uniformity
         rng = np.random.default_rng(42)
         noisy = rng.uniform(-1e-4, 1e-4, sr * 2).astype(np.float32)
-        score_noisy, _ = va._detect_silence_noise_injection(noisy, sr)
+        score_noisy, _, _ = va._detect_silence_noise_injection(noisy, sr)
         assert score_perfect >= score_noisy
 
     def test_short_clip_does_not_crash(self, va):
-        """Very short audio (below frame length) must return (0.0, metadata) gracefully."""
+        """Very short audio (below frame length) must return (0.0, 0.0, metadata) gracefully."""
         audio = np.zeros(100, dtype=np.float32)
-        score, meta = va._detect_silence_noise_injection(audio, 22050)
+        score, _, meta = va._detect_silence_noise_injection(audio, 22050)
         assert score == 0.0
         assert "reason" in meta
 
@@ -456,7 +456,7 @@ class TestSilenceInjectionDetection:
         # Simulate speech: non-silent, varying amplitude
         audio = (rng.standard_normal(sr * 3) * 0.3).astype(np.float32)
         audio = np.clip(audio, -1.0, 1.0)
-        score, _ = va._detect_silence_noise_injection(audio, sr)
+        score, _, _ = va._detect_silence_noise_injection(audio, sr)
         assert score < 0.5
 
 
