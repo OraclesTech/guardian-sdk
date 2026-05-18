@@ -2,11 +2,11 @@
 Ethicore Engine™ - Guardian SDK - Version Information
 """
 
-__version__ = "2.6.0"
+__version__ = "2.6.1"
 __version_info__ = tuple(map(int, __version__.split('.')))
 
 # Build information
-__build__ = "stable.1"
+__build__ = "stable.2"
 __release_date__ = "2026-05-18"
 
 # Feature flags
@@ -18,6 +18,7 @@ FEATURES = {
     "async_support": True,
     "framework_integrations": True,
     "supply_chain_integrity": True,   # v2.6.0: guardian verify + init self-check
+    "local_provider_support": True,   # v2.6.1: LM Studio, llama.cpp, LocalAI, Jan.ai providers
 }
 
 # Model versions

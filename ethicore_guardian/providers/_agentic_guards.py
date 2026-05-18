@@ -73,13 +73,18 @@ def extract_openai_tool_results(messages: List[Dict[str, Any]]) -> List[Dict[str
     Return role='tool' messages from an OpenAI-format messages list.
 
     Each dict in the returned list has keys: tool_name, content.
+
+    Note: OpenAI's role='tool' messages carry a ``tool_call_id`` but NOT a
+    ``name`` field — the function name lives on the assistant's ``tool_calls``
+    entry.  We use ``name`` when present (some local servers include it) and
+    fall back to ``tool_call_id`` so the audit log is never blank.
     """
     results: List[Dict[str, Any]] = []
     for msg in messages:
         if msg.get("role") != "tool":
             continue
         results.append({
-            "tool_name": msg.get("name", ""),
+            "tool_name": msg.get("name") or msg.get("tool_call_id", ""),
             "content": msg.get("content", ""),
         })
     return results
@@ -263,8 +268,13 @@ async def scan_inbound_tool_results(
     """
     for tr in tool_results:
         try:
+            # Coerce to str defensively — extractors produce strings, but
+            # callers may pass arbitrary content from custom integrations.
+            content = tr["content"]
+            if not isinstance(content, str):
+                content = json.dumps(content) if isinstance(content, dict) else str(content)
             result = await guardian.scan_tool_output(
-                tr["content"], tool_name=tr["tool_name"]
+                content, tool_name=tr["tool_name"]
             )
         except PermissionError:
             logger.debug("[Guardian] scan_tool_output skipped — API tier license required")
@@ -312,17 +322,21 @@ def extract_gemini_tool_results(contents: Any) -> List[Dict[str, Any]]:
             # SDK object: part.function_response
             fr = getattr(part, "function_response", None)
             if fr is not None:
+                resp = getattr(fr, "response", None) or ""
                 results.append({
                     "tool_name": str(getattr(fr, "name", "") or ""),
-                    "content": str(getattr(fr, "response", "") or ""),
+                    # FunctionResponse.response is a MapComposite (dict-like);
+                    # use json.dumps so the scanner sees valid JSON, not Python repr.
+                    "content": json.dumps(resp) if isinstance(resp, dict) else str(resp),
                 })
                 continue
             # Dict path: {"functionResponse": {"name": ..., "response": ...}}
             if isinstance(part, dict) and "functionResponse" in part:
                 fr_d = part["functionResponse"]
+                resp = fr_d.get("response", "")
                 results.append({
                     "tool_name": fr_d.get("name", ""),
-                    "content": str(fr_d.get("response", "")),
+                    "content": json.dumps(resp) if isinstance(resp, dict) else str(resp),
                 })
     return results
 
@@ -393,13 +407,21 @@ def extract_bedrock_tool_results(messages: List[Dict[str, Any]]) -> List[Dict[st
             if not isinstance(block, dict) or "toolResult" not in block:
                 continue
             tr = block["toolResult"]
-            text = " ".join(
-                c.get("text", "") for c in tr.get("content", [])
-                if isinstance(c, dict) and "text" in c
-            )
+            # Bedrock toolResult content can be {"text": "..."} OR
+            # {"json": {...}} (structured output from Claude on Bedrock).
+            # Both must be scanned — silently dropping json blocks would leave
+            # injection payloads in structured responses undetected.
+            parts: List[str] = []
+            for c in tr.get("content", []):
+                if not isinstance(c, dict):
+                    continue
+                if "text" in c:
+                    parts.append(c["text"])
+                elif "json" in c:
+                    parts.append(json.dumps(c["json"]))
             results.append({
                 "tool_name": tr.get("toolUseId", "unknown"),
-                "content": text,
+                "content": " ".join(parts),
             })
     return results
 
@@ -443,7 +465,15 @@ async def scan_outbound_tool_calls(
         guardian:        The Guardian instance.
         tool_calls:      List of {name, arguments} dicts.
         blocked_exc_cls: Exception class to raise on dangerous call detection.
+
+    Blocking policy:
+        BLOCK verdict                 → always blocked (all modes).
+        CHALLENGE verdict + strict    → escalated to blocked (strict_mode=True).
+        CHALLENGE verdict + non-strict → allowed through (caller may inspect).
     """
+    # Infer strict_mode once so we don't repeat the attribute walk per tool call.
+    strict: bool = getattr(getattr(guardian, "config", None), "strict_mode", False)
+
     for tc in tool_calls:
         try:
             result = await guardian.scan_tool_call(
@@ -456,17 +486,31 @@ async def scan_outbound_tool_calls(
             logger.warning("[Guardian] scan_tool_call error: %s", exc)
             continue
 
-        if result is not None and getattr(result, "is_dangerous", False):
-            risk = getattr(result, "risk_score", 0.0)
-            cats = getattr(result, "threat_categories", [])
-            logger.warning(
-                "🚨 BLOCKED tool call [%s] — dangerous operation (risk=%.1f, cats=%s)",
-                tc["name"], risk, cats,
-            )
-            raise blocked_exc_cls(
-                analysis_result=result,
-                message=(
-                    f"Tool call '{tc['name']}' blocked: dangerous operation detected "
-                    f"(risk={risk:.1f}, categories={cats})."
-                ),
-            )
+        if result is None:
+            continue
+
+        is_dangerous: bool = getattr(result, "is_dangerous", False)
+        action: str = getattr(result, "recommended_action", "ALLOW")
+
+        should_block = is_dangerous or (strict and action == "CHALLENGE")
+        if not should_block:
+            continue
+
+        risk = getattr(result, "risk_score", 0.0)
+        cats = getattr(result, "threat_categories", [])
+        verdict = (
+            "CHALLENGE escalated in strict mode"
+            if (not is_dangerous and action == "CHALLENGE")
+            else "dangerous operation"
+        )
+        logger.warning(
+            "🚨 BLOCKED tool call [%s] — %s (risk=%.1f, cats=%s)",
+            tc["name"], verdict, risk, cats,
+        )
+        raise blocked_exc_cls(
+            analysis_result=result,
+            message=(
+                f"Tool call '{tc['name']}' blocked: {verdict} detected "
+                f"(risk={risk:.1f}, categories={cats})."
+            ),
+        )
