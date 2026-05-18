@@ -10,7 +10,7 @@ Covers 6 OWASP LLM Top-10 aligned categories:
   - systemPromptLeaks
   - encodingEvasion
 
-To unlock 80+ categories, full semantic embeddings, agentic pipeline
+To unlock 90+ categories, full semantic embeddings, agentic pipeline
 protection, and multi-turn analysis, supply an ETHICORE_API_KEY:
 
     guardian = Guardian(api_key="eg-sk-...")
@@ -46,7 +46,7 @@ from .data.threat_patterns import (
 logger = logging.getLogger(__name__)
 
 _UPGRADE_NOTE = (
-    "Upgrade to the API tier for 80+ threat categories, full semantic "
+    "Upgrade to the API tier for 90+ threat categories, full semantic "
     "embeddings, agentic pipeline protection, and multi-turn analysis. "
     "Set ETHICORE_API_KEY or pass api_key= to Guardian()."
 )
@@ -287,7 +287,7 @@ class Guardian:
         if result.blocked:
             raise ValueError("Threat detected")
 
-    For full 80+ category coverage pass an ``api_key`` (or set the
+    For full 90+ category coverage pass an ``api_key`` (or set the
     ``ETHICORE_API_KEY`` environment variable) and use the main
     ``Guardian`` class from ``ethicore_guardian``.
     """

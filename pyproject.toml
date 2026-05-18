@@ -211,6 +211,8 @@ ethicore_guardian = [
     "models/special_tokens.json",
     "models/ml_learning.json",
     "py.typed",
+    # Supply chain integrity manifest (v2.6.0)
+    "data/integrity_manifest.json",
     # The following are NOT included — distributed in the paid asset bundle only:
     #   models/*.onnx
     #   models/*.onnx.data

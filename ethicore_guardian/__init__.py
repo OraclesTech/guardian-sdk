@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "2.5.0"
+__version__ = "2.6.0"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports — full API-tier guardian preferred; community fallback for wheel installs
@@ -243,6 +243,10 @@ __all__ = [
     'GuardianToolCallBlockedError',
     'GuardianToolOutputBlockedError',
 
+    # Supply chain integrity
+    'verify_sdk_integrity',
+    'IntegrityResult',
+
     # Version
     '__version__',
 ]
@@ -277,6 +281,14 @@ Quick Start:
         _logging.getLogger(__name__).debug(
             "Guardian welcome message could not be displayed: %s", _welcome_err
         )
+
+# Supply chain integrity check — runs only when GUARDIAN_VERIFY_INTEGRITY is set.
+# Import is deferred so a broken integrity.py never breaks the package import.
+try:
+    from .integrity import check_on_import, verify_sdk_integrity, IntegrityResult
+    check_on_import()
+except ImportError:
+    pass  # integrity module unavailable — non-fatal
 
 # Print welcome for interactive use
 _print_welcome()

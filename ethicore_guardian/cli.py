@@ -87,6 +87,37 @@ examples:
 
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
 
+    # ---- verify ------------------------------------------------------------
+    verify_parser = subparsers.add_parser(
+        "verify",
+        help="Verify Guardian SDK supply-chain integrity",
+        description=(
+            "Check SHA-256 hashes of all bundled Guardian SDK files against the "
+            "pre-computed baseline manifest.  Also re-verifies ONNX model files "
+            "against model_signatures.json when present.\n\n"
+            "Exit codes: 0 = all OK, 1 = tampered/mismatch, 2 = internal error."
+        ),
+    )
+    verify_parser.add_argument(
+        "--generate",
+        action="store_true",
+        help=(
+            "Regenerate the integrity manifest from the current files and write it "
+            "to data/integrity_manifest.json.  Run this at build time, not at "
+            "deployment time."
+        ),
+    )
+    verify_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat a missing manifest as a failure (default: warning only).",
+    )
+    verify_parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Show per-file pass/fail status.",
+    )
+
     # ---- analyze -----------------------------------------------------------
     analyze_parser = subparsers.add_parser(
         "analyze",
@@ -125,6 +156,97 @@ examples:
 # ---------------------------------------------------------------------------
 # Command implementations
 # ---------------------------------------------------------------------------
+
+def _run_verify(
+    generate: bool,
+    strict: bool,
+    verbose: bool,
+    as_json: bool,
+) -> int:
+    """
+    Verify (or regenerate) the Guardian SDK integrity manifest.
+
+    Returns
+    -------
+    int
+        0 = all OK, 1 = tampered / mismatch, 2 = internal error.
+    """
+    try:
+        from ethicore_guardian.integrity import (
+            generate_manifest,
+            save_manifest,
+            verify_sdk_integrity,
+        )
+    except ImportError as exc:
+        _err(as_json, f"Integrity module unavailable: {exc}")
+        return 2
+
+    # ── Generate mode ────────────────────────────────────────────────────────
+    if generate:
+        try:
+            manifest = generate_manifest()
+            path = save_manifest(manifest)
+            n = len(manifest.get("files", {}))
+            if as_json:
+                import json as _json
+                print(_json.dumps({"generated": True, "path": str(path), "files_hashed": n}, indent=2))
+            else:
+                print(f"\n[OK]  Integrity manifest generated — {n} files hashed")
+                print(f"   Written to: {path}\n")
+            return 0
+        except Exception as exc:  # noqa: BLE001
+            _err(as_json, f"Manifest generation failed: {exc}")
+            return 2
+
+    # ── Verify mode ──────────────────────────────────────────────────────────
+    try:
+        result = verify_sdk_integrity(strict=strict)
+    except Exception as exc:  # noqa: BLE001
+        _err(as_json, f"Integrity check failed: {exc}")
+        return 2
+
+    if as_json:
+        import json as _json
+        print(_json.dumps(result.to_dict(), indent=2))
+        return 0 if result.passed else 1
+
+    # Human-readable output (ASCII-safe for all platforms)
+    icon = "[OK]" if result.passed else "[FAIL]"
+    print()
+    print(f"{icon}  {result.summary}")
+
+    if result.warnings:
+        for w in result.warnings:
+            print(f"   [WARN]  {w}")
+
+    if result.errors:
+        for e in result.errors:
+            print(f"   [ERROR] {e}")
+
+    if result.files_checked > 0:
+        print(
+            f"\n   Files   : {result.files_passed}/{result.files_checked} passed"
+            + (f"  ({result.files_failed} FAILED)" if result.files_failed else "")
+        )
+    if result.onnx_checked:
+        onnx_tag = "[OK]" if result.onnx_verified else "[FAIL]"
+        print(f"   ONNX    : {onnx_tag} {'verified' if result.onnx_verified else 'TAMPERED'}")
+
+    if verbose and result.file_results:
+        print("\n   Per-file results:")
+        for fr in result.file_results:
+            status_tag = "[OK]  " if fr.passed else "[FAIL]"
+            print(f"     {status_tag} {fr.path:<40} {fr.status}")
+            if not fr.passed and not as_json:
+                if fr.error:
+                    print(f"            error: {fr.error}")
+                elif fr.actual_hash:
+                    print(f"            expected: {fr.expected_hash}")
+                    print(f"            actual  : {fr.actual_hash}")
+
+    print()
+    return 0 if result.passed else 1
+
 
 async def _run_analyze(
     text: str,
@@ -314,7 +436,16 @@ def main() -> None:
     api_key: Optional[str] = getattr(args, "api_key", None)
     as_json: bool = getattr(args, "as_json", False)
 
-    if args.command == "analyze":
+    if args.command == "verify":
+        exit_code = _run_verify(
+            generate=args.generate,
+            strict=args.strict,
+            verbose=args.verbose,
+            as_json=as_json,
+        )
+        sys.exit(exit_code)
+
+    elif args.command == "analyze":
         exit_code = asyncio.run(
             _run_analyze(
                 text=args.text,

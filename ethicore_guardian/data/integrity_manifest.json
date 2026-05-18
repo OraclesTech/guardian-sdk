@@ -1,0 +1,14 @@
+{
+  "version": "1",
+  "algorithm": "sha256",
+  "generated_by": "guardian verify --generate",
+  "files": {
+    "data/threat_patterns.py": "73335797368c5cbd47bb89459170a0f4650246300f25099e7d9e0d7aaf1a302e",
+    "models/vocab.json": "e27a8bf7aa6e02d0a9f7a40e189683ecf095f8c886800c744c2f39789b40be1c",
+    "models/special_tokens.json": "122f31947abbd639822a264153ac8111772e777e119af08eb8d671ec4a8fb96d",
+    "models/ml_learning.json": "f2064c1420f833c685763039c4be49124fb9b53f7e2cf8e4858bf7f4b07db898",
+    "community_guardian.py": "72d569695961cb28dbc6bb55d7a17312976d2c5a329b46c17c397aa32f2f510e",
+    "versions.py": "da88ffe20cdcb74455572b7a9667b6b1608ccd2a7c1ca2d0cd03e6be48e786d2",
+    "data/threat_embeddings.json": "93e8cb0f503ee58fa92af132a4116f3a83c5d4a791c1a451ebadd34722027220"
+  }
+}

@@ -2,12 +2,12 @@
 Ethicore Engine™ - Guardian SDK - Version Information
 """
 
-__version__ = "2.5.0"
+__version__ = "2.6.0"
 __version_info__ = tuple(map(int, __version__.split('.')))
 
 # Build information
 __build__ = "stable.1"
-__release_date__ = "2026-05-16"
+__release_date__ = "2026-05-18"
 
 # Feature flags
 FEATURES = {
@@ -17,13 +17,14 @@ FEATURES = {
     "anthropic_support": True,
     "async_support": True,
     "framework_integrations": True,
+    "supply_chain_integrity": True,   # v2.6.0: guardian verify + init self-check
 }
 
 # Model versions
 MODEL_VERSIONS = {
     "orchestrator": "3.0.0",
-    "pattern_analyzer": "1.1.0",   # 85 categories (toolChainEscalation, mcpSchemaInjection, posturalManipulation)
+    "pattern_analyzer": "1.2.0",   # 94 categories; +rlhfLayerExploitation, supplyChainDependencyInjection
     "semantic_analyzer": "1.1.0",
     "behavioral_analyzer": "1.0.0",
-    "ml_inference_engine": "3.1.0", # retrained 90k samples, 85 categories, 2026-05-16
+    "ml_inference_engine": "3.2.0", # retrained 125k samples, 94 categories, 1230 fingerprints, 2026-05-18
 }
