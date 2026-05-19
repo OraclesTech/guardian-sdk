@@ -3,7 +3,7 @@
 **Production-grade, real-time threat detection for Python LLM and agentic
 applications. Detect and block prompt injection, jailbreaks, adversarial
 manipulation, malicious tool calls, and data exfiltration across the full
-agentic loop — in text, images, and video — before they reach your model or
+agentic loop — in text, images, audio, and video — before they reach your model or
 execute in your pipeline.**
 
 [![PyPI version](https://badge.fury.io/py/ethicore-engine-guardian.svg)](https://pypi.org/project/ethicore-engine-guardian/)
@@ -204,7 +204,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
 - **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
-The community edition covers the six most prevalent categories. The API covers 90+.
+The community edition covers the six most prevalent categories. The API covers 100+.
 
 ---
 
@@ -212,8 +212,8 @@ The community edition covers the six most prevalent categories. The API covers 9
 
 | | Community | API — Free | API — Pro | API — ENT |
 |---|---|---|---|---|
-| **Threat categories** | 6 | 90+ | 90+ | 90+ |
-| **Regex patterns** | 26 | 800+ | 800+ | 800+ |
+| **Threat categories** | 6 | 100+ | 100+ | 100+ |
+| **Regex patterns** | 26 | 1000+ | 1000+ | 1000+ |
 | **Semantic model** | Hash-based fallback | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 |
 | **Semantic fingerprints** | Runtime-only | 1,000+ pre-loaded + runtime | 1,000+ pre-loaded + runtime | 1,000+ pre-loaded + runtime |
 | **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
@@ -530,7 +530,7 @@ and not be subverted by adversarial inputs into acting against its design. Devel
 who ship AI applications inherit a responsibility to defend what they build. The Guardian
 Covenant is the operational expression of that responsibility.
 
-[Read the full framework →](https://oraclestechnologies.com/guardian-covenant)
+[Read the full framework →](https://oraclestechnologies.com/guiding-principles)
 
 ---
 
