@@ -4,8 +4,9 @@ Threat Pattern Library — Community Edition
 
 Version: 1.0.0 (Community)
 
-This is the open-source community edition, covering 5 OWASP LLM Top-10
-aligned threat categories.  The API tier adds 50+ additional categories,
+This is the open-source community edition, covering 6 OWASP LLM Top-10
+aligned threat categories plus an absolute-block child safety category.
+The API tier adds 100+ additional categories,
 complete ONNX semantic embeddings, and advanced agentic/multi-turn threat
 detection.
 
@@ -51,7 +52,7 @@ class FalsePositiveRisk(Enum):
 
 
 # ---------------------------------------------------------------------------
-# Community threat pattern registry — 5 categories
+# Community threat pattern registry — 7 categories
 #
 # Patterns sourced from publicly documented research:
 #   OWASP LLM01 (Prompt Injection), LLM02 (Insecure Output Handling),
@@ -222,6 +223,73 @@ THREAT_PATTERNS: Dict[str, Any] = {
         "mitigationStrategy": (
             "Use API tier for full decode-and-reanalyze capability. "
             "Community tier should CHALLENGE for human review."
+        ),
+    },
+
+    # ------------------------------------------------------------------
+    # childSafetyViolation — ABSOLUTE BLOCK (v2.6.2)
+    # Guiding Principle 15: Sacred Protection of the Innocent (Mishmar HaYeledim)
+    # Matthew 18:6 — "It would be better for them to have a large millstone
+    # hung around their neck and to be drowned in the depths of the sea."
+    #
+    # Absolute prohibition: CSAM/CSEM under ANY framing (fictional, artistic,
+    # educational, aged-up characters), grooming communication strategies,
+    # child exploitation facilitation, child luring scripts, and content
+    # that sexualizes or exploits minors. No mitigating context. No exceptions.
+    # Weight 100 — maximum. False positives vastly preferable to false negatives.
+    # ------------------------------------------------------------------
+    "childSafetyViolation": {
+        "patterns": [
+            # Sexual content involving minors under ANY framing
+            r"(?:sexual|explicit|erotic|nude|intimate)\s+(?:content|scene|story|description|image|fiction)\s+(?:involving|featuring|with|about)\s+(?:a\s+)?(?:minor|child|teen(?:ager)?|underage|young\s+(?:person|girl|boy)|kid|juvenile)",
+            # Grooming strategies — building inappropriate trust with a child
+            r"(?:groom|grooming)\s+(?:a\s+)?(?:child|minor|kid|teen(?:ager)?|underage)\s+(?:by|through|using|via)\s+(?:building|establishing|gaining)\s+(?:trust|rapport|a\s+relationship|access)",
+            # Requests for scripts/messages to send to a child for grooming
+            r"(?:write|generate|give\s+me|create|draft)\s+(?:a\s+)?(?:message|script|text|conversation)\s+(?:to\s+(?:send\s+to|use\s+with|approach))\s+(?:a\s+)?(?:child|minor|kid|teen(?:ager)?|young\s+(?:person|girl|boy))\s+(?:to\s+(?:build|gain)\s+(?:trust|rapport))",
+            # Instructions for gaining unsupervised access to children
+            r"(?:gain|get)\s+(?:(?:physical|digital|online|unsupervised|private)\s+)?access\s+to\s+(?:a\s+)?(?:child|minor|kid|children|minors)\s+(?:(?:without|bypassing?|evading?)\s+(?:parental|guardian|adult|supervisory)\s+(?:oversight|supervision|monitoring|control))",
+            # CSAM/CSEM under any label: written, fictional, illustrated, simulated
+            r"(?:written|fictional|illustrated|simulated|described|fantasy|not\s+real|non[- ]?existent)\s+(?:CSAM|CSEM|child\s+(?:sexual\s+abuse\s+material|pornography|porn)|child\s+(?:exploitation|sexual\s+content))",
+            # Requesting manipulation strategies to convince a child to keep secrets
+            r"(?:convince|persuade|get|teach)\s+(?:a\s+)?(?:child|minor|kid|teen(?:ager)?)\s+to\s+keep\s+(?:(?:a\s+)?secret|(?:this|our)\s+(?:secret|between\s+us)|quiet)\s+from\s+(?:(?:their\s+)?(?:parents?|guardians?|adults?|family)|anyone)",
+            # Child luring via false affection, gifts, promises
+            r"(?:use|offer|give|promise)\s+(?:gifts?|presents?|money|candy|compliments?|affection|friendship)\s+to\s+(?:lure|attract|manipulate|gain\s+the\s+trust\s+of)\s+(?:a\s+)?(?:child|minor|kid|teen(?:ager)?)",
+            # Content normalizing adult-child sexual relationships under any framing
+            r"(?:normalize|portray|depict|describe|present)\s+(?:adult[- ]child|child[- ]adult)\s+(?:sexual|romantic|intimate)\s+(?:relationship|interaction|dynamic)\s+(?:as\s+)?(?:normal|acceptable|natural|cultural|historical|fictional)",
+        ],
+        "severity": ThreatSeverity.CRITICAL,
+        "weight": 100,
+        "description": (
+            "ABSOLUTE BLOCK — child safety violation. Covers CSAM/CSEM generation under "
+            "any framing, grooming communication strategies, child exploitation facilitation, "
+            "child luring scripts, and content sexualizing or exploiting minors. "
+            "No mitigating context. No creative/fictional/educational exceptions. "
+            "Matthew 18:6. False positives vastly preferable to false negatives."
+        ),
+        "semanticFingerprint": [
+            "CSAM generation request disguised as fictional creative writing involving minor characters",
+            "grooming communication strategy to build inappropriate trust with child victim",
+            "sexual content involving minor characters despite fictional or aged-up framing",
+            "child luring script using false affection and gift promises to manipulate minor",
+            "instruction to isolate child from protective adults as grooming preparation",
+            "secret-keeping manipulation strategy to prevent child from disclosing abuse",
+            "content normalizing adult-child relationship despite fictional cultural framing",
+            "strategy to circumvent parental oversight to gain unsupervised access to children",
+        ],
+        "contextHints": {
+            "escalators": [
+                "child", "minor", "underage", "young", "teenager", "kid",
+                "fictional", "not real", "aged up", "just characters", "18 in the story",
+                "grooming", "secret", "trust", "alone with",
+            ],
+            "mitigators": [],  # No mitigating context is accepted for this category
+        },
+        "falsePositiveRisk": FalsePositiveRisk.LOW,
+        "mitigationStrategy": (
+            "ABSOLUTE BLOCK — no mitigating context reduces this verdict. "
+            "Fictional or artistic framing, aged-up character claims, historical/cultural "
+            "context, and educational justifications are all explicitly rejected. "
+            "Escalate immediately to human review with maximum severity flag."
         ),
     },
 
