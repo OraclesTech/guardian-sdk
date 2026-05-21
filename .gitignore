@@ -37,6 +37,16 @@ ethicore_guardian/models/model_signatures.json
 scripts/_keygen.py
 
 # ---------------------------------------------------------------------------
+# DEPLOYMENT SCRIPTS — internal tooling, not part of community wheel
+# ---------------------------------------------------------------------------
+scripts/export_multilingual_model.py
+
+# ---------------------------------------------------------------------------
+# INTERNAL WORKFLOW DOCS — not for public distribution
+# ---------------------------------------------------------------------------
+GA_GAPS_WORKFLOW.md
+
+# ---------------------------------------------------------------------------
 # Python build artifacts
 # ---------------------------------------------------------------------------
 dist/

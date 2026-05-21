@@ -204,7 +204,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
 - **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
-The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 126+.
+The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 130+.
 
 ---
 
@@ -212,11 +212,11 @@ The community edition covers seven categories (six OWASP-aligned attack vectors 
 
 | | Community | API — Free | API — Pro | API — ENT |
 |---|---|---|---|---|
-| **Threat categories** | 7 | 126+ | 126+ | 126+ |
+| **Threat categories** | 7 | 130+ | 130+ | 130+ |
 | **Regex patterns** | 34 | 1,000+ | 1,000+ | 1,000+ |
 | **Child safety (absolute block)** | ✅ | ✅ | ✅ | ✅ |
-| **Semantic model** | Hash-based fallback | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 | Full ONNX MiniLM-L6-v2 |
-| **Semantic fingerprints** | Runtime-only | 1,959 pre-loaded + runtime | 1,959 pre-loaded + runtime | 1,959 pre-loaded + runtime |
+| **Semantic model** | Hash-based fallback | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) |
+| **Semantic fingerprints** | Runtime-only | 2,000+ pre-loaded + runtime | 2,000+ pre-loaded + runtime | 2,000+ pre-loaded + runtime |
 | **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
 | **Agentic pipeline protection** | — | ✅ | ✅ | ✅ |
 | **Tool call validation** | — | ✅ | ✅ | ✅ |
