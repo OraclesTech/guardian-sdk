@@ -16,18 +16,37 @@ maintainers = [
 ]
 keywords = [
     "ai-security",
-    "jailbreak-prevention",
-    "prompt-injection",
     "llm-security",
+    "agent-security",
+    "agent-safety",
+    "prompt-injection",
+    "jailbreak-prevention",
+    "adversarial-machine-learning",
+    "threat-intelligence",
+    "ai-safety",
+    "ai-agents",
+    "agentic-loop",
+    "proactive-security",
+    "multilingual",
+    "multimodal",
+    "continuous-learning",
+    "closed-loop-learning",
+    "detection",
     "openai",
     "anthropic",
     "claude",
     "gpt",
+    "langchain",
+    "guardrails",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Science/Research",
     "Topic :: Security",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: Other/Proprietary License",
     "Programming Language :: Python :: 3",
@@ -37,6 +56,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
+    "Natural Language :: English",
 ]
 requires-python = ">=3.8"
 
