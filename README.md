@@ -204,7 +204,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
 - **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
-The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 130+.
+The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 140+.
 
 ---
 
@@ -212,11 +212,11 @@ The community edition covers seven categories (six OWASP-aligned attack vectors 
 
 | | Community | API — Free | API — Pro | API — ENT |
 |---|---|---|---|---|
-| **Threat categories** | 7 | 130+ | 130+ | 130+ |
-| **Regex patterns** | 34 | 1,000+ | 1,000+ | 1,000+ |
+| **Threat categories** | 7 | 140+ | 140+ | 140+ |
+| **Regex patterns** | 34 | 1,285+ | 1,285+ | 1,285+ |
 | **Child safety (absolute block)** | ✅ | ✅ | ✅ | ✅ |
 | **Semantic model** | Hash-based fallback | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) |
-| **Semantic fingerprints** | Runtime-only | 2,000+ pre-loaded + runtime | 2,000+ pre-loaded + runtime | 2,000+ pre-loaded + runtime |
+| **Semantic fingerprints** | Runtime-only | 2,340+ pre-loaded + runtime | 2,340+ pre-loaded + runtime | 2,340+ pre-loaded + runtime |
 | **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
 | **Agentic pipeline protection** | — | ✅ | ✅ | ✅ |
 | **Tool call validation** | — | ✅ | ✅ | ✅ |
@@ -273,7 +273,7 @@ Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
 
 The SDK uses your key to authenticate against the Ethicore Engine™ platform and
-unlock the full threat library (90+ categories). Without a key, the SDK falls back to
+unlock the full threat library (140+ categories). Without a key, the SDK falls back to
 community mode (6 categories, local hash-based inference).
 
 ---
