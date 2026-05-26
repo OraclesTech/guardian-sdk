@@ -1,16 +1,35 @@
 """
 Ethicore Engine™ - Guardian SDK - Providers Package
 AI provider integrations for Guardian SDK
+
+Supported providers:
+  Local / self-hosted:
+    LM Studio, llama.cpp, LocalAI, Jan.ai  — local_openai_compat_provider
+    Ollama                                  — guardian_ollama_provider
+
+  Cloud (OpenAI-compatible API):
+    xAI / Grok                              — xai_provider
+    DeepSeek                                — deepseek_provider
+    Mistral AI                              — mistral_provider
+    Perplexity                              — perplexity_provider
+
+  Cloud (native API):
+    OpenAI                                  — openai_provider
+    Anthropic                               — anthropic_provider
+    Google Gemini                           — gemini_provider
+    Azure OpenAI                            — azure_provider
+    AWS Bedrock                             — bedrock_provider
+
+  Meta-provider:
+    LiteLLM (140+ backends)                 — litellm_provider
+
+  Framework integrations:
+    LangChain callback                      — langchain_callback
 """
 
-# This makes the providers directory a proper Python package.
-# Providers are importable either directly from their module or from here.
-
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 # ── Local OpenAI-compatible providers ────────────────────────────────────────
-# LM Studio, llama.cpp server, LocalAI, Jan.ai — all share the same
-# OpenAI-compatible REST API, covered by a single implementation.
 from .local_openai_compat_provider import (
     LocalOpenAICompatConfig,
     LocalOpenAICompatProvider,
@@ -31,25 +50,66 @@ from .local_openai_compat_provider import (
     LocalProviderError,
 )
 
+# ── DeepSeek provider ─────────────────────────────────────────────────────────
+from .deepseek_provider import (
+    DeepSeekProvider,
+    ProtectedDeepSeekClient,
+    create_protected_deepseek_client,
+    DEEPSEEK_BASE_URL,
+    DEEPSEEK_MODELS,
+)
+
+# ── Mistral AI provider ───────────────────────────────────────────────────────
+from .mistral_provider import (
+    MistralProvider,
+    ProtectedMistralClient,
+    create_protected_mistral_client,
+    MISTRAL_BASE_URL,
+    MISTRAL_MODELS,
+)
+
+# ── Perplexity provider ───────────────────────────────────────────────────────
+from .perplexity_provider import (
+    PerplexityProvider,
+    ProtectedPerplexityClient,
+    create_protected_perplexity_client,
+    PERPLEXITY_BASE_URL,
+    PERPLEXITY_MODELS,
+)
+
 __all__ = [
-    # Config
+    # ── Local OpenAI-compatible ───────────────────────────────────────────────
     "LocalOpenAICompatConfig",
-    # Base provider
     "LocalOpenAICompatProvider",
-    # Named providers
     "LMStudioProvider",
     "LlamaCppProvider",
     "LocalAIProvider",
     "JanAIProvider",
-    # Wrapped clients
     "ProtectedLocalClient",
     "ProtectedAsyncLocalClient",
-    # Convenience factories
     "create_protected_lmstudio_client",
     "create_protected_llamacpp_client",
     "create_protected_localai_client",
     "create_protected_janai_client",
-    # Exceptions
+    # ── DeepSeek ─────────────────────────────────────────────────────────────
+    "DeepSeekProvider",
+    "ProtectedDeepSeekClient",
+    "create_protected_deepseek_client",
+    "DEEPSEEK_BASE_URL",
+    "DEEPSEEK_MODELS",
+    # ── Mistral ───────────────────────────────────────────────────────────────
+    "MistralProvider",
+    "ProtectedMistralClient",
+    "create_protected_mistral_client",
+    "MISTRAL_BASE_URL",
+    "MISTRAL_MODELS",
+    # ── Perplexity ────────────────────────────────────────────────────────────
+    "PerplexityProvider",
+    "ProtectedPerplexityClient",
+    "create_protected_perplexity_client",
+    "PERPLEXITY_BASE_URL",
+    "PERPLEXITY_MODELS",
+    # ── Exceptions (re-exported from local_openai_compat_provider) ────────────
     "ThreatBlockedException",
     "ThreatChallengeException",
     "ToolOutputBlockedException",

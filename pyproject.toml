@@ -96,6 +96,10 @@ dev = [
 openai = ["openai>=1.0.0"]
 anthropic = ["anthropic>=0.8.0"]
 google = ["google-generativeai>=0.3.0"]
+xai = ["openai>=1.0.0"]
+deepseek = ["openai>=1.0.0"]
+mistral = ["openai>=1.0.0"]
+perplexity = ["openai>=1.0.0"]
 
 # multilingual: enables language detection for Layer 8 (Multilingual Semantic Analyzer).
 # Without langdetect, Layer 8 is disabled and the system runs as English-only (existing behaviour).

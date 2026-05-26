@@ -1,14 +1,29 @@
 """
 Ethicore Engine™ - Guardian SDK — Google Gemini Provider
-Version: 1.0.0
+Version: 1.1.0
 
 Wraps Google Gemini clients (google.genai.Client) with three-layer
 agentic protection.
 
-Supports the modern google-genai SDK (v1.0+) used for Gemini 2.x models.
+Supports the modern google-genai SDK (v1.0+) used for Gemini 3.x models.
 The protected wrapper intercepts client.models.generate_content() and
 client.models.generate_content_async(), preserving the full Gemini API
 surface via __getattr__ pass-through.
+
+Current Gemini model IDs (May 2026):
+  gemini-3.5-flash                  — Current flagship Flash model
+  gemini-3.1-pro-preview            — Pro-tier preview
+  gemini-3.1-flash-lite             — Lite/cost-optimised variant
+  gemini-3.1-flash-live-preview     — Live/streaming
+  gemini-3.1-flash-tts-preview      — Text-to-speech
+  gemini-2.5-pro                    — Previous generation Pro (still available)
+  gemini-2.5-flash                  — Previous generation Flash (still available)
+  gemini-embedding-2                — Embeddings
+
+API endpoints:
+  Native:  https://generativelanguage.googleapis.com (google-genai SDK)
+  OAI-compatible: https://generativelanguage.googleapis.com/v1beta/openai/
+                  (use OpenAI SDK with this base URL for OpenAI-style calls)
 
 Layer 1: Prompt scan via guardian.analyze()
 Layer 2: Inbound tool result scan — FunctionResponse parts in contents
@@ -397,7 +412,7 @@ def create_protected_gemini_client(
         protected = create_protected_gemini_client(client, guardian_api_key="eg-sk-...")
 
         response = protected.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3.5-flash",
             contents="Summarise this document.",
         )
     """

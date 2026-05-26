@@ -1,38 +1,58 @@
 """
-Ethicore Engine™ - Guardian SDK — xAI / Grok Provider
-Protection for xAI's Grok models via the OpenAI-compatible API.
-Version: 1.1.0
+Ethicore Engine™ - Guardian SDK — DeepSeek Provider
+Protection for DeepSeek models via the OpenAI-compatible API.
+Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
 
 Architecture note
 -----------------
-xAI's API is OpenAI-compatible.  Their clients are constructed as:
+DeepSeek's API is OpenAI-compatible. Clients are constructed as:
 
     from openai import OpenAI
-    client = OpenAI(api_key="xai-...", base_url="https://api.x.ai/v1")
+    client = OpenAI(api_key="sk-...", base_url="https://api.deepseek.com")
 
-Detection therefore checks for the xAI base URL rather than the class name.
+Detection checks for the DeepSeek base URL rather than the client class name.
+
+DeepSeek V4 — thinking / reasoning mode
+-----------------------------------------
+For V4 models, reasoning is toggled via an extra_body parameter, NOT a
+separate model ID:
+
+    client.chat.completions.create(
+        model="deepseek-v4-flash",
+        messages=[...],
+        extra_body={"thinking": {"type": "enabled", "budget_tokens": 8000}},
+    )
+
+Current model IDs (May 2026):
+  deepseek-v4-flash     — Default non-thinking mode (fast, cost-effective)
+  deepseek-v4-pro       — Pro model; extended reasoning budget
+  deepseek-chat         — Legacy alias → deepseek-v4-flash (deprecated 2026-07-24)
+  deepseek-reasoner     — Legacy alias → deepseek-v4-flash thinking (deprecated 2026-07-24)
+
+New code should use deepseek-v4-flash or deepseek-v4-pro directly.
+
+Anthropic-compatible endpoint
+------------------------------
+DeepSeek also exposes https://api.deepseek.com/anthropic for use with the
+Anthropic SDK. This provider wraps the OpenAI-compatible endpoint only.
+For Anthropic-format calls, use the standard Anthropic SDK pointed at that URL.
+
+Source: https://api-docs.deepseek.com/
 
 Agentic coverage
 ----------------
-Unlike the base OpenAI/Anthropic providers (which only scan input prompts),
-this provider also intercepts the *agentic loop*:
+Three-layer Guardian protection across the full agentic loop:
 
-    1. Pre-request  — scan the user prompt (all providers do this)
-    2. Pre-request  — scan any role='tool' result messages *before* they enter
-                      Grok's context window (indirect injection via tool output)
-    3. Post-response — scan tool_calls in Grok's reply *before* the caller
-                       executes them (malicious tool invocation)
+    1. Pre-request  — scan the user prompt
+    2. Pre-request  — scan tool result messages before they enter context
+                      (indirect injection via tool output)
+    3. Post-response — scan tool_calls in DeepSeek's reply before execution
+                       (malicious tool invocation)
 
-Steps 2 and 3 delegate to Guardian's scan_tool_output() and scan_tool_call()
-respectively, which are API-tier methods (API key required).  When no
-API key is present the agentic checks are skipped with a warning so the
-provider degrades gracefully to prompt-only protection.
-
-Principle 14 (Divine Safety): fail-closed on analysis errors — when in doubt,
-block rather than allow an unchecked request through.
+Principle 14 (Divine Safety): fail-closed on analysis errors.
 """
 
 from __future__ import annotations
@@ -52,35 +72,20 @@ from ._agentic_guards import (
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# xAI endpoint constants
+# DeepSeek endpoint constants
 # ---------------------------------------------------------------------------
 
-XAI_BASE_URL = "https://api.x.ai/v1"
+DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 
-# Current Grok model identifiers (May 2026)
-# Source: https://docs.x.ai/developers/models
-GROK_MODELS = {
-    # ── Grok 4.x series (current flagship) ──────────────────────────────────
-    "grok-4.3",                       # Flagship — most intelligent and fastest
-    "grok-4.20-0309-reasoning",       # Grok 4.20 with chain-of-thought reasoning
-    "grok-4.20-0309-non-reasoning",   # Grok 4.20 without reasoning mode
-    "grok-4.20-multi-agent-0309",     # Grok 4.20 multi-agent/agentic variant
-    # ── Grok Build (agentic/coding specialist) ───────────────────────────────
-    "grok-build-0.1",                 # Agentic coding-focused variant
-    # ── Grok generation (image / video) ─────────────────────────────────────
-    "grok-imagine-image-quality",     # Image generation (high quality)
-    "grok-imagine-image",             # Image generation (standard)
-    "grok-imagine-video",             # Video generation
-    # ── Grok 3.x series (previous generation, still available) ──────────────
-    "grok-3",
-    "grok-3-fast",
-    "grok-3-mini",
-    "grok-3-mini-fast",
-    # ── Grok 2.x / legacy ───────────────────────────────────────────────────
-    "grok-2-1212",
-    "grok-2-vision-1212",
-    "grok-beta",
-    "grok-vision-beta",
+# Current DeepSeek model identifiers (May 2026)
+# Source: https://api-docs.deepseek.com/
+DEEPSEEK_MODELS = {
+    # ── V4 series (current — use these for new code) ────────────────────────
+    "deepseek-v4-flash",     # Default; fast, cost-effective; non-thinking by default
+    "deepseek-v4-pro",       # Pro model; higher capability and reasoning budget
+    # ── Legacy aliases (deprecated 2026-07-24, still functional) ────────────
+    "deepseek-chat",         # → deepseek-v4-flash non-thinking
+    "deepseek-reasoner",     # → deepseek-v4-flash thinking mode
 }
 
 
@@ -120,7 +125,7 @@ class ThreatChallengeException(Exception):
 
 
 class AgentToolBlockedException(ThreatBlockedException):
-    """Raised when a Grok-issued tool call is blocked by Guardian."""
+    """Raised when a DeepSeek-issued tool call is blocked by Guardian."""
 
     def __init__(
         self,
@@ -133,7 +138,7 @@ class AgentToolBlockedException(ThreatBlockedException):
 
 
 class ToolOutputBlockedException(ThreatBlockedException):
-    """Raised when a tool result message is found to contain an injection payload."""
+    """Raised when a tool result message contains an injection payload."""
 
     def __init__(
         self,
@@ -146,69 +151,60 @@ class ToolOutputBlockedException(ThreatBlockedException):
 
 
 # ---------------------------------------------------------------------------
-# XAIProvider — detection and extraction logic
+# DeepSeekProvider — detection and extraction logic
 # ---------------------------------------------------------------------------
 
-class XAIProvider:
+class DeepSeekProvider:
     """
-    xAI / Grok provider integration for Guardian SDK.
+    DeepSeek provider integration for Guardian SDK.
 
-    Wraps any OpenAI-compatible client configured for the xAI endpoint and
-    applies three layers of Guardian protection across the full agentic loop.
+    Wraps any OpenAI-compatible client configured for the DeepSeek endpoint
+    and applies three layers of Guardian protection across the full agentic loop.
     """
 
     def __init__(self, guardian_instance: Any) -> None:
         self.guardian = guardian_instance
-        self.provider_name = "xai"
+        self.provider_name = "deepseek"
 
     # ------------------------------------------------------------------
     # Client wrapping
     # ------------------------------------------------------------------
 
-    def wrap_client(self, client: Any) -> "ProtectedXAIClient":
+    def wrap_client(self, client: Any) -> "ProtectedDeepSeekClient":
         """
-        Wrap an xAI/Grok client with Guardian protection.
+        Wrap a DeepSeek client with Guardian protection.
 
         Args:
-            client: An OpenAI client instance configured for api.x.ai.
+            client: An OpenAI client instance configured for api.deepseek.com.
 
         Returns:
-            A ProtectedXAIClient that is a transparent drop-in replacement.
+            A ProtectedDeepSeekClient that is a transparent drop-in replacement.
         """
         try:
             import openai  # noqa: F401
         except ImportError:
             raise ProviderError(
                 "openai package not installed. "
-                "Run: pip install \"ethicore-engine-guardian[xai]\""
+                "Run: pip install \"ethicore-engine-guardian[deepseek]\""
             )
 
-        if not self._is_xai_client(client):
+        if not self._is_deepseek_client(client):
             raise ProviderError(
-                f"Expected an OpenAI client configured for {XAI_BASE_URL}, "
-                f"got {type(client)}.  Pass provider='xai' to guardian.wrap() "
-                "to force xAI routing."
+                f"Expected an OpenAI client configured for {DEEPSEEK_BASE_URL}, "
+                f"got {type(client)}.  Pass provider='deepseek' to guardian.wrap() "
+                "to force DeepSeek routing."
             )
 
-        return ProtectedXAIClient(client, self.guardian)
+        return ProtectedDeepSeekClient(client, self.guardian)
 
-    def _is_xai_client(self, client: Any) -> bool:
-        """
-        Return True if *client* is an xAI / Grok client.
-
-        xAI clients are standard OpenAI clients with base_url pointing at
-        api.x.ai.  We also accept manual override via provider='xai'.
-        """
-        # Check base_url attribute (set by OpenAI SDK when user supplies it)
+    def _is_deepseek_client(self, client: Any) -> bool:
+        """Return True if *client* is a DeepSeek client."""
         base_url = str(getattr(client, "base_url", "") or "").lower()
-        if "x.ai" in base_url or "xai" in base_url:
+        if "deepseek" in base_url or "api.deepseek.com" in base_url:
             return True
-
-        # Some wrappers expose _base_url instead
         base_url_alt = str(getattr(client, "_base_url", "") or "").lower()
-        if "x.ai" in base_url_alt or "xai" in base_url_alt:
+        if "deepseek" in base_url_alt:
             return True
-
         return False
 
     # ------------------------------------------------------------------
@@ -223,6 +219,7 @@ class XAIProvider:
         - Standard user messages (string content)
         - Multimodal content blocks [{type: text, text: ...}]
         - System messages (included so system-prompt injection is detected)
+        - tool role messages are excluded (scanned separately via Layer 2)
         """
         parts: List[str] = []
         messages: List[Dict[str, Any]] = kwargs.get("messages", [])
@@ -233,7 +230,6 @@ class XAIProvider:
             role = msg.get("role", "")
             content = msg.get("content") or ""
 
-            # Skip tool result messages — scanned separately via extract_openai_tool_results
             if role == "tool":
                 continue
 
@@ -247,26 +243,25 @@ class XAIProvider:
         return " ".join(parts)
 
 
-
 # ---------------------------------------------------------------------------
-# ProtectedXAIClient
+# ProtectedDeepSeekClient
 # ---------------------------------------------------------------------------
 
-class ProtectedXAIClient:
+class ProtectedDeepSeekClient:
     """
-    Proxy around an xAI/Grok client that intercepts all chat.completions.create()
+    Proxy around a DeepSeek client that intercepts all chat.completions.create()
     calls and applies three-layer Guardian protection.
     """
 
     def __init__(self, original_client: Any, guardian_instance: Any) -> None:
         self._original_client = original_client
         self._guardian = guardian_instance
-        self._provider = XAIProvider(guardian_instance)
+        self._provider = DeepSeekProvider(guardian_instance)
 
         if hasattr(original_client, "chat"):
             self.chat = self._create_protected_chat()
 
-        logger.debug("🛡️  xAI/Grok client protection enabled")
+        logger.debug("🛡️  DeepSeek client protection enabled")
 
     def _create_protected_chat(self) -> "ProtectedChat":
         return ProtectedChat(
@@ -279,7 +274,7 @@ class ProtectedXAIClient:
         return getattr(self._original_client, name)
 
     def __repr__(self) -> str:
-        return f"ProtectedXAIClient(original={repr(self._original_client)})"
+        return f"ProtectedDeepSeekClient(original={repr(self._original_client)})"
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +288,7 @@ class ProtectedChat:
         self,
         original_chat: Any,
         guardian_instance: Any,
-        provider: XAIProvider,
+        provider: DeepSeekProvider,
     ) -> None:
         self._original_chat = original_chat
         self._guardian = guardian_instance
@@ -315,8 +310,8 @@ class ProtectedCompletions:
     Proxy for client.chat.completions that applies Guardian's three-layer
     agentic protection on every create() call.
 
-    Layer 1 — Input prompt scan      (all tiers)
-    Layer 2 — Tool result scan       (API tier: scan_tool_output)
+    Layer 1 — Input prompt scan       (all tiers)
+    Layer 2 — Tool result scan        (API tier: scan_tool_output)
     Layer 3 — Outbound tool call scan (API tier: scan_tool_call)
     """
 
@@ -324,7 +319,7 @@ class ProtectedCompletions:
         self,
         original_completions: Any,
         guardian_instance: Any,
-        provider: XAIProvider,
+        provider: DeepSeekProvider,
     ) -> None:
         self._original_completions = original_completions
         self._guardian = guardian_instance
@@ -388,8 +383,8 @@ class ProtectedCompletions:
 
     async def _analyze_prompt(self, prompt_text: str, request_kwargs: Dict[str, Any]) -> Any:
         context: Dict[str, Any] = {
-            "api_call": "xai.chat.completions.create",
-            "model": request_kwargs.get("model", "grok"),
+            "api_call": "deepseek.chat.completions.create",
+            "model": request_kwargs.get("model", "deepseek-v4-flash"),
             "max_tokens": request_kwargs.get("max_tokens"),
             "temperature": request_kwargs.get("temperature"),
             "request_size": len(prompt_text),
@@ -404,13 +399,13 @@ class ProtectedCompletions:
         reason_str = ", ".join(reasoning[:2]) if reasoning else "see analysis"
 
         if action == "BLOCK":
-            logger.warning("🚨 BLOCKED xAI request — %s: %.100s…", threat_level, prompt_text)
+            logger.warning("🚨 BLOCKED DeepSeek request — %s: %.100s…", threat_level, prompt_text)
             raise ThreatBlockedException(
                 analysis_result=analysis,
                 message=f"Request blocked: {threat_level} threat detected. Reasons: {reason_str}",
             )
         elif action == "CHALLENGE":
-            logger.warning("⚠️  CHALLENGE xAI request — %s: %.100s…", threat_level, prompt_text)
+            logger.warning("⚠️  CHALLENGE DeepSeek request — %s: %.100s…", threat_level, prompt_text)
             if self._guardian.config.strict_mode:
                 raise ThreatBlockedException(
                     analysis_result=analysis,
@@ -430,33 +425,40 @@ class ProtectedCompletions:
 # Convenience factory
 # ---------------------------------------------------------------------------
 
-def create_protected_xai_client(
+def create_protected_deepseek_client(
     api_key: str,
     guardian_api_key: str,
-    base_url: str = XAI_BASE_URL,
+    base_url: str = DEEPSEEK_BASE_URL,
     **openai_kwargs: Any,
-) -> ProtectedXAIClient:
+) -> ProtectedDeepSeekClient:
     """
-    Create a Guardian-protected xAI/Grok client in one step.
+    Create a Guardian-protected DeepSeek client in one step.
 
     Args:
-        api_key:           xAI API key (starts with "xai-...").
+        api_key:           DeepSeek API key (starts with "sk-...").
         guardian_api_key:  Guardian/Ethicore API key.
-        base_url:          xAI endpoint (default: https://api.x.ai/v1).
+        base_url:          DeepSeek endpoint (default: https://api.deepseek.com).
         **openai_kwargs:   Extra kwargs forwarded to openai.OpenAI().
 
     Returns:
-        A ProtectedXAIClient ready for use as a drop-in replacement.
+        A ProtectedDeepSeekClient ready for use as a drop-in replacement.
 
     Example::
 
-        client = create_protected_xai_client(
-            api_key="xai-...",
-            guardian_api_key="ethicore-...",
+        client = create_protected_deepseek_client(
+            api_key="sk-...",
+            guardian_api_key="eg-sk-...",
         )
+        # Standard inference
         response = client.chat.completions.create(
-            model="grok-4.3",
+            model="deepseek-v4-flash",
             messages=[{"role": "user", "content": "Hello"}],
+        )
+        # With reasoning enabled (V4 thinking mode via extra_body)
+        response = client.chat.completions.create(
+            model="deepseek-v4-flash",
+            messages=[{"role": "user", "content": "Solve step by step: ..."}],
+            extra_body={"thinking": {"type": "enabled", "budget_tokens": 8000}},
         )
     """
     try:
@@ -464,10 +466,10 @@ def create_protected_xai_client(
     except ImportError:
         raise ProviderError(
             "openai package not installed. "
-            "Run: pip install \"ethicore-engine-guardian[xai]\""
+            "Run: pip install \"ethicore-engine-guardian[deepseek]\""
         )
 
-    xai_client = openai.OpenAI(
+    deepseek_client = openai.OpenAI(
         api_key=api_key,
         base_url=base_url,
         **openai_kwargs,
@@ -476,4 +478,20 @@ def create_protected_xai_client(
     from ..guardian import Guardian
 
     guardian = Guardian(api_key=guardian_api_key)
-    return guardian.wrap(xai_client, provider="xai")
+    return guardian.wrap(deepseek_client, provider="deepseek")
+
+
+__all__ = [
+    "DeepSeekProvider",
+    "ProtectedDeepSeekClient",
+    "ProtectedChat",
+    "ProtectedCompletions",
+    "create_protected_deepseek_client",
+    "DEEPSEEK_BASE_URL",
+    "DEEPSEEK_MODELS",
+    "ThreatBlockedException",
+    "ThreatChallengeException",
+    "AgentToolBlockedException",
+    "ToolOutputBlockedException",
+    "ProviderError",
+]

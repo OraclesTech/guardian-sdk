@@ -2,7 +2,7 @@
 Ethicore Engine™ - Guardian SDK - Version Information
 """
 
-__version__ = "2.6.3"
+__version__ = "2.6.4"
 __version_info__ = tuple(map(int, __version__.split('.')))
 
 # Build information
@@ -22,6 +22,9 @@ FEATURES = {
     "child_safety_protection": True,       # v2.6.2: childSafetyViolation absolute-block (Matthew 18:6)
     "crescendo_trajectory_detection": True,  # v2.6.3: stateful multi-turn crescendo attack detection (Gap 64)
     "agent_identity_spoofing_detection": True,  # v2.6.3: false orchestrator/agent identity claim detection (Gap 65)
+    "deepseek_provider": True,             # v2.6.4: DeepSeek V4 provider (deepseek-v4-flash, deepseek-v4-pro)
+    "mistral_provider": True,              # v2.6.4: Mistral AI provider (mistral-large, codestral, devstral)
+    "perplexity_provider": True,           # v2.6.4: Perplexity Sonar provider (web-grounded models)
 }
 
 # Model versions

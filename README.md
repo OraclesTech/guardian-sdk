@@ -40,9 +40,16 @@ pip install ethicore-engine-guardian
 
 With provider integrations:
 ```bash
-pip install "ethicore-engine-guardian[openai]"
-pip install "ethicore-engine-guardian[anthropic]"
-pip install "ethicore-engine-guardian[openai,anthropic]"
+# Cloud (OpenAI-compatible)
+pip install "ethicore-engine-guardian[openai]"       # OpenAI (GPT-5.5, o3, Codex)
+pip install "ethicore-engine-guardian[xai]"          # xAI / Grok (grok-4.3, grok-build)
+pip install "ethicore-engine-guardian[deepseek]"     # DeepSeek (deepseek-v4-flash, v4-pro)
+pip install "ethicore-engine-guardian[mistral]"      # Mistral AI (mistral-large, codestral, devstral)
+pip install "ethicore-engine-guardian[perplexity]"   # Perplexity Sonar (web-grounded models)
+
+# Cloud (native SDK)
+pip install "ethicore-engine-guardian[anthropic]"    # Anthropic (claude-opus-4-7, claude-sonnet-4-6)
+pip install "ethicore-engine-guardian[google]"       # Google Gemini (gemini-3.5-flash, gemini-3.1-pro)
 ```
 
 With visual analysis (images):
@@ -399,6 +406,71 @@ from ethicore_guardian import Guardian, GuardianConfig
 
 guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
 client = guardian.wrap(anthropic.Anthropic())
+```
+
+### xAI / Grok
+
+```python
+import openai
+from ethicore_guardian import Guardian, GuardianConfig
+
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
+client = guardian.wrap(
+    openai.OpenAI(api_key="xai-...", base_url="https://api.x.ai/v1")
+)
+response = client.chat.completions.create(
+    model="grok-4.3",
+    messages=[{"role": "user", "content": user_input}]
+)
+```
+
+### DeepSeek
+
+```python
+import openai
+from ethicore_guardian import Guardian, GuardianConfig
+
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
+client = guardian.wrap(
+    openai.OpenAI(api_key="sk-...", base_url="https://api.deepseek.com")
+)
+response = client.chat.completions.create(
+    model="deepseek-v4-flash",
+    messages=[{"role": "user", "content": user_input}]
+)
+```
+
+### Mistral AI
+
+```python
+import openai
+from ethicore_guardian import Guardian, GuardianConfig
+
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
+client = guardian.wrap(
+    openai.OpenAI(api_key="...", base_url="https://api.mistral.ai/v1")
+)
+response = client.chat.completions.create(
+    model="mistral-large-latest",
+    messages=[{"role": "user", "content": user_input}]
+)
+```
+
+### Perplexity
+
+```python
+import openai
+from ethicore_guardian import Guardian, GuardianConfig
+
+guardian = Guardian(config=GuardianConfig(api_key="eg_live_..."))
+client = guardian.wrap(
+    openai.OpenAI(api_key="pplx-...", base_url="https://api.perplexity.ai")
+)
+# Guardian scans the user prompt before Perplexity fetches web sources
+response = client.chat.completions.create(
+    model="sonar-pro",
+    messages=[{"role": "user", "content": user_input}]
+)
 ```
 
 ### Ollama (local LLMs)

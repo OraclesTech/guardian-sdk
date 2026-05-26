@@ -1,7 +1,15 @@
 """
 Ethicore Engine™ - Guardian SDK — Anthropic Provider
 Mirrors the OpenAI provider pattern for the Anthropic Messages API.
-Version: 1.0.0
+Version: 1.1.0
+
+Current Claude model IDs (May 2026):
+  claude-opus-4-7      — Most capable; 1M context, 128k output (current flagship)
+  claude-sonnet-4-6    — Speed + intelligence balance; 1M context
+  claude-haiku-4-5     — Fastest; 200k context
+
+Retiring June 15 2026 (migrate off these):
+  claude-sonnet-4-0 / claude-opus-4-0 (claude-*-4-20250514 snapshots)
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
@@ -415,7 +423,7 @@ def create_protected_anthropic_client(
             guardian_api_key="ethicore-...",
         )
         response = client.messages.create(
-            model="claude-opus-4-5",
+            model="claude-opus-4-7",
             max_tokens=1024,
             messages=[{"role": "user", "content": "Hello"}],
         )

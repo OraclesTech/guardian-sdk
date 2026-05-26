@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "2.6.3"
+__version__ = "2.6.4"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports — full API-tier guardian preferred; community fallback for wheel installs

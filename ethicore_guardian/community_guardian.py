@@ -510,8 +510,11 @@ class Guardian:
         """
         Wrap an AI provider client so every request is scanned first.
 
-        Community edition supports OpenAI, xAI/Grok, and Azure OpenAI
-        clients (anything with a ``.chat.completions.create`` interface).
+        Community edition supports any OpenAI-compatible client
+        (OpenAI, xAI/Grok, DeepSeek, Mistral AI, Perplexity, Azure OpenAI)
+        and anything with a ``.chat.completions.create`` interface.
+        Full three-layer agentic protection (tool result and tool call scanning)
+        requires the API tier.
         """
         return _WrappedClient(client, self)
 
@@ -606,6 +609,27 @@ def protect_openai(client: Any, api_key: Optional[str] = None) -> Any:
 
 def protect_xai(client: Any, api_key: Optional[str] = None) -> Any:
     """Wrap an xAI / Grok client with Guardian protection."""
+    return Guardian(api_key=api_key).wrap(client)
+
+
+def protect_deepseek(client: Any, api_key: Optional[str] = None) -> Any:
+    """Wrap a DeepSeek client with Guardian protection."""
+    return Guardian(api_key=api_key).wrap(client)
+
+
+def protect_mistral(client: Any, api_key: Optional[str] = None) -> Any:
+    """Wrap a Mistral AI client with Guardian protection."""
+    return Guardian(api_key=api_key).wrap(client)
+
+
+def protect_perplexity(client: Any, api_key: Optional[str] = None) -> Any:
+    """
+    Wrap a Perplexity Sonar client with Guardian protection.
+
+    Guardian scans the user-supplied prompt before it reaches Perplexity.
+    Web-fetched content within Perplexity's inference pipeline is outside
+    the API boundary. Full three-layer agentic protection requires the API tier.
+    """
     return Guardian(api_key=api_key).wrap(client)
 
 
