@@ -2,12 +2,12 @@
 Ethicore Engine™ - Guardian SDK - Version Information
 """
 
-__version__ = "2.6.4"
+__version__ = "2.6.5"
 __version_info__ = tuple(map(int, __version__.split('.')))
 
 # Build information
 __build__ = "stable.1"
-__release_date__ = "2026-05-25"
+__release_date__ = "2026-05-31"
 
 # Feature flags
 FEATURES = {
@@ -25,6 +25,7 @@ FEATURES = {
     "deepseek_provider": True,             # v2.6.4: DeepSeek V4 provider (deepseek-v4-flash, deepseek-v4-pro)
     "mistral_provider": True,              # v2.6.4: Mistral AI provider (mistral-large, codestral, devstral)
     "perplexity_provider": True,           # v2.6.4: Perplexity Sonar provider (web-grounded models)
+    "context_aware_scanning": True,        # v2.6.5: source_type-aware suppression — no encoding FP on external content
 }
 
 # Model versions

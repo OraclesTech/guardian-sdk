@@ -52,6 +52,47 @@ _UPGRADE_NOTE = (
 )
 
 # ---------------------------------------------------------------------------
+# Context-aware category suppression  (parity with API tier pattern_analyzer)
+#
+# When content comes from an external, non-user-authored source (a fetched web
+# page, a RAG chunk, a tool return value), the ENCODING-family categories are
+# suppressed: base64 / data-URIs are ubiquitous in legitimate external content
+# and otherwise produce constant false positives.
+#
+# Encoding is the ONLY safe-to-suppress family — the surface "looks-encoded"
+# signal is dropped, but the underlying payload risk is unaffected (an actual
+# decoded instruction is still caught by the regular pattern/fingerprint layers
+# on the decoded text in the API tier; the community tier flags the decoded
+# content directly).  Injection / safety categories (instructionOverride,
+# jailbreakActivation, safetyBypass, roleHijacking, systemPromptLeaks) and the
+# absolute-block childSafetyViolation are NEVER suppressed — indirect injection
+# hides in exactly this retrieved content.
+#
+# Set is minimal and evidence-based.  encodingAttacks is included for parity
+# with the licensed library (harmless no-op in the community tier, which names
+# its single encoding category `encodingEvasion`).
+# ---------------------------------------------------------------------------
+
+# Source types representing external, non-user-authored content.
+_EXTERNAL_CONTEXTS: frozenset = frozenset({
+    "retrieved_content", "tool_output", "document", "web_page", "web_content",
+    "database", "email", "markdown", "rag_chunk", "api_response",
+})
+
+# Encoding-family categories suppressed for external content.
+_SUPPRESS_FOR_EXTERNAL: frozenset = frozenset({
+    "encodingEvasion",   # community + licensed
+    "encodingAttacks",   # licensed only (no-op in community)
+})
+
+
+def _community_suppressed_categories(source_type: str) -> frozenset:
+    """Return categories to suppress for a given source_type (community tier)."""
+    if source_type in _EXTERNAL_CONTEXTS:
+        return _SUPPRESS_FOR_EXTERNAL
+    return frozenset()
+
+# ---------------------------------------------------------------------------
 # Public data classes
 # ---------------------------------------------------------------------------
 
@@ -197,16 +238,30 @@ class _CommunityDetector:
     # Public API
     # ------------------------------------------------------------------
 
-    def scan(self, text: str) -> List[Dict[str, Any]]:
+    def scan(self, text: str, source_type: str = "user_input") -> List[Dict[str, Any]]:
         """
         Run both layers and return a list of match dicts.
 
         Each match contains: ``category``, ``layer``, ``pattern``/``fingerprint``,
         ``severity``, ``weight``, ``count``.
+
+        Args:
+            text:        Input text to scan.
+            source_type: Origin of the content.  External content source types
+                         (web pages, tool outputs, documents, RAG chunks)
+                         suppress categories that produce false positives on
+                         legitimate external content — currently ``encodingEvasion``
+                         (base64 data URIs are normal in web/CSS content).
+                         Injection/safety and child-safety categories are never
+                         suppressed.
         """
         matches: List[Dict[str, Any]] = []
         matches.extend(self._layer1_regex(text))
         matches.extend(self._layer2_fingerprint(text))
+
+        suppressed = _community_suppressed_categories(source_type)
+        if suppressed:
+            matches = [m for m in matches if m["category"] not in suppressed]
         return matches
 
     # ------------------------------------------------------------------
@@ -338,7 +393,14 @@ class Guardian:
                 metadata={"source": "adversarial_learner"},
             )
 
-        matches = self._detector.scan(text)
+        # source_type (from metadata) controls context-aware suppression.
+        # Callers scanning retrieved/tool/web content should pass
+        # metadata={"source_type": "web_content"} (or "tool_output", etc.) so
+        # categories like encodingEvasion don't false-positive on base64 in
+        # legitimate external content.  Defaults to "user_input" (full scrutiny).
+        source_type = (metadata or {}).get("source_type", "user_input")
+
+        matches = self._detector.scan(text, source_type=source_type)
         categories = list({m["category"] for m in matches})
 
         match_summaries = [
@@ -390,7 +452,11 @@ class Guardian:
         text = re.sub(r"<[^>]+>", " ", html)
         text = re.sub(r"&[a-zA-Z]{2,6};", " ", text)   # basic entity decode
         text = re.sub(r"\s+", " ", text).strip()
-        result = self.analyze(text, metadata)
+        # HTML is inherently external content — default to web_content so
+        # encodingEvasion does not false-positive on base64 data URIs that are
+        # normal in web pages.  Caller can override via metadata["source_type"].
+        html_meta = {"source_type": "web_content", **(metadata or {})}
+        result = self.analyze(text, html_meta)
         result.metadata["source"] = "html_stripped"
         result.metadata["_community_note"] = (
             "Full DOM/browser analysis requires API tier. " + _UPGRADE_NOTE
