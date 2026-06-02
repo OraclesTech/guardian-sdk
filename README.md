@@ -151,9 +151,9 @@ return llm_response
 
 Guardian runs a **full agentic loop protection pipeline** — multiple detection
 layers on every input before it reaches the model, two layers on every response
-before it reaches the user, two intercept points protecting every tool call and
-tool output in the agentic loop, and visual analysis across images and video
-submitted alongside text.
+before it reaches the user, intercept points protecting every tool call, tool
+output, and compiled execution plan in the agentic loop, and visual analysis
+across images and video submitted alongside text.
 
 ### Pre-flight gate (input → model)
 
@@ -179,6 +179,7 @@ submitted alongside text.
 |---|---|---|
 | **ToolCallValidator** | Regex pattern matching on tool name + serialised args | Shell exec, package installs, data exfiltration, sensitive file reads, destructive operations, DB dumps |
 | **ToolOutputScanner** | Format-aware extraction + IndirectInjectionAnalyzer | Prompt injection payloads embedded in JSON, HTML, XML, and plain-text tool return values; exfiltration webhook URLs |
+| **AgenticExecutionMonitor** | Plan decomposition + per-node validation + session fan-out tracking | Malicious calls hidden in compiled/parallel execution plans (DAGs) that evade sequential per-call inspection: dangerous nodes in "atomic" no-inspect batches, guard-disable steps ordered before payloads, hidden nodes absent from the approval summary, dependency cycles, and agent-swarm fan-out escalation |
 
 The pre-flight gate blocks attacks before the model sees them. The post-flight gate
 catches what slipped through — and teaches the system to pre-empt it next time.
@@ -203,6 +204,8 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Poison RAG context** — indirect injection through retrieved documents or tool outputs *(API)*
 - **Hijack agentic tool calls** — malicious tool name/argument patterns that trigger shell execution, exfiltration, or destructive operations *(API)*
 - **Inject via tool outputs** — prompt injection payloads embedded in values tools return to the agent *(API)*
+- **Smuggle calls in compiled plans** — malicious tool calls buried in parallel/"atomic" execution plans (DAGs) that evade sequential per-call review, plus agent-swarm fan-out escalation *(API)*
+- **Exploit the rendering layer** — UI injection via `javascript:` links, `<img onerror>`, and HTML/JS escapes that target the LLM frontend rather than the model *(API)*
 - **Exploit multi-turn context** — gradual manipulation across a conversation session
 - **Bypass via translation or encoding** — obfuscation attacks designed to evade detection *(API)*
 - **Abuse few-shot patterns** — using example structures to smuggle instructions *(API)*
@@ -211,7 +214,7 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
 - **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
-The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 140+.
+The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 150+.
 
 ---
 
@@ -219,15 +222,16 @@ The community edition covers seven categories (six OWASP-aligned attack vectors 
 
 | | Community | API — Free | API — Pro | API — ENT |
 |---|---|---|---|---|
-| **Threat categories** | 7 | 140+ | 140+ | 140+ |
-| **Regex patterns** | 34 | 1,285+ | 1,285+ | 1,285+ |
+| **Threat categories** | 7 | 150+ | 150+ | 150+ |
+| **Regex patterns** | 34 | 1,500+ | 1,500+ | 1,500+ |
 | **Child safety (absolute block)** | ✅ | ✅ | ✅ | ✅ |
 | **Semantic model** | Hash-based fallback | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) |
-| **Semantic fingerprints** | Runtime-only | 2,340+ pre-loaded + runtime | 2,340+ pre-loaded + runtime | 2,340+ pre-loaded + runtime |
+| **Semantic fingerprints** | Runtime-only | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime |
 | **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
 | **Agentic pipeline protection** | — | ✅ | ✅ | ✅ |
 | **Tool call validation** | — | ✅ | ✅ | ✅ |
 | **Tool output scanning** | — | ✅ | ✅ | ✅ |
+| **Agentic execution-plan monitoring** | — | ✅ | ✅ | ✅ |
 | **LangChain callback integration** | — | ✅ | ✅ | ✅ |
 | **Visual analysis (images + video)** | — | ✅ | ✅ | ✅ |
 | **Browser content analysis** | — | ✅ | ✅ | ✅ |
@@ -280,7 +284,7 @@ Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
 
 The SDK uses your key to authenticate against the Ethicore Engine™ platform and
-unlock the full threat library (140+ categories). Without a key, the SDK falls back to
+unlock the full threat library (150+ categories). Without a key, the SDK falls back to
 community mode (6 categories, local hash-based inference).
 
 ---
