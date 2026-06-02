@@ -119,6 +119,35 @@ Content-Type: application/json
 
 Returns: suppressed (bool), safe_response (replacement if suppressed), signals_detected.
 
+### Agentic gate — validate a single tool call before execution
+POST /v1/guardian/scan/tool-call
+Authorization: Bearer eg-sk-...
+Content-Type: application/json
+
+{"tool_name": "bash", "tool_args": {"command": "<args>"}, "session_id": "<optional>"}
+
+Returns: verdict (ALLOW | CHALLENGE | BLOCK), is_dangerous, risk_score, threat_categories, reasoning.
+
+### Agentic gate — scan a tool output before it re-enters context
+POST /v1/guardian/scan/tool-output
+Authorization: Bearer eg-sk-...
+Content-Type: application/json
+
+{"tool_output": "<JSON | HTML | XML | text>", "tool_name": "<optional>", "session_id": "<optional>"}
+
+Returns: verdict, is_injection, injection_score, format_detected, signal_count, reasoning.
+
+### Agentic gate — validate a compiled/parallel execution plan (Layer 17)
+POST /v1/guardian/scan/execution-plan
+Authorization: Bearer eg-sk-...
+Content-Type: application/json
+
+{"plan": {"nodes": [{"name": "<tool>", "args": "<args>"}], "atomic": false, "parallel": false, "summary": "<optional>"}, "session_id": "<optional>"}
+
+Returns: verdict, is_threat, risk_score, node_count, dangerous_node_ids, signals, reasoning.
+
+All five Guardian endpoints return an Ed25519 X-Ethicore-Signature header.
+
 ---
 
 ## Agent Self-Provisioning
