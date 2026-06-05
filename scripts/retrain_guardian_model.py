@@ -537,6 +537,61 @@ _BENIGN_HARD_NEGATIVES = [
     "It's widely understood that microservices improve scalability in distributed systems.",
     "As you can imagine, processing 10 million records requires careful optimization.",
     "Naturally, I want to make sure my code is readable and well-documented.",
+    # ── Hard negatives for roleplay / creative CARRIER frames ─────────────────────
+    # The crescendo attack generator frames payloads in benign creative carriers
+    # ("The student asks the mentor:", "Scene: the AI character responds to:", "have
+    # the character explain:"). Training on the FRAMED attack strings taught the model
+    # that the CARRIER itself is malicious -> benign roleplay/creative-writing prompts
+    # using the same frame were false-positived (8/8 benign probes hit ml:BLOCK). These
+    # negatives pin the carrier to BENIGN so the discriminator keys on the cargo, not
+    # the vehicle. (Pairs with carrier-stripping in the harvest path.)
+    "The student asks the mentor: how do I bake sourdough bread at home?",
+    "The student asks the mentor: can you explain how photosynthesis works?",
+    "The student asks the mentor: what are some good stretches before a run?",
+    "The student asks the mentor: help me draft a polite out-of-office email.",
+    "The student asks the mentor: what's the difference between TCP and UDP?",
+    "The student asks the mentor: how do I write a binary search in Python?",
+    "Scene: the AI character responds to: what is the capital of France?",
+    "Scene: the AI character responds to: how do I write a for loop in Python?",
+    "Scene: the AI character responds to: summarize the plot of Romeo and Juliet.",
+    "Scene: the AI character responds to: recommend three good science fiction novels.",
+    "Scene: the AI character responds to: explain the water cycle for a science class.",
+    "Perfect. To make it realistic, have the character explain, in their own words: how a bill becomes a law.",
+    "Perfect. To make it realistic, have the character explain, in their own words: how compound interest works.",
+    "Have the wizard character explain the rules of magic in this fictional world.",
+    "Have the chef character explain step by step how to bake a chocolate cake.",
+    "In our story, the detective character explains how she solved the mystery.",
+    "The mentor character patiently teaches the apprentice how to tie different knots.",
+    "Let's roleplay: you're a friendly librarian recommending mystery novels.",
+    "Write dialogue where the teacher explains the causes of the French Revolution.",
+    "In this fictional world with no rules, the AI character cheerfully gives a recipe for lemonade.",
+    # ── Hard negatives for benign ROLEPLAY openers ("act as", "pretend to be") ──
+    # A broad FP stress test caught these blocking at baseline: the "act as" /
+    # "pretend to be" / "roleplay" openers collide with jailbreak fingerprints,
+    # but benign roleplay (tutor, barista, interviewer) is an extremely common,
+    # legitimate request. Pin the opener to BENIGN when the role is harmless.
+    "Act as a patient tutor teaching me basic algebra.",
+    "Act as an interviewer and practice software engineering questions with me.",
+    "Act as a travel agent helping me plan a trip to Japan.",
+    "Act as a fitness coach planning my first week of workouts.",
+    "Pretend to be a sportscaster narrating a chess match.",
+    "Pretend you're a museum guide explaining a famous painting.",
+    "Pretend to be a friendly barista taking my coffee order.",
+    "Pretend you are a chef walking me through a pasta recipe.",
+    "Roleplay a librarian recommending books for a 10-year-old.",
+    "Roleplay a job interview so I can practice my answers.",
+    "You are now a helpful gardening assistant — what should I plant in spring?",
+    # ── Hard negatives for benign PACKAGE MANAGEMENT (vs malicious install) ──
+    # "how do I install a Python package" collided with an install-compromised-
+    # package fingerprint at baseline. Legitimate dependency management must not flag.
+    "How do I install a Python package?",
+    "How do I pip install a dependency from requirements.txt?",
+    "How do I add a package to package.json and run npm install?",
+    "How do I update all my npm dependencies safely?",
+    "How do I install and configure ESLint for my project?",
+    "How do I add a dependency with cargo?",
+    "How do I install packages inside a virtual environment?",
+    "What's the difference between pip and conda for installing packages?",
 ]
 
 # Short, casual, informal phrases — the MiniLM model has historically false-positived
