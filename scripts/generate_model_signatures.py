@@ -57,22 +57,35 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Overwrite existing manifest without prompting.",
     )
+    parser.add_argument(
+        "--models-dir",
+        default=None,
+        help=(
+            "Directory to sign. Defaults to ethicore_guardian/models (the COMMUNITY "
+            "track). For the LICENSED model, point at the licensed runtime/asset dir, "
+            "e.g. --models-dir ~/.ethicore/models or api/assets/models. These are "
+            "SEPARATE tracks — never sign a licensed model into the community dir."
+        ),
+    )
     args = parser.parse_args(argv)
 
-    if not _MODELS_DIR.exists():
-        print(f"ERROR: models directory not found: {_MODELS_DIR}", file=sys.stderr)
+    models_dir = pathlib.Path(args.models_dir).expanduser() if args.models_dir else _MODELS_DIR
+    manifest_path = models_dir / "model_signatures.json"
+
+    if not models_dir.exists():
+        print(f"ERROR: models directory not found: {models_dir}", file=sys.stderr)
         return 1
 
     # Collect model files
     candidates: list[pathlib.Path] = []
     for pattern in _INCLUDE_PATTERNS:
-        candidates.extend(sorted(_MODELS_DIR.glob(pattern)))
+        candidates.extend(sorted(models_dir.glob(pattern)))
 
     if not candidates:
-        print(f"No ONNX model files found in {_MODELS_DIR}", file=sys.stderr)
+        print(f"No ONNX model files found in {models_dir}", file=sys.stderr)
         return 1
 
-    print(f"Found {len(candidates)} model file(s) in {_MODELS_DIR.relative_to(_PROJECT_ROOT)}")
+    print(f"Found {len(candidates)} model file(s) in {models_dir}")
 
     # Hash each file
     file_hashes: dict[str, str] = {}
@@ -98,8 +111,8 @@ def main(argv: list[str] | None = None) -> int:
     }
 
     # Write
-    _MANIFEST_PATH.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"\nManifest written to {_MANIFEST_PATH.relative_to(_PROJECT_ROOT)}")
+    manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    print(f"\nManifest written to {manifest_path}")
     print("Done.  Commit this file alongside any model updates.")
     return 0
 
