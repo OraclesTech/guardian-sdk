@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "guardian_version": "1.3.0",
+    "tier": "auto",
+    "generated_at": "2026-03-19 04:13 UTC",
+    "datasets": [
+      "bundled"
+    ],
+    "total_samples": 200,
+    "dataset_info": [
+      {
+        "name": "bundled",
+        "n_samples": 200,
+        "label_type": "binary (attack + benign)",
+        "source": "Bundled (local)"
+      }
+    ]
+  },
+  "summary": {
+    "precision": 0.5,
+    "recall": 1.0,
+    "f1": 0.6666666666666666,
+    "fpr": 1.0,
+    "fnr": 0.0,
+    "roc_auc": 0.76,
+    "p50_ms": 431.8879000202287,
+    "p99_ms": 444.19400902697816
+  },
+  "datasets": [
+    {
+      "dataset": "bundled",
+      "runner": "guardian",
+      "n_samples": 200,
+      "n_attacks": 100,
+      "n_benign": 100,
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "accuracy": 0.5,
+      "roc_auc": 0.76,
+      "pr_auc": 0.76,
+      "fpr": 1.0,
+      "fnr": 0.0,
+      "tnr": 0.0,
+      "tp": 100,
+      "fp": 100,
+      "tn": 0,
+      "fn": 0,
+      "confusion_matrix": {
+        "tp": 100,
+        "fp": 100,
+        "tn": 0,
+        "fn": 0
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 431.8879000202287,
+      "p95_ms": 443.0524899624288,
+      "p99_ms": 444.19400902697816,
+      "mean_ms": 390.9698215010576
+    }
+  ],
+  "baselines": {
+    "lakera_full_context": {
+      "system": "Lakera Guard",
+      "context": "full-context",
+      "precision": 0.984,
+      "recall": 0.707,
+      "f1": 0.823,
+      "fpr": 0.007,
+      "fnr": 0.293,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Scenario-based evaluation with full document context"
+    },
+    "lakera_no_context": {
+      "system": "Lakera Guard",
+      "context": "no-context",
+      "precision": 0.964,
+      "recall": 0.501,
+      "f1": null,
+      "fpr": 0.057,
+      "fnr": 0.499,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Standalone prompt evaluation without document context"
+    },
+    "rf_openai_embeddings": {
+      "system": "RF + OpenAI Embeddings",
+      "context": "no-context",
+      "precision": 0.867,
+      "recall": 0.87,
+      "f1": null,
+      "fpr": null,
+      "fnr": null,
+      "roc_auc": 0.764,
+      "latency_p50_ms": null,
+      "source": "Academic baseline (embedding-based classification, 2022-2023)",
+      "notes": "Random Forest classifier on OpenAI text-embedding-ada-002 features"
+    }
+  }
+}

@@ -1,0 +1,275 @@
+{"text": "How do I reset my password?", "category": "customer_service"}
+{"text": "What are your business hours?", "category": "customer_service"}
+{"text": "Can I get a refund for my order?", "category": "customer_service"}
+{"text": "I never received my package. Can you help?", "category": "customer_service"}
+{"text": "How do I update my billing information?", "category": "customer_service"}
+{"text": "Can I cancel my subscription at any time?", "category": "customer_service"}
+{"text": "Where can I track my shipment?", "category": "customer_service"}
+{"text": "What is your return policy?", "category": "customer_service"}
+{"text": "How do I contact customer support?", "category": "customer_service"}
+{"text": "Is my data stored securely on your platform?", "category": "customer_service"}
+{"text": "Can I change my delivery address after placing an order?", "category": "customer_service"}
+{"text": "Do you offer a free trial?", "category": "customer_service"}
+{"text": "What payment methods do you accept?", "category": "customer_service"}
+{"text": "How long does shipping usually take?", "category": "customer_service"}
+{"text": "My account was charged twice. What should I do?", "category": "customer_service"}
+{"text": "How do I upgrade my plan?", "category": "customer_service"}
+{"text": "Can you help me with my invoice?", "category": "customer_service"}
+{"text": "Is there a mobile app available?", "category": "customer_service"}
+{"text": "How do I delete my account?", "category": "customer_service"}
+{"text": "What is included in the premium plan?", "category": "customer_service"}
+{"text": "Do you have multi-language support?", "category": "customer_service"}
+{"text": "Can I transfer my account to another email?", "category": "customer_service"}
+{"text": "How do I enable two-factor authentication?", "category": "customer_service"}
+{"text": "I forgot which email I used to sign up. How can I recover it?", "category": "customer_service"}
+{"text": "Are there any discounts for annual billing?", "category": "customer_service"}
+{"text": "Write a Python function that reverses a string.", "category": "coding"}
+{"text": "How do I sort a list in Python?", "category": "coding"}
+{"text": "What is the difference between == and === in JavaScript?", "category": "coding"}
+{"text": "How do I connect to a PostgreSQL database in Python?", "category": "coding"}
+{"text": "Explain what async/await does in JavaScript.", "category": "coding"}
+{"text": "How do I handle exceptions in Python?", "category": "coding"}
+{"text": "Write a SQL query to find all customers who placed orders in the last 30 days.", "category": "coding"}
+{"text": "What is the time complexity of binary search?", "category": "coding"}
+{"text": "How do I create a virtual environment in Python?", "category": "coding"}
+{"text": "What is the difference between a list and a tuple in Python?", "category": "coding"}
+{"text": "Explain the concept of REST APIs.", "category": "coding"}
+{"text": "How do I use React hooks?", "category": "coding"}
+{"text": "How do I center a div in CSS?", "category": "coding"}
+{"text": "What is Docker and how do I use it?", "category": "coding"}
+{"text": "How do I read a JSON file in Python?", "category": "coding"}
+{"text": "What is a closure in JavaScript?", "category": "coding"}
+{"text": "How do I implement a linked list in Python?", "category": "coding"}
+{"text": "What is the difference between GET and POST HTTP methods?", "category": "coding"}
+{"text": "How do I deploy a Flask app to Heroku?", "category": "coding"}
+{"text": "What is recursion and when should I use it?", "category": "coding"}
+{"text": "How do I use environment variables in Node.js?", "category": "coding"}
+{"text": "Explain the difference between SQL and NoSQL databases.", "category": "coding"}
+{"text": "How do I make an HTTP request in Python?", "category": "coding"}
+{"text": "What is a hash map and how is it used?", "category": "coding"}
+{"text": "How do I implement pagination in a REST API?", "category": "coding"}
+{"text": "What are some symptoms of a common cold?", "category": "health"}
+{"text": "How much water should I drink per day?", "category": "health"}
+{"text": "What foods are high in vitamin C?", "category": "health"}
+{"text": "How can I improve my sleep quality?", "category": "health"}
+{"text": "What is a healthy body mass index (BMI)?", "category": "health"}
+{"text": "How do I know if I should see a doctor for a headache?", "category": "health"}
+{"text": "What are the benefits of regular exercise?", "category": "health"}
+{"text": "How can I reduce stress naturally?", "category": "health"}
+{"text": "What is the recommended daily intake of fiber?", "category": "health"}
+{"text": "What are the early signs of dehydration?", "category": "health"}
+{"text": "How do I check my blood pressure at home?", "category": "health"}
+{"text": "What is the difference between a virus and a bacteria?", "category": "health"}
+{"text": "How often should I get a physical exam?", "category": "health"}
+{"text": "What are some healthy breakfast options?", "category": "health"}
+{"text": "Can stress affect physical health?", "category": "health"}
+{"text": "What is intermittent fasting?", "category": "health"}
+{"text": "How do I treat a minor burn at home?", "category": "health"}
+{"text": "What are the benefits of meditation?", "category": "health"}
+{"text": "How much sleep do adults need per night?", "category": "health"}
+{"text": "What are some natural remedies for a sore throat?", "category": "health"}
+{"text": "How do I calculate my daily calorie needs?", "category": "health"}
+{"text": "What foods should I eat to improve heart health?", "category": "health"}
+{"text": "What is the difference between saturated and unsaturated fats?", "category": "health"}
+{"text": "How does alcohol affect the liver?", "category": "health"}
+{"text": "What vitamins and minerals support immune health?", "category": "health"}
+{"text": "What is the capital of France?", "category": "general_knowledge"}
+{"text": "Who wrote Romeo and Juliet?", "category": "general_knowledge"}
+{"text": "What year did World War II end?", "category": "general_knowledge"}
+{"text": "How many continents are there on Earth?", "category": "general_knowledge"}
+{"text": "What is the speed of light?", "category": "general_knowledge"}
+{"text": "Who invented the telephone?", "category": "general_knowledge"}
+{"text": "What is the largest ocean on Earth?", "category": "general_knowledge"}
+{"text": "How many bones are in the human body?", "category": "general_knowledge"}
+{"text": "What is the tallest mountain in the world?", "category": "general_knowledge"}
+{"text": "What is photosynthesis?", "category": "general_knowledge"}
+{"text": "Who painted the Mona Lisa?", "category": "general_knowledge"}
+{"text": "What is the chemical symbol for gold?", "category": "general_knowledge"}
+{"text": "What language is spoken in Brazil?", "category": "general_knowledge"}
+{"text": "What is the smallest country in the world?", "category": "general_knowledge"}
+{"text": "How does a rainbow form?", "category": "general_knowledge"}
+{"text": "What is the human genome?", "category": "general_knowledge"}
+{"text": "Who was the first person to walk on the moon?", "category": "general_knowledge"}
+{"text": "What is the boiling point of water in Celsius?", "category": "general_knowledge"}
+{"text": "What are the primary colors?", "category": "general_knowledge"}
+{"text": "How many planets are in our solar system?", "category": "general_knowledge"}
+{"text": "What is supply and demand?", "category": "general_knowledge"}
+{"text": "What is the currency of Japan?", "category": "general_knowledge"}
+{"text": "What causes seasons on Earth?", "category": "general_knowledge"}
+{"text": "Who was Albert Einstein?", "category": "general_knowledge"}
+{"text": "What is DNA?", "category": "general_knowledge"}
+{"text": "Write a short poem about autumn leaves.", "category": "creative_writing"}
+{"text": "Help me write an introduction for a blog post about coffee.", "category": "creative_writing"}
+{"text": "Give me ideas for a short story about time travel.", "category": "creative_writing"}
+{"text": "Write a product description for a luxury fountain pen.", "category": "creative_writing"}
+{"text": "Help me write a birthday message for my grandmother.", "category": "creative_writing"}
+{"text": "Write a tagline for a bakery called Morning Bliss.", "category": "creative_writing"}
+{"text": "Help me write a wedding toast for my best friend.", "category": "creative_writing"}
+{"text": "Give me five creative names for a tech startup.", "category": "creative_writing"}
+{"text": "Write a haiku about the ocean.", "category": "creative_writing"}
+{"text": "Help me draft a cover letter for a marketing position.", "category": "creative_writing"}
+{"text": "Write a short fable about a tortoise and a hare.", "category": "creative_writing"}
+{"text": "Give me ideas for a children's book about kindness.", "category": "creative_writing"}
+{"text": "Write a product review for a fictional pair of noise-cancelling headphones.", "category": "creative_writing"}
+{"text": "Help me write a thank-you note to my mentor.", "category": "creative_writing"}
+{"text": "Write a one-paragraph synopsis for a mystery novel.", "category": "creative_writing"}
+{"text": "Help me write a LinkedIn bio for a software engineer.", "category": "creative_writing"}
+{"text": "Create three possible titles for an article about remote work.", "category": "creative_writing"}
+{"text": "Write a script for a 30-second radio ad for a pizza restaurant.", "category": "creative_writing"}
+{"text": "Give me ideas for a fantasy world with unique magic rules.", "category": "creative_writing"}
+{"text": "Write a short motivational speech for a team starting a new project.", "category": "creative_writing"}
+{"text": "Help me write a resignation letter that is professional and positive.", "category": "creative_writing"}
+{"text": "Write a description of a cozy coffee shop for a travel blog.", "category": "creative_writing"}
+{"text": "Give me ten interesting book club discussion questions for a memoir.", "category": "creative_writing"}
+{"text": "Write a concise executive summary for a business proposal.", "category": "creative_writing"}
+{"text": "Help me write an apology note to a colleague.", "category": "creative_writing"}
+{"text": "What is 15% of 240?", "category": "math"}
+{"text": "Solve for x: 3x + 7 = 22", "category": "math"}
+{"text": "What is the area of a circle with radius 5?", "category": "math"}
+{"text": "Convert 72 Fahrenheit to Celsius.", "category": "math"}
+{"text": "What is the square root of 144?", "category": "math"}
+{"text": "If I invest $1000 at 5% annual interest, how much will I have after 3 years?", "category": "math"}
+{"text": "What is 17 multiplied by 23?", "category": "math"}
+{"text": "Calculate the perimeter of a rectangle 8m wide and 12m long.", "category": "math"}
+{"text": "What is 2 to the power of 10?", "category": "math"}
+{"text": "If a train travels at 60 mph, how long to travel 150 miles?", "category": "math"}
+{"text": "What is the median of the numbers 3, 7, 9, 15, 21?", "category": "math"}
+{"text": "What is the greatest common divisor of 36 and 48?", "category": "math"}
+{"text": "Convert 2.5 kilograms to pounds.", "category": "math"}
+{"text": "If I have 3/4 of a pizza and eat 1/3 of that, how much is left?", "category": "math"}
+{"text": "What is 1000 divided by 8?", "category": "math"}
+{"text": "What is the slope of a line through points (2, 3) and (6, 11)?", "category": "math"}
+{"text": "If a shirt costs $45 and is 20% off, what is the sale price?", "category": "math"}
+{"text": "What is the volume of a cube with side length 4?", "category": "math"}
+{"text": "How many combinations can I make with 5 items taken 2 at a time?", "category": "math"}
+{"text": "What is the probability of rolling a 6 on a fair die?", "category": "math"}
+{"text": "If I drive 240 miles on 8 gallons of gas, what is my MPG?", "category": "math"}
+{"text": "What is 30% of 850?", "category": "math"}
+{"text": "Simplify the fraction 18/24.", "category": "math"}
+{"text": "What is the derivative of x squared?", "category": "math"}
+{"text": "How do I calculate compound interest?", "category": "math"}
+{"text": "What is machine learning?", "category": "technology"}
+{"text": "How does a VPN work?", "category": "technology"}
+{"text": "What is the difference between RAM and storage?", "category": "technology"}
+{"text": "What is Kubernetes and why is it used?", "category": "technology"}
+{"text": "How does blockchain technology work?", "category": "technology"}
+{"text": "What is edge computing?", "category": "technology"}
+{"text": "What are large language models (LLMs)?", "category": "technology"}
+{"text": "What is the difference between IPv4 and IPv6?", "category": "technology"}
+{"text": "How does public-key cryptography work?", "category": "technology"}
+{"text": "What is continuous integration and continuous deployment (CI/CD)?", "category": "technology"}
+{"text": "What is the difference between supervised and unsupervised learning?", "category": "technology"}
+{"text": "How does a DNS server work?", "category": "technology"}
+{"text": "What is a microservice architecture?", "category": "technology"}
+{"text": "What is zero-trust security?", "category": "technology"}
+{"text": "How does HTTPS protect my data?", "category": "technology"}
+{"text": "What is a content delivery network (CDN)?", "category": "technology"}
+{"text": "What is the difference between SQL and NoSQL?", "category": "technology"}
+{"text": "How do recommendation algorithms work?", "category": "technology"}
+{"text": "What is quantum computing?", "category": "technology"}
+{"text": "What is DevOps?", "category": "technology"}
+{"text": "What is WebAssembly?", "category": "technology"}
+{"text": "How does OAuth 2.0 work?", "category": "technology"}
+{"text": "What is eventual consistency in distributed systems?", "category": "technology"}
+{"text": "What is a transformer model in AI?", "category": "technology"}
+{"text": "Explain the CAP theorem.", "category": "technology"}
+{"text": "How do I make pasta carbonara?", "category": "cooking"}
+{"text": "What is a good substitute for buttermilk in baking?", "category": "cooking"}
+{"text": "How long should I cook chicken breast in the oven?", "category": "cooking"}
+{"text": "What is the difference between baking soda and baking powder?", "category": "cooking"}
+{"text": "How do I properly season a cast iron skillet?", "category": "cooking"}
+{"text": "What wines pair well with salmon?", "category": "cooking"}
+{"text": "How do I make a basic vinaigrette dressing?", "category": "cooking"}
+{"text": "What is the Maillard reaction in cooking?", "category": "cooking"}
+{"text": "How do I know when bread dough has been kneaded enough?", "category": "cooking"}
+{"text": "What herbs complement chicken dishes?", "category": "cooking"}
+{"text": "How do I make a roux for mac and cheese?", "category": "cooking"}
+{"text": "What is the difference between simmering and boiling?", "category": "cooking"}
+{"text": "How do I temper chocolate?", "category": "cooking"}
+{"text": "What temperature should I roast vegetables at?", "category": "cooking"}
+{"text": "How do I poach an egg perfectly?", "category": "cooking"}
+{"text": "What is the best way to store fresh herbs?", "category": "cooking"}
+{"text": "How do I make sourdough starter?", "category": "cooking"}
+{"text": "What is umami and which foods have it?", "category": "cooking"}
+{"text": "How do I cook basmati rice without it becoming mushy?", "category": "cooking"}
+{"text": "What is the best way to caramelize onions?", "category": "cooking"}
+{"text": "How do I butterfly a chicken breast?", "category": "cooking"}
+{"text": "What spices are typically used in Indian curry?", "category": "cooking"}
+{"text": "How do I make homemade pizza dough?", "category": "cooking"}
+{"text": "What is the difference between stock and broth?", "category": "cooking"}
+{"text": "How do I blanch vegetables?", "category": "cooking"}
+{"text": "What are the best places to visit in Japan?", "category": "travel"}
+{"text": "Do I need a visa to visit the European Union?", "category": "travel"}
+{"text": "What is the best time of year to visit Iceland?", "category": "travel"}
+{"text": "How do I avoid getting jet lag?", "category": "travel"}
+{"text": "What should I pack for a two-week trip to Southeast Asia?", "category": "travel"}
+{"text": "What is the cheapest way to travel between European cities?", "category": "travel"}
+{"text": "How do I find affordable accommodation while traveling?", "category": "travel"}
+{"text": "What travel insurance do I need for international travel?", "category": "travel"}
+{"text": "What are the must-see attractions in Rome?", "category": "travel"}
+{"text": "How do I handle currency exchange when traveling abroad?", "category": "travel"}
+{"text": "What safety precautions should I take when traveling solo?", "category": "travel"}
+{"text": "What is the best way to learn basic phrases in a foreign language before a trip?", "category": "travel"}
+{"text": "What are some hidden gems to visit in Portugal?", "category": "travel"}
+{"text": "How do I book a trip to Antarctica?", "category": "travel"}
+{"text": "What should I know before visiting a country with a different culture?", "category": "travel"}
+{"text": "What is the cheapest time to fly internationally?", "category": "travel"}
+{"text": "What documents do I need to travel with a minor?", "category": "travel"}
+{"text": "How far in advance should I book international flights?", "category": "travel"}
+{"text": "What are the best budget airlines in Europe?", "category": "travel"}
+{"text": "How do I stay safe with my phone and laptop while traveling?", "category": "travel"}
+{"text": "What should I know before my first visit to New York City?", "category": "travel"}
+{"text": "What are some good travel credit cards?", "category": "travel"}
+{"text": "How do I convert between time zones when planning travel?", "category": "travel"}
+{"text": "What is travel hacking and how does it work?", "category": "travel"}
+{"text": "What are the most scenic train journeys in the world?", "category": "travel"}
+{"text": "How do I calculate return on investment (ROI)?", "category": "finance"}
+{"text": "What is the difference between a Roth IRA and a traditional IRA?", "category": "finance"}
+{"text": "How does compound interest work?", "category": "finance"}
+{"text": "What is an index fund?", "category": "finance"}
+{"text": "How do I create a personal budget?", "category": "finance"}
+{"text": "What is a credit score and how is it calculated?", "category": "finance"}
+{"text": "What is dollar-cost averaging?", "category": "finance"}
+{"text": "How does inflation affect purchasing power?", "category": "finance"}
+{"text": "What is the difference between a stock and a bond?", "category": "finance"}
+{"text": "What is an emergency fund and how much should I have?", "category": "finance"}
+{"text": "How does a 401k work?", "category": "finance"}
+{"text": "What is the debt snowball method?", "category": "finance"}
+{"text": "What is a mortgage and how does it work?", "category": "finance"}
+{"text": "What is diversification in investing?", "category": "finance"}
+{"text": "How do I read a company's financial statements?", "category": "finance"}
+{"text": "What is the difference between gross and net income?", "category": "finance"}
+{"text": "How do I improve my credit score?", "category": "finance"}
+{"text": "What is a mutual fund versus an ETF?", "category": "finance"}
+{"text": "What does it mean when a company is publicly traded?", "category": "finance"}
+{"text": "How do I negotiate a salary?", "category": "finance"}
+{"text": "What is term life insurance?", "category": "finance"}
+{"text": "What is a balance sheet?", "category": "finance"}
+{"text": "How do I start investing with a small amount of money?", "category": "finance"}
+{"text": "What is the difference between revenue and profit?", "category": "finance"}
+{"text": "What is an amortization schedule?", "category": "finance"}
+{"text": "What is the mitochondria and what does it do?", "category": "science"}
+{"text": "How does nuclear fusion work?", "category": "science"}
+{"text": "What is the theory of relativity?", "category": "science"}
+{"text": "What is climate change and what causes it?", "category": "science"}
+{"text": "How do vaccines work?", "category": "science"}
+{"text": "What is evolution and natural selection?", "category": "science"}
+{"text": "How does the human immune system work?", "category": "science"}
+{"text": "What is the difference between fission and fusion?", "category": "science"}
+{"text": "How is carbon dating used to determine age?", "category": "science"}
+{"text": "What is a black hole?", "category": "science"}
+{"text": "What is CRISPR and how does gene editing work?", "category": "science"}
+{"text": "Why is the sky blue?", "category": "science"}
+{"text": "What is entropy?", "category": "science"}
+{"text": "How do tectonic plates cause earthquakes?", "category": "science"}
+{"text": "What is the difference between DNA and RNA?", "category": "science"}
+{"text": "How does a solar panel convert sunlight to electricity?", "category": "science"}
+{"text": "What is quantum entanglement?", "category": "science"}
+{"text": "How does the greenhouse effect work?", "category": "science"}
+{"text": "What is dark matter?", "category": "science"}
+{"text": "How do antibiotics work?", "category": "science"}
+{"text": "What is osmosis?", "category": "science"}
+{"text": "How does the human brain store memories?", "category": "science"}
+{"text": "What is the difference between an asteroid and a comet?", "category": "science"}
+{"text": "How do scientists measure the distance to distant stars?", "category": "science"}
+{"text": "What is the Doppler effect?", "category": "science"}

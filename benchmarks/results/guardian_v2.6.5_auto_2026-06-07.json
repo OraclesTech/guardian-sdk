@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "guardian_version": "2.6.5",
+    "tier": "auto",
+    "generated_at": "2026-06-07 03:21 UTC",
+    "datasets": [
+      "bundled",
+      "agentic"
+    ],
+    "total_samples": 400,
+    "dataset_info": [
+      {
+        "name": "bundled",
+        "n_samples": 200,
+        "label_type": "binary (attack + benign)",
+        "source": "Bundled (local)"
+      },
+      {
+        "name": "agentic",
+        "n_samples": 200,
+        "label_type": "binary (attack + benign)",
+        "source": "HuggingFace"
+      }
+    ]
+  },
+  "summary": {
+    "precision": 0.9252873563218391,
+    "recall": 0.75,
+    "f1": 0.8275401069518716,
+    "fpr": 0.065,
+    "fnr": 0.25,
+    "roc_auc": 0.743825,
+    "p50_ms": 2568.9056499977596,
+    "p99_ms": 5444.9068884702865
+  },
+  "datasets": [
+    {
+      "dataset": "bundled",
+      "runner": "guardian",
+      "n_samples": 200,
+      "n_attacks": 100,
+      "n_benign": 100,
+      "precision": 1.0,
+      "recall": 0.76,
+      "f1": 0.8636,
+      "accuracy": 0.88,
+      "roc_auc": 0.6028,
+      "pr_auc": 0.6123,
+      "fpr": 0.0,
+      "fnr": 0.24,
+      "tnr": 1.0,
+      "tp": 76,
+      "fp": 0,
+      "tn": 100,
+      "fn": 24,
+      "confusion_matrix": {
+        "tp": 76,
+        "fp": 0,
+        "tn": 100,
+        "fn": 24
+      },
+      "threshold_used": 0.05,
+      "warnings": [],
+      "p50_ms": 2305.2948500262573,
+      "p95_ms": 3139.310249988921,
+      "p99_ms": 3139.6836729277857,
+      "mean_ms": 2268.165341488784
+    },
+    {
+      "dataset": "agentic",
+      "runner": "guardian",
+      "n_samples": 200,
+      "n_attacks": 100,
+      "n_benign": 100,
+      "precision": 0.8506,
+      "recall": 0.74,
+      "f1": 0.7914,
+      "accuracy": 0.805,
+      "roc_auc": 0.8849,
+      "pr_auc": 0.8634,
+      "fpr": 0.13,
+      "fnr": 0.26,
+      "tnr": 0.87,
+      "tp": 74,
+      "fp": 13,
+      "tn": 87,
+      "fn": 26,
+      "confusion_matrix": {
+        "tp": 74,
+        "fp": 13,
+        "tn": 87,
+        "fn": 26
+      },
+      "threshold_used": 0.05,
+      "warnings": [],
+      "p50_ms": 2832.516449969262,
+      "p95_ms": 4921.859919978306,
+      "p99_ms": 7750.130104012787,
+      "mean_ms": 3076.9553255080245
+    }
+  ],
+  "baselines": {
+    "lakera_full_context": {
+      "system": "Lakera Guard",
+      "context": "full-context",
+      "precision": 0.984,
+      "recall": 0.707,
+      "f1": 0.823,
+      "fpr": 0.007,
+      "fnr": 0.293,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Scenario-based evaluation with full document context"
+    },
+    "lakera_no_context": {
+      "system": "Lakera Guard",
+      "context": "no-context",
+      "precision": 0.964,
+      "recall": 0.501,
+      "f1": null,
+      "fpr": 0.057,
+      "fnr": 0.499,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Standalone prompt evaluation without document context"
+    },
+    "rf_openai_embeddings": {
+      "system": "RF + OpenAI Embeddings",
+      "context": "no-context",
+      "precision": 0.867,
+      "recall": 0.87,
+      "f1": null,
+      "fpr": null,
+      "fnr": null,
+      "roc_auc": 0.764,
+      "latency_p50_ms": null,
+      "source": "Academic baseline (embedding-based classification, 2022-2023)",
+      "notes": "Random Forest classifier on OpenAI text-embedding-ada-002 features"
+    }
+  }
+}

@@ -1,0 +1,137 @@
+# Ethicore Engine™ — Guardian SDK Benchmark Report
+
+**Version:** {{ meta.guardian_version }}
+**Tier:** {{ meta.tier }}
+**Generated:** {{ meta.generated_at }}
+**Datasets:** {{ meta.datasets | join(", ") }}
+**Total samples evaluated:** {{ meta.total_samples | format_int }}
+
+---
+
+## Executive Summary
+
+Guardian SDK {{ meta.guardian_version }} ({{ meta.tier }} tier) evaluated against
+{{ meta.total_samples | format_int }} prompts spanning {{ meta.datasets | length }}
+public benchmark datasets. Results compared against published Lakera Guard and
+academic baselines.
+
+### Key Numbers
+
+| Metric | Guardian v{{ meta.guardian_version }} ({{ meta.tier }}) | Lakera Guard (full-ctx, published) | Δ vs Lakera |
+|:---|---:|---:|---:|
+| Precision | **{{ summary.precision | pct }}** | 0.984 | {{ (summary.precision - 0.984) | delta_pct }} |
+| Recall | **{{ summary.recall | pct }}** | 0.707 | {{ (summary.recall - 0.707) | delta_pct }} |
+| F1 Score | **{{ summary.f1 | pct }}** | 0.823 | {{ (summary.f1 - 0.823) | delta_pct }} |
+| FPR | **{{ summary.fpr | pct }}** | 0.007 | {{ (summary.fpr - 0.007) | delta_pct }} |
+| FNR | **{{ summary.fnr | pct }}** | 0.293 | {{ (summary.fnr - 0.293) | delta_pct }} |
+| ROC-AUC | **{{ summary.roc_auc | fmt3 }}** | — | — |
+| p50 Latency | **{{ summary.p50_ms | fmt1 }}ms** | ~51ms | {{ (summary.p50_ms - 51) | delta_ms }} |
+| p99 Latency | **{{ summary.p99_ms | fmt1 }}ms** | N/A | — |
+
+> **Positive Δ = Guardian better** for Precision/Recall/F1/ROC-AUC.
+> **Negative Δ = Guardian better** for FPR/FNR/Latency.
+
+---
+
+## Per-Dataset Results
+
+{% for ds in datasets %}
+### {{ ds.dataset }} ({{ ds.runner }})
+
+| Metric | Value |
+|:---|---:|
+| Samples | {{ ds.n_samples | format_int }} ({{ ds.n_attacks }} attacks, {{ ds.n_benign }} benign) |
+| Precision | {{ ds.precision | pct }} |
+| Recall | {{ ds.recall | pct }} |
+| F1 Score | {{ ds.f1 | pct }} |
+| Accuracy | {{ ds.accuracy | pct }} |
+| ROC-AUC | {{ ds.roc_auc | fmt3 }} |
+| PR-AUC | {{ ds.pr_auc | fmt3 }} |
+| FPR | {{ ds.fpr | pct }} |
+| FNR | {{ ds.fnr | pct }} |
+
+**Confusion Matrix:**
+
+|  | Predicted Attack | Predicted Benign |
+|:---|---:|---:|
+| **Actual Attack** | TP = {{ ds.tp }} | FN = {{ ds.fn }} |
+| **Actual Benign** | FP = {{ ds.fp }} | TN = {{ ds.tn }} |
+
+**Latency:**
+
+| Percentile | Value |
+|:---|---:|
+| p50 | {{ ds.p50_ms | fmt1 }}ms |
+| p95 | {{ ds.p95_ms | fmt1 }}ms |
+| p99 | {{ ds.p99_ms | fmt1 }}ms |
+| Mean | {{ ds.mean_ms | fmt1 }}ms |
+
+{% if ds.warnings %}
+> ⚠️ **Warnings:** {{ ds.warnings | join("; ") }}
+{% endif %}
+
+{% endfor %}
+
+---
+
+## Published Baselines (Reference)
+
+| System | Context | Precision | Recall | F1 | FPR | Latency | Source |
+|:---|:---|---:|---:|---:|---:|---:|:---|
+| **Guardian v{{ meta.guardian_version }} ({{ meta.tier }})** | no-context | **{{ summary.precision | pct }}** | **{{ summary.recall | pct }}** | **{{ summary.f1 | pct }}** | **{{ summary.fpr | pct }}** | **{{ summary.p50_ms | fmt1 }}ms** | *this report* |
+| Lakera Guard | full-context | 0.984 | 0.707 | 0.823 | 0.007 | ~51ms | Palit et al. 2025 |
+| Lakera Guard | no-context | 0.964 | 0.501 | — | 0.057 | ~51ms | Palit et al. 2025 |
+| RF + OpenAI Embeddings | no-context | 0.867 | 0.870 | — | — | — | Academic baseline |
+
+---
+
+## Methodology
+
+- **Guardian SDK version:** {{ meta.guardian_version }}
+- **Tier:** {{ meta.tier }} ({% if meta.tier == "licensed" %}full 500+ threat patterns + ONNX MiniLM-L6-v2 semantic engine{% else %}community patterns (24) + ONNX MiniLM-L6-v2 semantic engine{% endif %})
+- **Binary classification:** Guardian's actual production decision is used directly —
+  `recommended_action ∈ {BLOCK, CHALLENGE}` → label 1 (attack); `ALLOW / MONITOR` → label 0
+  (benign). This is the same decision your application would receive in production, making
+  the comparison apples-to-apples with Lakera Guard (which publishes against its own block
+  threshold) and other production safety services.
+- **Per-sample session isolation:** Each prompt receives a unique `session_id` in the
+  `analyze()` context. Without isolation, Guardian's session-keyed analyzers
+  (`automated_scan_detector`, `context_poisoning_tracker`, behavioral profile)
+  accumulate state across the rapid-fire benchmark stream and correctly treat it as
+  a coordinated scan attack, producing artificially high FPR. The unique `session_id`
+  makes each benchmark sample an independent measurement — matching how a real
+  application would handle distinct end-user requests.
+- **Continuous score:** Raw `threat_score` (normalized to 0.0–1.0) used for ROC-AUC and PR-AUC.
+- **Caching:** Disabled during benchmark (each prompt independently measured)
+- **Latency measurement:** Wall-clock time from `analyze()` call to result return
+- **Baselines:** Published numbers from peer-reviewed literature (no live API calls)
+- **Evaluation date:** {{ meta.generated_at }}
+
+### Dataset Quality Notes
+
+- **bundled** — Curated in-house; ground-truth reference for FPR. All labels manually verified.
+- **neuralchemy** — Public HuggingFace dataset. Manual inspection confirmed the `benign` class
+  contains mislabeled samples: phishing email generation requests, drug synthesis prompts, and
+  cybersecurity exploitation scenarios labeled as benign. FPR on this dataset reflects Guardian
+  correctly rejecting actually-harmful content that the dataset mislabeled as benign; it is **not**
+  a true false positive rate. Recall and ROC-AUC on the attack class remain reliable.
+- **deepset** — 546 manually curated prompt-injection examples; binary labeled. Well-structured.
+- **jailbreakbench** — NeurIPS 2024 standardized behaviors; attack-only, supplemented with
+  bundled benigns for FPR computation.
+- **advbench** — Gated dataset (requires HuggingFace access request). All samples are attacks.
+- **harmbench** — Dataset unavailable on HuggingFace Hub as of the evaluation date.
+
+---
+
+## Dataset Coverage
+
+| Dataset | Samples | Labels | Source |
+|:---|---:|:---|:---|
+{% for info in meta.dataset_info %}
+| {{ info.name }} | {{ info.n_samples | format_int }} | {{ info.label_type }} | {{ info.source }} |
+{% endfor %}
+
+---
+
+*Report generated by Ethicore Engine™ Guardian SDK Benchmark Suite.*
+*© 2026 Oracles Technologies LLC — [oraclestechnologies.com](https://oraclestechnologies.com)*

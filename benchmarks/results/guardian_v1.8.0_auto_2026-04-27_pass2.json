@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "guardian_version": "1.8.0",
+    "tier": "auto",
+    "generated_at": "2026-04-27 23:04 UTC",
+    "datasets": [
+      "bundled",
+      "deepset",
+      "jailbreakbench",
+      "salad_data",
+      "neuralchemy"
+    ],
+    "total_samples": 27146,
+    "dataset_info": [
+      {
+        "name": "bundled",
+        "n_samples": 416,
+        "label_type": "binary (attack + benign)",
+        "source": "Bundled (local)"
+      },
+      {
+        "name": "neuralchemy",
+        "n_samples": 4391,
+        "label_type": "binary (attack + benign)",
+        "source": "HuggingFace"
+      },
+      {
+        "name": "deepset",
+        "n_samples": 546,
+        "label_type": "binary (attack + benign)",
+        "source": "HuggingFace"
+      },
+      {
+        "name": "jailbreakbench",
+        "n_samples": 200,
+        "label_type": "binary (attack + benign)",
+        "source": "HuggingFace"
+      },
+      {
+        "name": "salad_data",
+        "n_samples": 21593,
+        "label_type": "binary (attack + benign)",
+        "source": "HuggingFace"
+      }
+    ]
+  },
+  "summary": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "fpr": 0.0,
+    "fnr": 1.0,
+    "roc_auc": 0.742349981045788,
+    "p50_ms": 854.2079500039108,
+    "p99_ms": 12990.342096593698
+  },
+  "datasets": [
+    {
+      "dataset": "bundled",
+      "runner": "guardian",
+      "n_samples": 416,
+      "n_attacks": 141,
+      "n_benign": 275,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.6611,
+      "roc_auc": 0.9998,
+      "pr_auc": 0.9997,
+      "fpr": 0.0,
+      "fnr": 1.0,
+      "tnr": 1.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 275,
+      "fn": 141,
+      "confusion_matrix": {
+        "tp": 0,
+        "fp": 0,
+        "tn": 275,
+        "fn": 141
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 794.0836999914609,
+      "p95_ms": 904.7769251046702,
+      "p99_ms": 60915.19638992032,
+      "mean_ms": 3607.472044233313
+    },
+    {
+      "dataset": "neuralchemy",
+      "runner": "guardian",
+      "n_samples": 4391,
+      "n_attacks": 2650,
+      "n_benign": 1741,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.3965,
+      "roc_auc": 0.6984,
+      "pr_auc": 0.7831,
+      "fpr": 0.0,
+      "fnr": 1.0,
+      "tnr": 1.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 1741,
+      "fn": 2650,
+      "confusion_matrix": {
+        "tp": 0,
+        "fp": 0,
+        "tn": 1741,
+        "fn": 2650
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 880.8299000374973,
+      "p95_ms": 1028.7141000153497,
+      "p99_ms": 1191.4157999912277,
+      "mean_ms": 827.635012206238
+    },
+    {
+      "dataset": "deepset",
+      "runner": "guardian",
+      "n_samples": 546,
+      "n_attacks": 203,
+      "n_benign": 343,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.6282,
+      "roc_auc": 0.9326,
+      "pr_auc": 0.8593,
+      "fpr": 0.0,
+      "fnr": 1.0,
+      "tnr": 1.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 343,
+      "fn": 203,
+      "confusion_matrix": {
+        "tp": 0,
+        "fp": 0,
+        "tn": 343,
+        "fn": 203
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 877.2697999957018,
+      "p95_ms": 980.8344999910332,
+      "p99_ms": 1016.0637100634631,
+      "mean_ms": 805.0052901092855
+    },
+    {
+      "dataset": "jailbreakbench",
+      "runner": "guardian",
+      "n_samples": 200,
+      "n_attacks": 100,
+      "n_benign": 100,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.5,
+      "roc_auc": 0.5486,
+      "pr_auc": 0.5421,
+      "fpr": 0.0,
+      "fnr": 1.0,
+      "tnr": 1.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 100,
+      "fn": 100,
+      "confusion_matrix": {
+        "tp": 0,
+        "fp": 0,
+        "tn": 100,
+        "fn": 100
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 857.0798499858938,
+      "p95_ms": 885.140814963961,
+      "p99_ms": 886.7345150164329,
+      "mean_ms": 775.9664554981282
+    },
+    {
+      "dataset": "salad_data",
+      "runner": "guardian",
+      "n_samples": 21593,
+      "n_attacks": 21318,
+      "n_benign": 275,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "accuracy": 0.0127,
+      "roc_auc": 0.5323,
+      "pr_auc": 0.9881,
+      "fpr": 0.0,
+      "fnr": 1.0,
+      "tnr": 1.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 275,
+      "fn": 21318,
+      "confusion_matrix": {
+        "tp": 0,
+        "fp": 0,
+        "tn": 275,
+        "fn": 21318
+      },
+      "threshold_used": 0.5,
+      "warnings": [],
+      "p50_ms": 861.7765000090003,
+      "p95_ms": 898.8747999770567,
+      "p99_ms": 942.3000679770483,
+      "mean_ms": 781.8147129073545
+    }
+  ],
+  "baselines": {
+    "lakera_full_context": {
+      "system": "Lakera Guard",
+      "context": "full-context",
+      "precision": 0.984,
+      "recall": 0.707,
+      "f1": 0.823,
+      "fpr": 0.007,
+      "fnr": 0.293,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Scenario-based evaluation with full document context"
+    },
+    "lakera_no_context": {
+      "system": "Lakera Guard",
+      "context": "no-context",
+      "precision": 0.964,
+      "recall": 0.501,
+      "f1": null,
+      "fpr": 0.057,
+      "fnr": 0.499,
+      "roc_auc": null,
+      "latency_p50_ms": 51.0,
+      "source": "Palit et al., arXiv:2505.13028 (2025)",
+      "notes": "Standalone prompt evaluation without document context"
+    },
+    "rf_openai_embeddings": {
+      "system": "RF + OpenAI Embeddings",
+      "context": "no-context",
+      "precision": 0.867,
+      "recall": 0.87,
+      "f1": null,
+      "fpr": null,
+      "fnr": null,
+      "roc_auc": 0.764,
+      "latency_p50_ms": null,
+      "source": "Academic baseline (embedding-based classification, 2022-2023)",
+      "notes": "Random Forest classifier on OpenAI text-embedding-ada-002 features"
+    }
+  }
+}
