@@ -1,7 +1,6 @@
 """
 Ethicore Engine™ - Guardian SDK — Perplexity Provider
 Protection for Perplexity Sonar models via the OpenAI-compatible API.
-Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
@@ -29,13 +28,11 @@ outside the API call boundary.  Treat Sonar responses as you would any
 externally-sourced content: verify citations before acting on them in agentic
 workflows.
 
-Current model IDs (May 2026):
-  sonar                 — Lightweight, cost-effective web-grounded responses
-  sonar-pro             — Advanced search; complex multi-source queries
-  sonar-reasoning-pro   — Chain-of-thought reasoning with web grounding
-  sonar-deep-research   — Exhaustive multi-step research agent
-
-Model IDs are living aliases — no version suffixes.
+Model-agnostic by design: the ``model`` argument is forwarded untouched — never
+validated, allowlisted, or branched on. Any current or future Sonar model ID works
+with zero code changes; clients are detected by base_url, not model ID. A
+``PERPLEXITY_MODELS`` convenience set of well-known IDs is exported for callers who
+want it, but it is non-exhaustive and never used for detection or gating.
 
 Perplexity Agent API
 ---------------------
@@ -82,9 +79,11 @@ logger = logging.getLogger(__name__)
 
 PERPLEXITY_BASE_URL = "https://api.perplexity.ai"
 
-# Current Perplexity model identifiers (May 2026)
-# Source: https://docs.perplexity.ai/docs/model-cards
+# Well-known Perplexity model identifiers — a non-exhaustive convenience export.
+# NOT used for client detection (see _is_perplexity_client, which keys off base_url)
+# or for any runtime validation: the provider forwards any model ID untouched.
 # All Sonar models are web-grounded by default.
+# Source: https://docs.perplexity.ai/docs/model-cards
 PERPLEXITY_MODELS = {
     "sonar",                  # Lightweight, cost-effective; fast web-grounded answers
     "sonar-pro",              # Advanced search; complex multi-source queries
@@ -428,7 +427,7 @@ def create_protected_perplexity_client(
             guardian_api_key="eg-sk-...",
         )
         response = client.chat.completions.create(
-            model="sonar-pro",
+            model="<perplexity-model-id>",  # any current Sonar model — forwarded as-is
             messages=[{"role": "user", "content": "What happened in AI this week?"}],
         )
     """

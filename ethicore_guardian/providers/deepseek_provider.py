@@ -1,7 +1,6 @@
 """
 Ethicore Engine™ - Guardian SDK — DeepSeek Provider
 Protection for DeepSeek models via the OpenAI-compatible API.
-Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
@@ -21,18 +20,16 @@ For V4 models, reasoning is toggled via an extra_body parameter, NOT a
 separate model ID:
 
     client.chat.completions.create(
-        model="deepseek-v4-flash",
+        model="<deepseek-model-id>",   # any current DeepSeek model — forwarded as-is
         messages=[...],
         extra_body={"thinking": {"type": "enabled", "budget_tokens": 8000}},
     )
 
-Current model IDs (May 2026):
-  deepseek-v4-flash     — Default non-thinking mode (fast, cost-effective)
-  deepseek-v4-pro       — Pro model; extended reasoning budget
-  deepseek-chat         — Legacy alias → deepseek-v4-flash (deprecated 2026-07-24)
-  deepseek-reasoner     — Legacy alias → deepseek-v4-flash thinking (deprecated 2026-07-24)
-
-New code should use deepseek-v4-flash or deepseek-v4-pro directly.
+Model-agnostic by design: the ``model`` argument is forwarded untouched — never
+validated, allowlisted, or branched on. Any current or future DeepSeek model ID works
+with zero code changes; clients are detected by base_url, not model ID. A
+``DEEPSEEK_MODELS`` convenience set of well-known IDs is exported for callers who want
+it, but it is non-exhaustive and never used for detection or gating.
 
 Anthropic-compatible endpoint
 ------------------------------
@@ -77,7 +74,9 @@ logger = logging.getLogger(__name__)
 
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 
-# Current DeepSeek model identifiers (May 2026)
+# Well-known DeepSeek model identifiers — a non-exhaustive convenience export.
+# NOT used for client detection (see _is_deepseek_client, which keys off base_url) or
+# for any runtime validation: the provider forwards any model ID untouched.
 # Source: https://api-docs.deepseek.com/
 DEEPSEEK_MODELS = {
     # ── V4 series (current — use these for new code) ────────────────────────
@@ -451,12 +450,12 @@ def create_protected_deepseek_client(
         )
         # Standard inference
         response = client.chat.completions.create(
-            model="deepseek-v4-flash",
+            model="<deepseek-model-id>",  # any current DeepSeek model — forwarded as-is
             messages=[{"role": "user", "content": "Hello"}],
         )
         # With reasoning enabled (V4 thinking mode via extra_body)
         response = client.chat.completions.create(
-            model="deepseek-v4-flash",
+            model="<deepseek-model-id>",
             messages=[{"role": "user", "content": "Solve step by step: ..."}],
             extra_body={"thinking": {"type": "enabled", "budget_tokens": 8000}},
         )

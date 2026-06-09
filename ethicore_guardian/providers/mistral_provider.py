@@ -1,7 +1,6 @@
 """
 Ethicore Engine™ - Guardian SDK — Mistral AI Provider
 Protection for Mistral models via the OpenAI-compatible API.
-Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
@@ -20,25 +19,12 @@ Mistral model ID convention
 Mistral uses a versioned naming scheme: {name}-{major}-{minor}-{YY-MM}
 e.g. mistral-large-3-25-12 = Mistral Large 3, released Dec 2025.
 
-Current model IDs (May 2026):
-  mistral-large-3-25-12           — Mistral Large 3 (flagship)
-  mistral-medium-3-5-26-04        — Mistral Medium 3.5
-  mistral-medium-3-1-25-08        — Mistral Medium 3.1
-  mistral-small-4-0-26-03         — Mistral Small 4
-  magistral-medium-1-2-25-09      — Magistral Medium 1.2 (reasoning/CoT model)
-  ministral-3-14b-25-12           — Ministral 3 14B
-  ministral-3-8b-25-12            — Ministral 3 8B
-  ministral-3-3b-25-12            — Ministral 3 3B
-  codestral-25-08                 — Codestral (code specialist)
-  devstral-2-25-12                — Devstral 2 (agentic coding)
-  voxtral-tts-26-03               — Voxtral TTS (text-to-speech)
-  voxtral-small-25-07             — Voxtral Small
-  leanstral-26-03                 — Leanstral (efficient/edge model)
-  mistral-moderation-26-03        — Mistral Moderation 2
-
-Short aliases (e.g. mistral-large-latest) may also be valid — check
-https://docs.mistral.ai/getting-started/models/models_overview/ for current
-alias mappings.
+Model-agnostic by design: the ``model`` argument is forwarded untouched — never
+validated, allowlisted, or branched on. Any current or future Mistral model ID
+(including ``-latest`` aliases) works with zero code changes; clients are detected by
+base_url, not model ID. A ``MISTRAL_MODELS`` convenience set of well-known IDs is
+exported for callers who want it, but it is non-exhaustive and never used for
+detection or gating.
 
 Source: https://docs.mistral.ai/
 
@@ -77,7 +63,9 @@ logger = logging.getLogger(__name__)
 
 MISTRAL_BASE_URL = "https://api.mistral.ai/v1"
 
-# Current Mistral model identifiers (May 2026)
+# Well-known Mistral model identifiers — a non-exhaustive convenience export.
+# NOT used for client detection (see _is_mistral_client, which keys off base_url) or
+# for any runtime validation: the provider forwards any model ID untouched.
 # Source: https://docs.mistral.ai/getting-started/models/models_overview/
 MISTRAL_MODELS = {
     # ── Frontier / general-purpose ───────────────────────────────────────────
@@ -441,7 +429,7 @@ def create_protected_mistral_client(
             guardian_api_key="eg-sk-...",
         )
         response = client.chat.completions.create(
-            model="mistral-large-3-25-12",
+            model="<mistral-model-id>",  # any current Mistral model — forwarded as-is
             messages=[{"role": "user", "content": "Hello"}],
         )
     """
