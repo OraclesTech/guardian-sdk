@@ -1,24 +1,18 @@
 """
 Ethicore Engine™ - Guardian SDK — Google Gemini Provider
-Version: 1.1.0
 
 Wraps Google Gemini clients (google.genai.Client) with three-layer
 agentic protection.
 
-Supports the modern google-genai SDK (v1.0+) used for Gemini 3.x models.
-The protected wrapper intercepts client.models.generate_content() and
-client.models.generate_content_async(), preserving the full Gemini API
-surface via __getattr__ pass-through.
+Supports the modern google-genai SDK (v1.0+). The protected wrapper intercepts
+client.models.generate_content() and client.models.generate_content_async(),
+preserving the full Gemini API surface via __getattr__ pass-through.
 
-Current Gemini model IDs (May 2026):
-  gemini-3.5-flash                  — Current flagship Flash model
-  gemini-3.1-pro-preview            — Pro-tier preview
-  gemini-3.1-flash-lite             — Lite/cost-optimised variant
-  gemini-3.1-flash-live-preview     — Live/streaming
-  gemini-3.1-flash-tts-preview      — Text-to-speech
-  gemini-2.5-pro                    — Previous generation Pro (still available)
-  gemini-2.5-flash                  — Previous generation Flash (still available)
-  gemini-embedding-2                — Embeddings
+Model-agnostic by design: the ``model`` argument is forwarded untouched — never
+validated, allowlisted, or branched on — and recorded only as informational analysis
+context. Any current or future Gemini model ID works with zero code changes. The
+agentic tool-call/result layers key off the response *shape* (FunctionCall /
+FunctionResponse parts), which is stable across models.
 
 API endpoints:
   Native:  https://generativelanguage.googleapis.com (google-genai SDK)
@@ -412,7 +406,7 @@ def create_protected_gemini_client(
         protected = create_protected_gemini_client(client, guardian_api_key="eg-sk-...")
 
         response = protected.models.generate_content(
-            model="gemini-3.5-flash",
+            model="<gemini-model-id>",  # any current Gemini model — forwarded as-is
             contents="Summarise this document.",
         )
     """

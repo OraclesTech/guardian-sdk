@@ -1,16 +1,13 @@
 """
 Ethicore Engine™ - Guardian SDK - OpenAI Provider
-Self-contained version that doesn't rely on external base classes
-Version: 1.1.0
+Self-contained version that doesn't rely on external base classes.
 
-Current flagship models (May 2026):
-  gpt-5.5, gpt-5.5-pro              — Top frontier models
-  gpt-5.3-codex                     — Agentic coding specialist (replaces codex-mini-latest,
-                                       deprecated Feb 12 2026)
-  o3, o3-pro, o3-mini               — Reasoning / chain-of-thought models
-  gpt-5.4, gpt-5.4-pro, gpt-5.4-mini, gpt-5.4-nano
-  gpt-5-mini, gpt-5-nano, gpt-5
-  gpt-oss-120b, gpt-oss-20b         — Open-weight variants
+Model-agnostic by design: the ``model`` argument is forwarded untouched to the
+OpenAI client — never validated, allowlisted, or branched on — and recorded only as
+informational analysis context. Any current or future OpenAI model ID (gpt-*, o-*,
+gpt-oss-*, …) works with zero code changes. The agentic tool-call/result layers key
+off the response *shape* (``tool_calls`` / ``role='tool'`` messages), which is stable
+across models, so new model releases require no update here.
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved

@@ -1,7 +1,10 @@
 """
 Ethicore Engine™ - Guardian SDK — xAI / Grok Provider
 Protection for xAI's Grok models via the OpenAI-compatible API.
-Version: 1.1.0
+
+Model-agnostic by design: the ``model`` argument is forwarded untouched — never
+validated, allowlisted, or branched on. Any current or future Grok model ID works
+with zero code changes (xAI clients are detected by base_url, not by model ID).
 
 Copyright © 2026 Oracles Technologies LLC
 All Rights Reserved
@@ -57,31 +60,8 @@ logger = logging.getLogger(__name__)
 
 XAI_BASE_URL = "https://api.x.ai/v1"
 
-# Current Grok model identifiers (May 2026)
-# Source: https://docs.x.ai/developers/models
-GROK_MODELS = {
-    # ── Grok 4.x series (current flagship) ──────────────────────────────────
-    "grok-4.3",                       # Flagship — most intelligent and fastest
-    "grok-4.20-0309-reasoning",       # Grok 4.20 with chain-of-thought reasoning
-    "grok-4.20-0309-non-reasoning",   # Grok 4.20 without reasoning mode
-    "grok-4.20-multi-agent-0309",     # Grok 4.20 multi-agent/agentic variant
-    # ── Grok Build (agentic/coding specialist) ───────────────────────────────
-    "grok-build-0.1",                 # Agentic coding-focused variant
-    # ── Grok generation (image / video) ─────────────────────────────────────
-    "grok-imagine-image-quality",     # Image generation (high quality)
-    "grok-imagine-image",             # Image generation (standard)
-    "grok-imagine-video",             # Video generation
-    # ── Grok 3.x series (previous generation, still available) ──────────────
-    "grok-3",
-    "grok-3-fast",
-    "grok-3-mini",
-    "grok-3-mini-fast",
-    # ── Grok 2.x / legacy ───────────────────────────────────────────────────
-    "grok-2-1212",
-    "grok-2-vision-1212",
-    "grok-beta",
-    "grok-vision-beta",
-}
+# Model-agnostic: xAI clients are detected by base_url (see _is_xai_client), never by
+# a model allowlist — so any current/future Grok model ID works without changes here.
 
 
 # ---------------------------------------------------------------------------
@@ -455,7 +435,7 @@ def create_protected_xai_client(
             guardian_api_key="ethicore-...",
         )
         response = client.chat.completions.create(
-            model="grok-4.3",
+            model="<grok-model-id>",  # any current Grok model — forwarded as-is
             messages=[{"role": "user", "content": "Hello"}],
         )
     """
