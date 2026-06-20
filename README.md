@@ -214,36 +214,39 @@ Guardian protects your AI system from adversarial inputs designed to:
 - **Coordinate across modalities** — split-channel attacks that distribute threat signals across text and visual inputs, each appearing benign in isolation *(API)*
 - **Hide payloads in video** — injection content embedded across video frames, including temporally recurring signals designed to survive frame-level filtering *(API)*
 
-The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API covers 150+.
+The community edition covers seven categories (six OWASP-aligned attack vectors + an absolute-block child safety category). The API and self-hosted editions cover 160+.
 
 ---
 
-## Community vs API
+## Community vs API vs Self-Hosted
 
-| | Community | API — Free | API — Pro | API — ENT |
-|---|---|---|---|---|
-| **Threat categories** | 7 | 150+ | 150+ | 150+ |
-| **Regex patterns** | 34 | 1,500+ | 1,500+ | 1,500+ |
-| **Child safety (absolute block)** | ✅ | ✅ | ✅ | ✅ |
-| **Semantic model** | Hash-based fallback | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) |
-| **Semantic fingerprints** | Runtime-only | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime |
-| **RAG / indirect injection** | — | ✅ | ✅ | ✅ |
-| **Agentic pipeline protection** | — | ✅ | ✅ | ✅ |
-| **Tool call validation** | — | ✅ | ✅ | ✅ |
-| **Tool output scanning** | — | ✅ | ✅ | ✅ |
-| **Agentic execution-plan monitoring** | — | ✅ | ✅ | ✅ |
-| **LangChain callback integration** | — | ✅ | ✅ | ✅ |
-| **Visual analysis (images + video)** | — | ✅ | ✅ | ✅ |
-| **Browser content analysis** | — | ✅ | ✅ | ✅ |
-| **Voice / audio threat analysis** | — | ✅ | ✅ | ✅ |
-| **Autonomous payment protection** | — | ✅ | ✅ | ✅ |
-| **Cross-modal threat fusion** | — | ✅ | ✅ | ✅ |
-| **Post-flight OutputAnalyzer** | ✅ | ✅ | ✅ | ✅ |
-| **Adversarial learning** | ✅ hash-based | ✅ embedding-based | ✅ embedding-based | ✅ embedding-based |
-| **Monthly requests** | Unlimited (local) | 1,000 | 100,000 | Custom |
-| **Rate limit** | Unlimited (local) | 60 RPM | 600 RPM | Custom |
-| **API key required** | No | Yes | Yes | Yes |
-| **Price** | Free | Free | Paid | Contact us |
+| | Community | API — Free | API — Pro | API — ENT | Self-Hosted |
+|---|---|---|---|---|---|
+| **Deployment** | Local (pip) | Hosted platform | Hosted platform | Hosted platform | Your infrastructure |
+| **Threat categories** | 7 | 160+ | 160+ | 160+ | 160+ |
+| **Regex patterns** | 34 | 1,800+ | 1,800+ | 1,800+ | 1,800+ |
+| **Child safety (absolute block)** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Semantic model** | Hash-based fallback | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) | ONNX MiniLM-L6-v2 (EN) + multilingual ONNX (50+ languages) |
+| **Semantic fingerprints** | Runtime-only | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime | 2,500+ pre-loaded + runtime | 2,500+ (sealed, local) |
+| **Data stays in your environment** | ✅ | — | — | — | ✅ |
+| **RAG / indirect injection** | — | ✅ | ✅ | ✅ | ✅ |
+| **Visual analysis (images + video)** ‡ | — | ✅ | ✅ | ✅ | ✅ |
+| **Browser content analysis** ‡ | — | ✅ | ✅ | ✅ | ✅ |
+| **Voice / audio threat analysis** ‡ | — | ✅ | ✅ | ✅ | ✅ |
+| **Multilingual (50+ languages)** | — | ✅ | ✅ | ✅ | ✅ |
+| **Autonomous payment protection** | — | ✅ | ✅ | ✅ | ✅ |
+| **Cross-modal threat fusion** | — | ✅ | ✅ | ✅ | ✅ |
+| **Post-flight OutputAnalyzer** | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Adversarial learning** | ✅ hash-based | ✅ embedding-based | ✅ embedding-based | ✅ embedding-based | ✅ embedding-based |
+| **Agentic pipeline protection** | — | ✅ | ✅ | ✅ | — |
+| **Tool call validation** | — | ✅ | ✅ | ✅ | — |
+| **Tool output scanning** | — | ✅ | ✅ | ✅ | — |
+| **Agentic execution-plan monitoring** | — | ✅ | ✅ | ✅ | — |
+| **LangChain callback integration** | — | ✅ | ✅ | ✅ | — |
+| **Monthly requests** | Unlimited (local) | 1,000 | 100,000 | Custom | Unlimited (local) |
+| **Rate limit** | Unlimited (local) | 60 RPM | 600 RPM | Custom | 60 – unlimited RPM (by tier) |
+| **Key required** | No | Yes | Yes | Yes | License key |
+| **Price** | Free | Free | Paid | Contact us | From $5/mo (Bronze / Silver / Gold) |
 
 **Community** is the open-source, pip-installable SDK. Inference runs locally using a
 hash-based fallback covering the six most prevalent attack categories. No API key, no
@@ -253,6 +256,20 @@ account required.
 threat library, ONNX models, and semantic fingerprint database are managed server-side
 — no downloads, no local model files, no configuration beyond your API key. Free and Pro
 are identical in capability; they differ only in rate limits.
+
+**Self-Hosted** runs the **full Guardian engine inside your own infrastructure** — every
+detection layer (pattern, semantic, behavioral, ML, multilingual, visual, voice, browser,
+post-flight, and adversarial learning) executes locally; no request data ever leaves your
+environment. The threat library and trained models ship **encrypted** and are decrypted
+only into an ephemeral, wiped-on-exit runtime workspace; the engine code ships **compiled**
+(binary-only). A license key unlocks everything after a one-time phone-home activation,
+with an offline grace window thereafter. The **agentic pipeline gates** (tool-call /
+tool-output / execution-plan validation) are API-tier only. Install
+`ethicore-engine-selfhost`; purchase and manage licenses at
+[portal.oraclestechnologies.com](https://portal.oraclestechnologies.com).
+
+‡ Visual, browser, and voice analysis require their optional dependency extras
+(`pip install "ethicore-engine-selfhost[vision,voice,browser]"`).
 
 ---
 
@@ -284,7 +301,7 @@ Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
 
 The SDK uses your key to authenticate against the Ethicore Engine™ platform and
-unlock the full threat library (150+ categories). Without a key, the SDK falls back to
+unlock the full threat library (160+ categories). Without a key, the SDK falls back to
 community mode (6 categories, local hash-based inference).
 
 ---

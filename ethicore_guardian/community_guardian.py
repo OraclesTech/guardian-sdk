@@ -358,6 +358,15 @@ class Guardian:
         self._detector = _CommunityDetector()
         self._learner = _HashBasedLearner()
         logger.debug("Guardian (community edition) initialised — 6 categories active")
+        # One-time upsell for word-of-mouth installers who never read the README:
+        # the community edition covers 7 of 160+ categories.
+        print(
+            "[Ethicore] Community edition active — 7 of 160+ threat categories.\n"
+            "           Want the full engine? Hosted API has a free tier, or run the\n"
+            "           COMPLETE engine in your own infrastructure, self-hosted from\n"
+            "           $5/mo (no data leaves your environment):\n"
+            "           https://oraclestechnologies.com/guardian"
+        )
 
     # ------------------------------------------------------------------
     # Core analysis
