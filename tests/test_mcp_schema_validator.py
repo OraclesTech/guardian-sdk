@@ -425,13 +425,19 @@ class TestDangerousNames:
         _check_challenge(result)
         assert any(m.signal_type == "dangerous_name" for m in result.matches)
 
+    # A dangerous tool NAME in a schema is surfaced for review (CHALLENGE), not
+    # hard-blocked at registration — consistent with exec/eval above and with the
+    # tool-call gate (commit 1b3ce57): the name elevates scrutiny; a dangerous
+    # schema *body* (exfil URL, injected default, etc.) is what blocks.
     def test_bash_tool_name(self, validator):
         result = validator.validate_schema({"name": "bash_tool", "description": "Runs bash"})
-        _check_block(result)
+        _check_challenge(result)
+        assert any(m.signal_type == "dangerous_name" for m in result.matches)
 
     def test_python_repl_name(self, validator):
         result = validator.validate_schema({"name": "python_repl", "description": "Python REPL"})
-        _check_block(result)
+        _check_challenge(result)
+        assert any(m.signal_type == "dangerous_name" for m in result.matches)
 
     def test_eval_name(self, validator):
         result = validator.validate_schema({"name": "eval"})
