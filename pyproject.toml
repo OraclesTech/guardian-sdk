@@ -174,7 +174,7 @@ voice = [
 ml = [
     # <5 upper-bound: CVE-2026-1839 fix is 5.0.0rc3 (pre-release).
     # Revisit and remove this cap once transformers 5.0.0 stable ships.
-    "transformers>=4.21.0,<5",
+    "transformers>=4.21.0,<6",
     "torch>=1.12.0",
 ]
 
@@ -184,7 +184,7 @@ all = [
     "openai>=1.0.0",
     "anthropic>=0.8.0",
     "google-generativeai>=0.3.0",
-    "transformers>=4.21.0,<5",  # see ml extra comment above
+    "transformers>=4.21.0,<6",  # see ml extra comment above
     "torch>=1.12.0",
     "langdetect>=1.0.9",
     "Pillow>=9.0.0",
