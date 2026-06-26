@@ -1,0 +1,20 @@
+version: 2
+
+# Automated dependency + Action monitoring for the public Guardian SDK. Treat
+# high-severity alerts as blocking. The github-actions updater also bumps the
+# commit-SHA pins in the workflows so they stay current without losing
+# immutability.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "security"]
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "security"]

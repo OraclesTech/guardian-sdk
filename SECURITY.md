@@ -176,18 +176,28 @@ within 48 hours and coordinate a responsible disclosure timeline.
 
 ---
 
-## Existing Supply Chain Protections
+## How We Secure Our Own Build Pipeline
 
-| Protection | Status |
+Guardian is a security product, so compromising a Guardian release would compromise
+every downstream deployment. We therefore hold our own CI/CD to the standard we ask
+of customers. Every release is built by an immutable, least-privilege pipeline whose
+provenance you can verify independently (see *Verify Sigstore attestation*, above).
+
+| Control | Status |
 |---|---|
-| PyPI package hashes published | ✅ |
-| Sigstore / SLSA attestations | ✅ |
-| Hash-pinned `requirements.lock` | ✅ |
-| Continuous `pip-audit` on wheel builds | ✅ |
-| Typosquatting stubs on PyPI | ✅ (4 variants monitored) |
-| SDK self-integrity check (`guardian verify`) | ✅ v2.6.0+ |
-| AI-mediated supply chain detection | ✅ API tier v2.6.0+ |
+| **PyPI Trusted Publishing (OIDC)** — no long-lived API tokens in CI | ✅ |
+| **Sigstore / SLSA build attestations** on every release | ✅ |
+| **Third-party Actions pinned to commit SHAs** (immutable; no mutable tags) | ✅ |
+| **Least-privilege workflows** — `permissions: contents: read` default, scoped per job | ✅ |
+| **No `pull_request_target`**, no untrusted input in shell, no PR→publish artifact flow | ✅ |
+| **Hash-pinned `requirements.lock`** + `pip-audit --require-hashes --strict` (release-blocking) | ✅ |
+| **Dependabot** monitoring (`pip` + `github-actions`) | ✅ |
+| **PyPI package hashes published** + SDK self-integrity (`guardian verify`) | ✅ |
+| **Typosquatting stubs** on PyPI (4 variants monitored) | ✅ |
+| **AI-mediated supply chain detection** (`supplyChainDependencyInjection`, API tier) | ✅ |
 
 ---
 
-*Last updated: 2026-05-18 — Guardian SDK v2.6.0*
+*Last updated: 2026-06-23 — supply-chain hardening pass (Trusted Publishing,
+SHA-pinned Actions, least-privilege workflows, Dependabot) following the Cordyceps
+malicious-PR disclosure.*
