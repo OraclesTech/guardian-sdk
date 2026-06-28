@@ -49,7 +49,9 @@ escalation that sequential per-call inspection cannot see.
 
 Guardian covers 150+ threat categories on the API tier across 1,500+ regex patterns
 and 2,500+ semantic fingerprints. The community edition covers the six most prevalent
-categories using local inference.
+categories using local inference. The same full engine is also available fully
+self-hosted (pip install ethicore-engine-selfhost) for customers who must keep every
+request inside their own infrastructure — see Tiers below.
 
 ---
 
@@ -73,6 +75,11 @@ pip install "ethicore-engine-guardian[video]"
 pip install "ethicore-engine-guardian[voice]"
 pip install "ethicore-engine-guardian[browser]"
 pip install "ethicore-engine-guardian[all]"
+```
+
+Self-hosted edition (full engine in your own infrastructure, license required):
+```bash
+pip install ethicore-engine-selfhost
 ```
 
 ---
@@ -276,6 +283,18 @@ Keys are displayed once at provisioning time and cannot be retrieved thereafter.
 ### API — Enterprise
 - Custom rate limits and SLA
 - Contact: support@oraclestechnologies.com
+
+### Self-Hosted — the full engine in your own infrastructure
+The complete Ethicore Engine — every analyzer, compiled and sealed — runs entirely in the
+customer's own environment. No request data ever leaves; threat assets are fetched once at
+activation (AES-256-GCM sealed, license-gated). Same detection engine as the API tier.
+Install: `pip install ethicore-engine-selfhost`
+
+- **Bronze** — $5/month · 1 seat · 120 RPM · runs locally, no data leaves
+- **Silver** — $399/month · 10 seats · 600 RPM · priority support
+- **Gold** — custom · unlimited seats · air-gapped / enclave · support@oraclestechnologies.com
+
+License purchase at https://portal.oraclestechnologies.com (Bronze/Silver via Stripe Checkout; Gold via sales).
 
 ---
 
