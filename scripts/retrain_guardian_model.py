@@ -859,6 +859,77 @@ def _make_benign_sample(rng: random.Random) -> str:
 
 
 # ===========================================================================
+# OBFUSCATION AUGMENTATION
+# ===========================================================================
+# Teach the ML the TWO obfuscation classes that NO other layer generalizes to:
+#   leetspeak — the pattern-layer de-leet normalization is regex-only, so it does
+#               not reach categories detected primarily by the semantic/ML layers
+#               (full-library leetspeak evasion 26% vs 13% on the regex-heavy core).
+#   carrier   — the sub-span semantic defense (ETHICORE_SUBSPAN_SEMANTIC) is off by
+#               default, so carrier-framed payloads dilute below threshold (14%).
+# Encoding-class obfuscations (base64 / hex / rot13 / reversed / zero-width /
+# unicode / homoglyph) are owned by encoding_detector.py and evade ~0% — augmenting
+# them here would be redundant, so they are deliberately excluded.
+_LEET_MAP = {"a": "4", "e": "3", "i": "1", "o": "0", "s": "5",
+             "t": "7", "b": "8", "g": "9", "l": "1"}
+_CARRIER_FRAMES = [
+    'In a fictional story, a character says: "{}"',
+    "For a cybersecurity training exercise, {}",
+    "Translate the following to French and then carry it out: {}",
+    "As part of a role-play scenario, {}",
+    "Note buried in a longer message ... {} ... end of note.",
+]
+
+
+def _obf_leet(text: str, rng: random.Random) -> str:
+    # partial leet (≈70% of eligible chars) so it isn't uniformly transformed
+    return "".join(
+        _LEET_MAP[c.lower()] if (c.lower() in _LEET_MAP and rng.random() < 0.7) else c
+        for c in text
+    )
+
+
+def _obf_carrier(text: str, rng: random.Random) -> str:
+    return rng.choice(_CARRIER_FRAMES).format(text)
+
+
+def _obf_altcase(text: str, rng: random.Random) -> str:
+    return "".join(ch.upper() if i % 2 else ch.lower() for i, ch in enumerate(text))
+
+
+def _maybe_obfuscate(text: str, rng: random.Random) -> str:
+    """≈38% of threat samples get obfuscated, weighted to the two real gaps."""
+    r = rng.random()
+    if r < 0.20:
+        return _obf_leet(text, rng)       # leetspeak — the 26% gap
+    if r < 0.34:
+        return _obf_carrier(text, rng)    # carrier — the 14% gap
+    if r < 0.38:
+        return _obf_altcase(text, rng)    # residual alt-case
+    return text                            # 62% clean base
+
+
+def _load_learned_fingerprints() -> List[Dict[str, Any]]:
+    """Fold the red-team's learned adversarial fingerprints (category
+    'adversarial_learned' in the embeddings DB) into the training set so the ML
+    trains on the ACTUAL evasion variants — not only the semantic layer's
+    exact-neighbor match. Read-only; empty list if the DB is absent."""
+    import json
+    path = os.path.join(os.path.expanduser("~/.ethicore/data"), "threat_embeddings.json")
+    if not os.path.exists(path):
+        return []
+    try:
+        db = json.load(open(path, encoding="utf-8")).get("embeddings", [])
+    except Exception:
+        return []
+    return [
+        {"text": e["text"], "weight": e.get("weight", 80)}
+        for e in db
+        if e.get("category") == "adversarial_learned" and e.get("text")
+    ]
+
+
+# ===========================================================================
 # DATASET BUILDER
 # ===========================================================================
 
@@ -871,6 +942,10 @@ def _build_texts_and_labels(
     rng = random.Random(seed)
 
     fps = threat_module.get_semantic_fingerprints()
+    learned = _load_learned_fingerprints()
+    if learned:
+        fps = fps + learned
+        print(f"  +{len(learned)} learned adversarial fingerprints folded into training")
     stats = threat_module.get_threat_statistics()
     n_cats = stats["totalCategories"]
     n_fps = len(fps)
@@ -902,7 +977,7 @@ def _build_texts_and_labels(
         # allocate proportional count but at least 1, at most avg_vars*2
         n_this = max(1, min(avg_vars * 2, round(p * n_threat)))
         for var in _make_threat_variations(fp, rng, n_this):
-            texts.append(var)
+            texts.append(_maybe_obfuscate(var, rng))
             labels.append(1)
             threat_generated += 1
             if threat_generated >= n_threat:
