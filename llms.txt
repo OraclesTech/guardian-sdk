@@ -156,6 +156,15 @@ Returns: verdict, is_threat, risk_score, node_count, dangerous_node_ids, signals
 
 All five Guardian endpoints return an Ed25519 X-Ethicore-Signature header (see Authentication).
 
+### Account — export your audit log (Team tier)
+GET /v1/usage/export?format=csv|json&from=YYYY-MM-DD&to=YYYY-MM-DD&limit=N
+Authorization: Bearer eg-sk-...
+
+Immutable per-request audit log (event_id, timestamp, product, endpoint, chars_analyzed,
+threat_detected, latency_ms, api_key_id) as CSV (default) or JSON — for a SIEM or a vendor
+security review. Team and Enterprise plans only. Defaults to the last 30 days; max 366 days,
+100,000 rows.
+
 ---
 
 ## Agent Self-Provisioning
