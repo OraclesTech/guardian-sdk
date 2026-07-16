@@ -8,8 +8,9 @@
 
 AI agents can self-provision Guardian SDK API keys autonomously via
 POST /v1/agents/provision — no human account creation or portal signup required.
-Free tier keys are issued immediately. Pro tier supports autonomous x402 payment
-(USDC on Base Mainnet) or Stripe-supervised checkout.
+Free tier keys are issued immediately. Pro tier is paid via Stripe Checkout — cards
+(incl. Visa Intelligent Commerce and Mastercard Agent Pay) and BNPL through Stripe's
+Agentic Commerce Suite.
 
 Ethicore Engine™ is a trademark of Oracles Technologies LLC.
 
@@ -153,7 +154,7 @@ Content-Type: application/json
 
 Returns: verdict, is_threat, risk_score, node_count, dangerous_node_ids, signals, reasoning.
 
-All five Guardian endpoints return an Ed25519 X-Ethicore-Signature header.
+All five Guardian endpoints return an Ed25519 X-Ethicore-Signature header (see Authentication).
 
 ---
 
@@ -162,6 +163,12 @@ All five Guardian endpoints return an Ed25519 X-Ethicore-Signature header.
 AI agents can obtain Guardian SDK API keys autonomously without a human account.
 The endpoint is public — no Authorization header required.
 
+### Discover payment terms (body-less)
+GET /v1/agents/provision  →  HTTP 402 with machine-readable terms (plan, price, RPM,
+monthly quota, and how to provision). No request body required — call this to learn
+the Pro price and payment method before committing.
+
+### Provision a key
 POST /v1/agents/provision
 Base URL: https://api.oraclestechnologies.com
 Content-Type: application/json
@@ -171,8 +178,7 @@ Request body:
   "agent_name":    "<string, 1-128 chars>",        // required — display name of this agent
   "intended_use":  "<string, 10-1000 chars>",      // required — scanned by Guardian before any key is issued
   "tier":          "free" | "pro",                 // default "free"
-  "contact_email": "<email>",                      // optional for free; required for pro Stripe path
-  "wallet_address": "0x...",                       // EVM wallet address — required for pro x402 path
+  "contact_email": "<email>",                      // optional for free; REQUIRED for pro
   "agent_card_url": "https://..."                  // optional — A2A agent card URL for trust verification
 }
 
@@ -191,50 +197,36 @@ Agents that populate it receive a fake success with no real key issued.
 tier="free" → key issued immediately in the response.
 Plan: agent_free — 1,000 requests/month, 60 RPM.
 
-### Path B — Pro tier, autonomous x402 payment (HTTP 402 → HTTP 201)
-tier="pro" + wallet_address provided → HTTP 402 with x402-spec payment body.
+### Path B — Pro tier via Stripe (HTTP 402 with checkout URL)
+tier="pro" + contact_email → HTTP 402 with a Stripe Checkout URL.
 
 Response body (402):
 {
-  "x402Version": 1,
-  "accepts": [{
-    "scheme": "exact",
-    "network": "base",
-    "maxAmountRequired": "59990000",                        // $59.99 USDC, 6 decimals
-    "payTo": "<per-payment Stripe deposit address>",        // unique per request — do not reuse
-    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Base Mainnet
-    "maxTimeoutSeconds": 600,
-    ...
-  }]
+  "payment_required": true,
+  "payment_method": "stripe",
+  "checkout_url": "https://checkout.stripe.com/...",   // complete payment here
+  "contact_email": "<your email>",
+  "plan": "agent_pro",
+  "rpm": 600,
+  "monthly_limit": 100000,
+  "description": "..."
 }
 
-Payment flow:
-1. Send exactly 59,990,000 USDC base units to accepts[0].payTo on Base Mainnet.
-   The deposit address is unique per payment session — do not send to a previously used address.
-2. Re-submit the identical POST /v1/agents/provision request with an X-PAYMENT header:
-   X-PAYMENT: <base64-encoded JSON: {"x402Version":1,"scheme":"exact","network":"base","payload":{...}}>
-3. Server verifies USDC settlement on-chain via Stripe. If not yet confirmed, HTTP 402 is returned
-   with status details — retry after 1-3 minutes for Base Mainnet confirmation.
-4. On confirmed settlement: HTTP 201 with Pro key in response body.
-   payment_settled=true is recorded; no manual verification required.
+Complete payment at checkout_url. Stripe accepts cards — including agentic card
+credentials (Visa Intelligent Commerce, Mastercard Agent Pay) and BNPL via Stripe's
+Agentic Commerce Suite. The Pro key is emailed to contact_email after payment; no key
+is returned in an API response for this path.
+Plan: agent_pro — 100,000 requests/month, 600 RPM, $59.99/month (auto-renewing
+Stripe subscription; cancel any time via the Stripe customer portal).
 
-If the payment session expires (>10 minutes), re-submit without X-PAYMENT to obtain a new deposit address.
-
-Plan: agent_pro — 100,000 requests/month, 600 RPM, $59.99/month.
-
-### Path C — Pro tier, Stripe supervised payment (HTTP 402 with checkout URL)
-tier="pro" + contact_email (no wallet_address) → HTTP 402 with Stripe Checkout URL.
-A human supervisor completes payment at the URL. Pro key is delivered to contact_email.
-No key is returned in an API response for this path.
-
-### Response body (HTTP 201 — free tier or x402 Pro)
+### Free-tier response body (HTTP 201)
 {
   "agent_id":       "<uuid>",
   "key":            "eg-sk-agent-XXXXXXXX-<32hex>",  // shown ONCE — store immediately and securely
   "key_prefix":     "eg-sk-agent-XXXXXXXX",           // safe to log; does not expose secret portion
-  "plan":           "agent_free" | "agent_pro",
-  "rpm":            60 | 600,
-  "monthly_limit":  1000 | 100000,
+  "plan":           "agent_free",
+  "rpm":            60,
+  "monthly_limit":  1000,
   "provisioned_at": "<ISO 8601 UTC>"
 }
 
@@ -278,7 +270,14 @@ Keys are displayed once at provisioning time and cannot be retrieved thereafter.
 ### API — Pro
 - Same capabilities as Free
 - 100,000 requests/month, 600 RPM
-- Paid — see pricing at portal.oraclestechnologies.com
+- $59.99/month — see pricing at portal.oraclestechnologies.com
+
+### API — Team
+- Same capabilities as Pro, built for teams closing enterprise deals
+- 500,000 requests/month, 1,200 RPM, 5 seats
+- Audit log export, priority support
+- Security-questionnaire support pack: pre-filled SIG-Lite / CAIQ answers referencing our NIST OLIR control mappings
+- $299/month — see pricing at portal.oraclestechnologies.com
 
 ### API — Enterprise
 - Custom rate limits and SLA
@@ -287,14 +286,50 @@ Keys are displayed once at provisioning time and cannot be retrieved thereafter.
 ### Self-Hosted — the full engine in your own infrastructure
 The complete Ethicore Engine — every analyzer, compiled and sealed — runs entirely in the
 customer's own environment. No request data ever leaves; threat assets are fetched once at
-activation (AES-256-GCM sealed, license-gated). Same detection engine as the API tier.
-Install: `pip install ethicore-engine-selfhost`
+activation (AES-256-GCM sealed, license-gated) and updated via the sealed bundle channel.
+Same detection engine as the API tier. Install: `pip install ethicore-engine-selfhost`.
 
-- **Bronze** — $5/month · 1 seat · 120 RPM · runs locally, no data leaves
+- **Bronze** — $29.99/month · 1 seat · 120 RPM · runs locally, no data leaves
 - **Silver** — $399/month · 10 seats · 600 RPM · priority support
-- **Gold** — custom · unlimited seats · air-gapped / enclave · support@oraclestechnologies.com
+- **Gold** — custom · unlimited seats · air-gapped / enclave deployment · support@oraclestechnologies.com
 
-License purchase at https://portal.oraclestechnologies.com (Bronze/Silver via Stripe Checkout; Gold via sales).
+Purchase a self-host license at https://portal.oraclestechnologies.com (Bronze/Silver via
+Stripe Checkout; Gold via sales). Details: https://oraclestechnologies.com/resources/selfhost-launch
+
+---
+
+## Benchmark (v2.6.5, API tier, 2026-06-07)
+
+Reproducible, auditable benchmark vs published baselines. All numbers from
+`python benchmarks/run_benchmark.py --quick --learn` at the API (licensed) tier.
+
+| Metric    | Guardian v2.6.5 | Lakera Guard (full-ctx, Palit et al. 2025) | Δ vs Lakera |
+|-----------|----------------:|-------------------------------------------:|------------:|
+| F1        | **0.981**       | 0.823                                       | **+0.158**  |
+| Recall    | **0.995**       | 0.707                                       | **+0.288**  |
+| Precision | 0.967           | 0.984                                       | -0.017      |
+| FPR       | 0.035           | 0.007                                       | +0.028      |
+| FNR       | **0.005**       | 0.293                                       | **-0.288**  |
+| ROC-AUC   | 0.800           | —                                           | —           |
+
+Per-dataset (Guardian, API tier):
+- **bundled** (classic injection / jailbreak): P=1.000  R=0.990  F1=0.995  **FPR=0.000**
+- **agentic** (tool-calls, exec plans, carrier-framing, Gaps 77–83): P=0.935  R=1.000  F1=0.966  ROC-AUC=0.966
+
+Guardian beats Lakera on F1 (+0.158), Recall (+0.288), and FNR (-0.288 — misses ~59× fewer
+attacks). Precision is essentially tied. Zero false positives on the classic injection
+corpus (100/100 benigns clean).
+
+### Architectural property: closed-loop fingerprint persistence
+
+Unlike static-corpus competitors, Guardian's AdversarialLearner persists confirmed-attack
+fingerprints between runs. A customer-confirmed missed attack becomes detection on the
+next request — not the next quarterly release. FP-safety + carrier-stripping gates ensure
+this never raises FPR (verified: 49 organically-learned fingerprints across runs, bundled
+FPR remained 0.000).
+
+Full report: https://oraclestechnologies.com/resources/benchmark
+Source code: https://github.com/OraclesTech/guardian-sdk/tree/main/benchmarks
 
 ---
 

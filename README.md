@@ -246,7 +246,15 @@ The community edition covers seven categories (six OWASP-aligned attack vectors 
 | **Monthly requests** | Unlimited (local) | 1,000 | 100,000 | Custom | Unlimited (local) |
 | **Rate limit** | Unlimited (local) | 60 RPM | 600 RPM | Custom | 60 – unlimited RPM (by tier) |
 | **Key required** | No | Yes | Yes | Yes | License key |
-| **Price** | Free | Free | Paid | Contact us | From $5/mo (Bronze / Silver / Gold) |
+| **Price** | Free | Free | $59.99/mo | Contact us | From $29.99/mo (Bronze / Silver / Gold) |
+
+**API pricing ladder** — all API tiers share the full capability set above; they differ on volume, rate limit, and support:
+
+- **Free** — 1,000 requests/mo · 60 RPM · $0
+- **Pro** — 100,000 requests/mo · 600 RPM · $59.99/mo
+- **Team** — 500,000 requests/mo · 1,200 RPM · 5 seats · audit log export · priority support · security-questionnaire support pack (pre-filled SIG-Lite / CAIQ answers referencing our NIST OLIR mappings) · $299/mo
+- **Enterprise** — custom rate limits + SLA · contact us
+- **Self-Hosted** — Bronze $29.99/mo · Silver $399/mo · Gold custom
 
 **Community** is the open-source, pip-installable SDK. Inference runs locally using a
 hash-based fallback covering the six most prevalent attack categories. No API key, no
