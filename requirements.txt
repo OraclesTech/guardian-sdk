@@ -6,7 +6,7 @@ scipy>=1.7.0
 # Logging and utilities
 loguru>=0.7.3
 pydantic>=2.13.4
-python-dotenv>=1.2.2
+python-dotenv>=1.2.3
 tenacity>=9.1.4
 
 # Optional AI provider support (installed via extras_require)
