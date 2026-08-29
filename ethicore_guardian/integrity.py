@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Supply Chain Integrity Module
+Ethicore Engine® - Guardian SDK — Supply Chain Integrity Module
 Version: 1.0.0  (shipped as part of Guardian SDK v2.6.0)
 
 Provides runtime self-integrity verification for the Guardian SDK package.

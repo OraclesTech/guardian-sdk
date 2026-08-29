@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — LangChain Callback Handlers
+Ethicore Engine® - Guardian SDK — LangChain Callback Handlers
 Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC

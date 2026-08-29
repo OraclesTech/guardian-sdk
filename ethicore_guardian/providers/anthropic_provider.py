@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Anthropic Provider
+Ethicore Engine® - Guardian SDK — Anthropic Provider
 Mirrors the OpenAI provider pattern for the Anthropic Messages API.
 
 Model-agnostic by design: the ``model`` argument is forwarded untouched to

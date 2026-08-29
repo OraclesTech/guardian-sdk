@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK - Community Edition
+Ethicore Engine® - Guardian SDK - Community Edition
 Pure-Python threat detection — no external ML dependencies.
 
 Covers 6 OWASP LLM Top-10 aligned categories:
@@ -328,7 +328,7 @@ class _CommunityDetector:
 
 class Guardian:
     """
-    Ethicore Engine™ Guardian — Community Edition.
+    Ethicore Engine® Guardian — Community Edition.
 
     Drop-in replacement for the API-tier Guardian with the same public
     interface. Covers 6 threat categories using pure-Python detection
@@ -352,9 +352,14 @@ class Guardian:
         api_key: Optional[str] = None,
         config: Optional[GuardianConfig] = None,
     ) -> None:
-        self.config = config or GuardianConfig(
-            api_key=api_key or os.environ.get("ETHICORE_API_KEY")
-        )
+        resolved_key = api_key or os.environ.get("ETHICORE_API_KEY")
+        # Community edition requires a free, verified-email community token,
+        # verified OFFLINE (zero data egress). Hosted-API users authenticate via
+        # their api_key and are exempt from this gate.
+        if not resolved_key:
+            from .activation import require_activation
+            require_activation()
+        self.config = config or GuardianConfig(api_key=resolved_key)
         self._detector = _CommunityDetector()
         self._learner = _HashBasedLearner()
         logger.debug("Guardian (community edition) initialised — 6 categories active")

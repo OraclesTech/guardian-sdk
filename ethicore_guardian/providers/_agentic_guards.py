@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Shared Agentic Loop Guards
+Ethicore Engine® - Guardian SDK — Shared Agentic Loop Guards
 Layers 2 and 3 of full agentic pipeline protection, shared across all providers.
 
 Layer 2 — Inbound tool result scan

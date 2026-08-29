@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — DeepSeek Provider
+Ethicore Engine® - Guardian SDK — DeepSeek Provider
 Protection for DeepSeek models via the OpenAI-compatible API.
 
 Copyright © 2026 Oracles Technologies LLC

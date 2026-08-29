@@ -1,4 +1,4 @@
-# Ethicore Engine™ — Guardian SDK
+# Ethicore Engine® — Guardian SDK
 
 **Production-grade, real-time threat detection for Python LLM and agentic
 applications. Detect and block prompt injection, jailbreaks, adversarial
@@ -260,7 +260,7 @@ The community edition covers seven categories (six OWASP-aligned attack vectors 
 hash-based fallback covering the six most prevalent attack categories. No API key, no
 account required.
 
-**API (Free & Pro)** routes requests through the Ethicore Engine™ platform. The full
+**API (Free & Pro)** routes requests through the Ethicore Engine® platform. The full
 threat library, ONNX models, and semantic fingerprint database are managed server-side
 — no downloads, no local model files, no configuration beyond your API key. Free and Pro
 are identical in capability; they differ only in rate limits.
@@ -308,7 +308,7 @@ Or pass it directly in code:
 Guardian(config=GuardianConfig(api_key="eg_live_..."))
 ```
 
-The SDK uses your key to authenticate against the Ethicore Engine™ platform and
+The SDK uses your key to authenticate against the Ethicore Engine® platform and
 unlock the full threat library (160+ categories). Without a key, the SDK falls back to
 community mode (6 categories, local hash-based inference).
 

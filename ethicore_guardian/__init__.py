@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK - AI Threat Protection
+Ethicore Engine® - Guardian SDK - AI Threat Protection
 Multi-layer security for AI applications
 
 Copyright © 2026 Oracles Technologies LLC
@@ -7,7 +7,7 @@ All Rights Reserved
 """
 
 # Version information
-__version__ = "2.7.0"
+__version__ = "2.8.0"
 __author__ = "Oracles Technologies LLC"
 
 # Core exports — full API-tier guardian preferred; community fallback for wheel installs
@@ -261,7 +261,7 @@ def _print_welcome():
         import sys
         if hasattr(sys, 'ps1'):  # Interactive Python
             print(f"""
-[Guardian]  Ethicore Engine™ - Guardian SDK v{__version__}
+[Guardian]  Ethicore Engine® - Guardian SDK v{__version__}
    AI Threat Protection Ready
 
 Quick Start:

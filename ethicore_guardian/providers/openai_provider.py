@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK - OpenAI Provider
+Ethicore Engine® - Guardian SDK - OpenAI Provider
 Self-contained version that doesn't rely on external base classes.
 
 Model-agnostic by design: the ``model`` argument is forwarded untouched to the

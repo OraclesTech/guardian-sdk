@@ -29,6 +29,21 @@ collect_ignore = ["test_openai.py"]
 
 
 # ---------------------------------------------------------------------------
+# Community activation gate bypass (v2.8.0)
+#
+# community_guardian.Guardian() now HARD-GATES on a verified-email community
+# token (see ethicore_guardian/activation.py). The gate itself is exercised in
+# test_activation.py; for every OTHER test we treat the environment as activated
+# so a community-edition Guardian() can be constructed without a live token.
+# Individual tests may override is_activated (monkeypatch wins over this autouse).
+# ---------------------------------------------------------------------------
+@pytest.fixture(autouse=True)
+def _community_activated(monkeypatch):
+    import ethicore_guardian.activation as _activation
+    monkeypatch.setattr(_activation, "is_activated", lambda: True)
+
+
+# ---------------------------------------------------------------------------
 # Core fixture: initialised Guardian instance
 # ---------------------------------------------------------------------------
 

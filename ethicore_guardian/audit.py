@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Append-Only Audit Log
+Ethicore Engine® - Guardian SDK — Append-Only Audit Log
 Version: 1.0.0
 
 Copyright © 2026 Oracles Technologies LLC

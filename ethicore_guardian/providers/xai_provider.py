@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — xAI / Grok Provider
+Ethicore Engine® - Guardian SDK — xAI / Grok Provider
 Protection for xAI's Grok models via the OpenAI-compatible API.
 
 Model-agnostic by design: the ``model`` argument is forwarded untouched — never

@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — LiteLLM Provider
+Ethicore Engine® - Guardian SDK — LiteLLM Provider
 Version: 1.0.0
 
 Wraps LiteLLM's completion / acompletion functions with three-layer

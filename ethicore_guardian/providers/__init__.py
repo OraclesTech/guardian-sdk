@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK - Providers Package
+Ethicore Engine® - Guardian SDK - Providers Package
 AI provider integrations for Guardian SDK
 
 Supported providers:

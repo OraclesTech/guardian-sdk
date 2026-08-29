@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ — Guardian SDK
+Ethicore Engine® — Guardian SDK
 Threat Pattern Library — Community Edition
 
 Version: 1.0.0 (Community)

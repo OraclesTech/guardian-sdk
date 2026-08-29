@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Azure OpenAI Provider
+Ethicore Engine® - Guardian SDK — Azure OpenAI Provider
 Version: 1.0.0
 
 Wraps Azure OpenAI clients (openai.AzureOpenAI / openai.AsyncAzureOpenAI)

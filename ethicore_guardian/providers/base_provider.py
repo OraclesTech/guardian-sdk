@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK - Base Provider & Configuration
+Ethicore Engine® - Guardian SDK - Base Provider & Configuration
 Core abstractions for AI provider integrations
 Version: 1.0.0
 

@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — AWS Bedrock Provider
+Ethicore Engine® - Guardian SDK — AWS Bedrock Provider
 Version: 1.0.0
 
 Wraps AWS Bedrock runtime clients (boto3.client('bedrock-runtime')) with

@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Command Line Interface
+Ethicore Engine® - Guardian SDK — Command Line Interface
 
 Provides the ``guardian`` console script entry point defined in pyproject.toml.
 
@@ -54,7 +54,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="guardian",
         description=(
-            "Ethicore Engine™ - Guardian SDK\n"
+            "Ethicore Engine® - Guardian SDK\n"
             "Multi-layer AI threat detection for LLM applications."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,

@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Google Gemini Provider
+Ethicore Engine® - Guardian SDK — Google Gemini Provider
 
 Wraps Google Gemini clients (google.genai.Client) with three-layer
 agentic protection.

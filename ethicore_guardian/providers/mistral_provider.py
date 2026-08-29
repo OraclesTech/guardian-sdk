@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Mistral AI Provider
+Ethicore Engine® - Guardian SDK — Mistral AI Provider
 Protection for Mistral models via the OpenAI-compatible API.
 
 Copyright © 2026 Oracles Technologies LLC

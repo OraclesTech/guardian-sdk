@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Local OpenAI-Compatible Providers
+Ethicore Engine® - Guardian SDK — Local OpenAI-Compatible Providers
 Version: 1.0.0
 
 Covers any inference server that exposes an OpenAI-compatible REST API

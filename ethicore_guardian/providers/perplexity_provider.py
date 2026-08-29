@@ -1,5 +1,5 @@
 """
-Ethicore Engine™ - Guardian SDK — Perplexity Provider
+Ethicore Engine® - Guardian SDK — Perplexity Provider
 Protection for Perplexity Sonar models via the OpenAI-compatible API.
 
 Copyright © 2026 Oracles Technologies LLC
