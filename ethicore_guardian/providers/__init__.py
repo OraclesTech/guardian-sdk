@@ -23,6 +23,9 @@ Supported providers:
   Meta-provider:
     LiteLLM (140+ backends)                 — litellm_provider
 
+  Decision models (System One — non-chat, typed decisions):
+    TypeSafe AI Jev / System One            — system_one_provider
+
   Framework integrations:
     LangChain callback                      — langchain_callback
 """
@@ -77,6 +80,19 @@ from .perplexity_provider import (
     PERPLEXITY_MODELS,
 )
 
+# ── System One / Jev provider (decision models — non-chat) ────────────────────
+from .system_one_provider import (
+    SystemOneProvider,
+    JevProvider,
+    ProtectedSystemOneClient,
+    create_protected_jev_client,
+    JEV_SYSTEMONE_ENDPOINT,
+    JEV_DEFAULT_MODEL,
+    JEV_PRIMITIVES,
+    PoisonedStateException,
+    DecisionActionBlockedException,
+)
+
 __all__ = [
     # ── Local OpenAI-compatible ───────────────────────────────────────────────
     "LocalOpenAICompatConfig",
@@ -109,6 +125,16 @@ __all__ = [
     "create_protected_perplexity_client",
     "PERPLEXITY_BASE_URL",
     "PERPLEXITY_MODELS",
+    # ── System One / Jev (decision models) ────────────────────────────────────
+    "SystemOneProvider",
+    "JevProvider",
+    "ProtectedSystemOneClient",
+    "create_protected_jev_client",
+    "JEV_SYSTEMONE_ENDPOINT",
+    "JEV_DEFAULT_MODEL",
+    "JEV_PRIMITIVES",
+    "PoisonedStateException",
+    "DecisionActionBlockedException",
     # ── Exceptions (re-exported from local_openai_compat_provider) ────────────
     "ThreatBlockedException",
     "ThreatChallengeException",
