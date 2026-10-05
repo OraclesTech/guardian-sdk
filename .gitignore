@@ -155,3 +155,6 @@ embeddings_backup_pre_v160/
 /demo/test_output.txt
 /demo/phase3_test_results.txt
 /run_phase3_tests.bat
+
+# Proprietary training methodology — kept private (lives in guardian-api)
+scripts/retrain_guardian_model.py
