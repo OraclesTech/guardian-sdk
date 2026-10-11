@@ -1,0 +1,3 @@
+# uv creates the environment at MCP start; never commit it (blows the directory's file limits).
+.venv/
+__pycache__/

@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "ethicore-guardian": {
-      "command": "uvx",
-      "args": ["--from", "ethicore-guardian-mcp==0.1.2", "guardian-mcp"],
+      "command": "uv",
+      "args": ["run", "--frozen", "--project", "${CLAUDE_PLUGIN_ROOT}", "guardian-mcp"],
       "env": {
         "ETHICORE_API_KEY": "${user_config.ETHICORE_API_KEY}"
       }
