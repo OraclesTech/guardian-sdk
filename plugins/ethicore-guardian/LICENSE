@@ -1,0 +1,22 @@
+Ethicore Guardian plugin — Proprietary License
+Copyright (c) 2026 Oracles Technologies LLC. All rights reserved.
+
+This plugin (the manifest, MCP configuration, README, and skill in this folder) is
+provided by Oracles Technologies LLC to enable installation and use of the Ethicore
+Engine(R) Guardian MCP server (the "Software"). Permission is granted to download,
+install, and use this plugin solely to access the Software.
+
+The Software (the ethicore-guardian-mcp package and the Ethicore Engine(R) Guardian
+service it connects to) is a paid product and is licensed separately; use requires a
+valid, current Guardian API key or license. Nothing in this plugin grants any right to
+the Software or service beyond what your paid plan or license provides.
+
+Ethicore Engine(R) is a registered mark of Oracles Technologies LLC.
+
+THE PLUGIN IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR
+IN CONNECTION WITH THE PLUGIN OR THE USE OF IT.
+
+Contact: support@oraclestechnologies.com
