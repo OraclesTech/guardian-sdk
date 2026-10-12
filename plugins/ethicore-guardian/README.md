@@ -1,4 +1,4 @@
-# Ethicore Guardian — AI Threat Screening
+# Ethicore Engine® Guardian — AI Threat Screening
 
 Runtime AI-threat screening for Claude. This plugin adds the Ethicore Engine® Guardian MCP
 server — four on-demand scans exposed as tools — plus a skill that tells Claude when to use them,
@@ -17,27 +17,51 @@ injection, jailbreaks, data/secret exfiltration, tool-call abuse, RAG/memory poi
 
 ## Use it
 
-Set your Guardian API key when you add the plugin. Then, in **Claude Code** (or a **local Cowork**
-session), Claude uses the Guardian tools to screen untrusted prompts, tool calls, tool output, and
-documents before taking action — blocking or challenging the dangerous ones.
+Set your Ethicore Engine® Guardian API key when you add the plugin. Then, in **Claude Code** (or a
+**local Cowork** session), Claude uses the Guardian tools to screen untrusted prompts, tool calls,
+tool output, and documents before taking action — blocking or challenging the dangerous ones.
 
 ## Paid feature
 
-Requires a **Pro-plan-or-higher** Guardian API key; free/community keys are refused. Get one at
-<https://portal.oraclestechnologies.com>. (Free access to Guardian remains available directly via the
-API/SDK — this plugin is the paid, agent-native convenience.)
+Requires a **Pro-plan-or-higher** Ethicore Engine® Guardian API key; free/community keys are refused.
+Get one at <https://portal.oraclestechnologies.com>. (Free access to Guardian remains available
+directly via the API/SDK — this plugin is the paid, agent-native convenience.)
 
 ## Data
 
-The plugin runs the published `ethicore-guardian-mcp` server (from PyPI) locally via `uvx`. The scans
-you invoke send the text, tool arguments, tool output, or documents you pass them to the Guardian API
-over TLS for threat analysis, authenticated with your API key. Payloads are analyzed transiently;
-Guardian does not retain them as training data, and does not send your data anywhere other than the
-Guardian API. Full privacy policy: <https://oraclestechnologies.com/legal/privacy>.
+The scans you invoke send the text, tool arguments, tool output, or documents you pass them to the
+Ethicore Engine® Guardian API over TLS for threat analysis, authenticated with your API key.
+Payloads are analyzed transiently; Guardian does not retain them as training data, and does not send
+your data anywhere other than the Guardian API. Full privacy policy:
+<https://oraclestechnologies.com/legal/privacy>. Terms of service:
+<https://oraclestechnologies.com/legal/terms>.
+
+## Security
+
+This plugin is built to the same standard as the product it fronts — it must not become an attack
+surface for the very threats Guardian defends against:
+
+- **Pinned, hash-verified supply chain.** The MCP server is launched with
+  `uv run --frozen --project ${CLAUDE_PLUGIN_ROOT} guardian-mcp`. `--frozen` forbids any
+  re-resolution: uv installs *exactly* the versions in the committed `uv.lock`, each verified against
+  its recorded hash. `pyproject.toml` pins `ethicore-guardian-mcp==0.1.2`. This closes the
+  rug-pull / dependency-substitution window that an unpinned `uvx <pkg>` one-liner would leave open.
+- **No secrets in the repo.** The API key is declared as a `sensitive` user-config value, so Claude
+  Code stores it in the OS secure-credential store (never in `settings.json` or any plugin file) and
+  injects it only into the server process's environment via `${user_config.ETHICORE_API_KEY}`.
+- **No shell interpolation.** The launcher is an exec-form `command` + static `args` array over
+  stdio — no shell parses the key or any path, so there is no command-injection surface.
+- **Least privilege.** The four tools are read-only (they return a verdict and never mutate an
+  account or write data), the plugin requests exactly one secret, and it ships no `bin/`, hooks, or
+  background monitors.
+- **Scoped egress.** The only network destination is the first-party Guardian API, over TLS, and
+  only for payloads you explicitly pass to a scan. Self-hosted (zero-egress) licensees run the engine
+  locally; this plugin targets the hosted edition.
 
 ## Requirements
 
-- [`uv`](https://docs.astral.sh/uv/) installed (provides `uvx`), Python 3.10+.
+- [`uv`](https://docs.astral.sh/uv/) installed (provides `uv run`), Python 3.10+. On first launch
+  `uv` builds the server's environment from the committed, hashed `uv.lock`.
 - Works in **Claude Code** and **local Cowork** sessions. Local MCP servers do not load in claude.ai
   chat — for an everywhere-available connector, use the hosted Guardian MCP connector instead.
 - Self-hosted (zero-egress) users run the license-delivered engine directly; this plugin targets the

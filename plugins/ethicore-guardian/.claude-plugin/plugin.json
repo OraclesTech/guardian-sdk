@@ -1,15 +1,31 @@
 {
   "name": "ethicore-guardian",
-  "displayName": "Ethicore Guardian — AI Threat Screening",
+  "displayName": "Ethicore Engine® Guardian — AI Threat Screening",
   "version": "0.1.0",
   "description": "Runtime AI-threat screening for Claude: analyze prompts, scan tool calls and outputs, and vet documents before you act, with BLOCK / CHALLENGE / ALLOW verdicts. Paid feature — needs a Pro-plan-or-higher Guardian API key.",
   "author": { "name": "Oracles Technologies LLC", "url": "https://oraclestechnologies.com/guardian" },
+  "homepage": "https://oraclestechnologies.com",
+  "repository": "https://github.com/OraclesTech/guardian-sdk",
   "license": "LicenseRef-Oracles-Proprietary",
+  "keywords": [
+    "security",
+    "ai-safety",
+    "prompt-injection",
+    "jailbreak",
+    "threat-detection",
+    "guardrails",
+    "mcp"
+  ],
+  "icon": "./.claude-plugin/icon.png",
+  "documentationUrl": "https://github.com/OraclesTech/guardian-sdk",
+  "supportUrl": "https://oraclestechnologies.com/guardian",
+  "privacyPolicyUrl": "https://oraclestechnologies.com/legal/privacy",
+  "termsOfServiceUrl": "https://oraclestechnologies.com/legal/terms",
   "userConfig": {
     "ETHICORE_API_KEY": {
       "type": "string",
-      "title": "Guardian API key (Pro plan or higher)",
-      "description": "Your Ethicore Guardian hosted API key on the Pro plan or higher. Get one at https://portal.oraclestechnologies.com — free/community keys are refused.",
+      "title": "Ethicore Engine® Guardian API key (Pro plan or higher)",
+      "description": "Your Ethicore Engine® Guardian hosted API key on the Pro plan or higher. Get one at https://portal.oraclestechnologies.com — free/community keys are refused.",
       "sensitive": true,
       "required": true
     }
