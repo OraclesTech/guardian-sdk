@@ -7,7 +7,7 @@ scipy>=1.7.0
 loguru>=0.7.3
 pydantic>=2.13.4
 python-dotenv>=1.2.2
-tenacity>=9.1.4
+tenacity>=9.2.1
 
 # Optional AI provider support (installed via extras_require)
 # openai>=1.0.0
