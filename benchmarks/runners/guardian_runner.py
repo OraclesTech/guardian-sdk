@@ -116,6 +116,13 @@ class GuardianRunner(BenchmarkRunner):
 
         # Benchmark-specific overrides only:
         config.cache_enabled = False        # measure each call independently
+        # Freeze online learning so attack samples cannot train the engine mid-run
+        # and shift the verdicts of later samples (a benchmark must be reproducible,
+        # and each sample is an INDEPENDENT measurement). Mirrors the attack-audit
+        # harness, which freezes the engine for the same reason.
+        for _frozen in ("auto_adversarial_learning", "structural_tool_learning"):
+            if hasattr(config, _frozen):
+                setattr(config, _frozen, False)
         config.log_level = "WARNING"        # suppress noise during runs
         config.enable_metrics = False       # no telemetry during benchmarks
         config.analysis_timeout_ms = self.timeout_ms
