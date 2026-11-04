@@ -118,7 +118,7 @@ multilingual = ["langdetect>=1.0.9"]
 #   macOS : brew install zbar
 #   Ubuntu: apt install libzbar0
 vision = [
-    "Pillow>=9.0.0",
+    "Pillow>=12.3.0",
     "pytesseract>=0.3.10",
     "pyzbar>=0.1.9",
     "numpy>=1.21.0",
@@ -149,6 +149,7 @@ video = [
 # Install: pip install "ethicore-engine-guardian[browser]"
 browser = [
     "beautifulsoup4>=4.12.0",
+    "soupsieve>=2.8.4",
     "lxml>=4.9.0",
 ]
 
@@ -172,9 +173,7 @@ voice = [
 # Without these packages the engine runs its built-in heuristic fallback,
 # which is still effective but less accurate than a fine-tuned classifier.
 ml = [
-    # <5 upper-bound: CVE-2026-1839 fix is 5.0.0rc3 (pre-release).
-    # Revisit and remove this cap once transformers 5.0.0 stable ships.
-    "transformers>=4.21.0,<6",
+    "transformers>=5.0.0",
     "torch>=1.12.0",
 ]
 
@@ -184,10 +183,10 @@ all = [
     "openai>=1.0.0",
     "anthropic>=0.8.0",
     "google-generativeai>=0.3.0",
-    "transformers>=4.21.0,<6",  # see ml extra comment above
+    "transformers>=5.0.0",
     "torch>=1.12.0",
     "langdetect>=1.0.9",
-    "Pillow>=9.0.0",
+    "Pillow>=12.3.0",
     "pytesseract>=0.3.10",
     "pyzbar>=0.1.9",
     "numpy>=1.21.0",
@@ -195,6 +194,7 @@ all = [
     "imagehash>=4.3.1",
     "opencv-python-headless>=4.8.0",
     "beautifulsoup4>=4.12.0",
+    "soupsieve>=2.8.4",
     "lxml>=4.9.0",
     # voice (Layer 14)
     "librosa>=0.10.0",
